@@ -1,0 +1,34 @@
+{
+    "name": "typo3/tailor",
+    "description": "A CLI tool to make extension handling easier, also uploading extensions to extensions.typo3.org (TER)",
+    "license": "MIT",
+    "authors": [{
+        "name": "Benni Mack",
+        "email": "benni@typo3.org",
+        "role": "Maintainer"
+    }],
+    "require": {
+        "php": "^7.1",
+        "ext-json": "*",
+        "ext-zip": "*",
+        "symfony/console": "^5.1",
+        "symfony/dotenv": "^5.1",
+        "symfony/http-client": "^5.1"
+    },
+    "require-dev": {
+        "typo3/coding-standards": "^0.2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TYPO3\\Tailor\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TYPO3\\Tailor\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
