@@ -4,56 +4,61 @@ declare(strict_types=1);
 
 /*
  * This file is part of the TYPO3 project  - inspiring people to share!
- * (c) 2020 Benni Mack
+ * (c) 2020 Oliver Bartsch
  *
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace TYPO3\Tailor\Command;
+namespace TYPO3\Tailor\Command\Auth;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
+use TYPO3\Tailor\HttpClientFactory;
 use TYPO3\Tailor\Service\FormatService;
 
 /**
- * Command for TER REST endpoint `GET /extension/{key}`
+ * Command for TER REST endpoint `POST /auth/token/revoke`
  */
-class ExtensionDetailsCommand extends AbstractClientRequestCommand
+class RevokeTokenCommand extends AbstractClientRequestCommand
 {
-    /** @var string */
-    protected $extensionKey;
-
     protected function configure(): void
     {
         parent::configure();
         $this
-            ->setDescription('Fetch details about an extension')
-            ->setResultFormat(FormatService::FORMAT_DETAIL)
-            ->addArgument('extensionkey', InputArgument::REQUIRED, 'The extension key');
+            ->setDescription('Revoke an access token for the TER')
+            ->setDefaultAuthMethod(HttpClientFactory::BASIC_AUTH)
+            ->setResultFormat(FormatService::FORMAT_NONE)
+            ->addArgument('token', InputArgument::REQUIRED, 'The access token to revoke.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->extensionKey = $input->getArgument('extensionkey');
         parent::execute($input, $output);
         return (int)$this->requestService->run();
     }
 
     protected function generateRequestConfiguration(): RequestConfiguration
     {
-        return new RequestConfiguration('GET', 'extension/' . $this->extensionKey);
+        return new RequestConfiguration(
+            'POST',
+            'auth/token/revoke',
+            [],
+            ['token' => $this->input->getArgument('token')],
+            ['Content-Type' => 'application/x-www-form-urlencoded']
+        );
     }
 
     protected function getMessages(): Messages
     {
         return new Messages(
-            sprintf('Fetching details for extension %s', $this->extensionKey),
-            sprintf('Successfully fetched extensions details for extension %s.', $this->extensionKey),
-            sprintf('Extension details for extension %s could not be fetched.', $this->extensionKey)
+            'Revoking an access token',
+            'Access token was successfully revoked.',
+            'Access token could not be revoked.'
         );
     }
 }

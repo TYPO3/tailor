@@ -14,12 +14,17 @@ use TYPO3\Tailor\Command as Command;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-\call_user_func(function() {
+\call_user_func(static function() {
     (new Symfony\Component\Dotenv\Dotenv())->loadEnv(__DIR__ . '/../.env', 'dist');
     $application = new Application('Tailor - Your TYPO3 Extension Helper', '1.0.0');
+    $application->add(new Command\Auth\CreateTokenCommand('ter:token:create'));
+    $application->add(new Command\Auth\RefreshTokenCommand('ter:token:refresh'));
+    $application->add(new Command\Auth\RevokeTokenCommand('ter:token:revoke'));
     $application->add(new Command\FindExtensionsCommand('ter:find'));
     $application->add(new Command\ExtensionDetailsCommand('ter:details'));
+    $application->add(new Command\VersionDetailsCommand('ter:version'));
     $application->add(new Command\RegisterExtensionCommand('ter:register'));
     $application->add(new Command\UploadExtensionVersionCommand('ter:publish'));
+    $application->add(new Command\TransferExtensionCommand('ter:transfer'));
     $application->run();
 });

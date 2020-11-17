@@ -4,54 +4,59 @@ declare(strict_types=1);
 
 /*
  * This file is part of the TYPO3 project  - inspiring people to share!
- * (c) 2020 Benni Mack
+ * (c) 2020 Oliver Bartsch
  *
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace TYPO3\Tailor\Command;
+namespace TYPO3\Tailor\Command\Auth;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
+use TYPO3\Tailor\HttpClientFactory;
 
 /**
- * Command for TER REST endpoint `POST /extension/{key}`
+ * Command for TER REST endpoint `POST /auth/token/refresh`
  */
-class RegisterExtensionCommand extends AbstractClientRequestCommand
+class RefreshTokenCommand extends AbstractClientRequestCommand
 {
-    /** @var string */
-    protected $extensionKey;
-
     protected function configure(): void
     {
         parent::configure();
         $this
-            ->setDescription('Register a new extension key in TER')
-            ->addArgument('extensionkey', InputArgument::REQUIRED, 'Define an extension key');
+            ->setDescription('Refresh an access token for the TER')
+            ->setDefaultAuthMethod(HttpClientFactory::BASIC_AUTH)
+            ->addArgument('token', InputArgument::REQUIRED, 'The refresh token, recieved with the access token.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->extensionKey = $input->getArgument('extensionkey');
         parent::execute($input, $output);
         return (int)$this->requestService->run();
     }
 
     protected function generateRequestConfiguration(): RequestConfiguration
     {
-        return new RequestConfiguration('POST', 'extension/' . $this->extensionKey);
+        return new RequestConfiguration(
+            'POST',
+            'auth/token/refresh',
+            [],
+            ['token' => $this->input->getArgument('token')],
+            ['Content-Type' => 'application/x-www-form-urlencoded']
+        );
     }
 
     protected function getMessages(): Messages
     {
         return new Messages(
-            sprintf('Registering the extension key %s', $this->extensionKey),
-            sprintf('Successfully fetched extensions details for extension %s.', $this->extensionKey),
-            sprintf('Could not register extension key %s.', $this->extensionKey)
+            'Refreshing an access token',
+            'Access token was successfully refreshed.',
+            'Access token could not be refreshed.'
         );
     }
 }

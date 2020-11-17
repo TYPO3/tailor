@@ -4,55 +4,57 @@ declare(strict_types=1);
 
 /*
  * This file is part of the TYPO3 project  - inspiring people to share!
- * (c) 2020 Benni Mack
+ * (c) 2020 Oliver Bartsch
  *
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace TYPO3\Tailor\Command;
+namespace TYPO3\Tailor\Command\Auth;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
-use TYPO3\Tailor\Service\FormatService;
+use TYPO3\Tailor\HttpClientFactory;
 
 /**
- * Command for TER REST endpoint `GET /extension`
+ * Command for TER REST endpoint `POST /auth/token`
  */
-class FindExtensionsCommand extends AbstractClientRequestCommand
+class CreateTokenCommand extends AbstractClientRequestCommand
 {
     protected function configure(): void
     {
         parent::configure();
         $this
-            ->setDescription('Fetch a list of extensions from TER')
-            ->setResultFormat(FormatService::FORMAT_TABLE)
+            ->setDescription('Request an access token for the TER')
+            ->setDefaultAuthMethod(HttpClientFactory::BASIC_AUTH)
             ->addOption(
-                'page',
+                'name',
                 '',
                 InputOption::VALUE_OPTIONAL,
-                'Page number for paginated result'
+                'The name for the new access token'
             )
             ->addOption(
-                'per-page',
+                'expires',
                 '',
                 InputOption::VALUE_OPTIONAL,
-                'FPer page limit for paginated result'
+                'The name for the new access token'
             )
             ->addOption(
-                'author',
+                'scope',
                 '',
                 InputOption::VALUE_OPTIONAL,
-                'Filter by a specific author. Use the TYPO3 username, e.g. georgringer'
+                'The scopes for the access token as comma separated list',
+                'extension:read,extension:write'
             )
             ->addOption(
-                'typo3-version',
+                'extensions',
                 '',
                 InputOption::VALUE_OPTIONAL,
-                'Only list extensions compatible with a specific major TYPO3 version, use it like --typo3-version=10'
+                'The extensions, the access token should have access to'
             );
     }
 
@@ -64,15 +66,15 @@ class FindExtensionsCommand extends AbstractClientRequestCommand
 
     protected function generateRequestConfiguration(): RequestConfiguration
     {
-        return new RequestConfiguration('GET', 'extension', $this->getQuery($this->input->getOptions()));
+        return new RequestConfiguration('POST', 'auth/token', $this->getQuery($this->input->getOptions()));
     }
 
     protected function getMessages(): Messages
     {
         return new Messages(
-            'Fetching registered remote extensions',
-            'Successfully fetched remote extensions.',
-            'Could not fetch remote extensions.'
+            'Creating an access token',
+            'Access token was successfully created.',
+            'Access token could not be created.'
         );
     }
 
@@ -80,17 +82,17 @@ class FindExtensionsCommand extends AbstractClientRequestCommand
     {
         $query = [];
 
-        if ($options['page'] !== null) {
-            $query['page'] = $options['page'];
+        if ($options['name'] !== null) {
+            $query['name'] = $options['name'];
         }
-        if ($options['per-page'] !== null) {
-            $query['per_page'] = $options['per-page'];
+        if ($options['expires'] !== null) {
+            $query['expires'] = $options['expires'];
         }
-        if ($options['author'] !== null) {
-            $query['filter']['username'] = $options['author'];
+        if ($options['scope'] !== null) {
+            $query['scope'] = $options['scope'];
         }
-        if ($options['typo3-version'] !== null) {
-            $query['filter']['typo3_version'] = $options['typo3-version'];
+        if ($options['extensions'] !== null) {
+            $query['extensions'] = $options['extensions'];
         }
 
         return $query;
