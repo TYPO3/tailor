@@ -34,6 +34,11 @@ All commands provide the `-r, --raw` option. If set, the raw result will
 be returned. This can be used for further processing e.g. by using some
 JSON processor.
 
+Additionally, all commands provide the `-f, --force` option. This can be
+used to skip confirmation dialoges which are present in e.g. commands
+which delete a resource. Usefull for automating workflows by combining
+multiple commands without the need for manual actions (confirmations).
+
 ### Manage your personal access token
 
 Use the `ter:token:create` command to create a new token:
@@ -84,13 +89,37 @@ It's possible to transfer one of your extensions to another user.
 Therefore, use the `ter:transfer` command providing the extension key
 to be transfered and the TYPO3.org username of the recipient.
 
+Since you won't have any access to the extension afterwards, the
+command asks for your confirmation before sending the order to the
+REST API.
+
     ./vendor/bin/tailor ter:transfer my_extension some_user
     
 This transfers the extension `my_extension`  to the user `some_user`
 and returns following confirmation:
 
     Key: my_extension
-    Owner: some_user
+    Owner: some_user    
+
+**Note**: For automated workflows the confirmation can be skipped
+with the `-f, --force` option.
+
+### Delete / abandon an extension
+
+You can easily delete / abandon extensions with Tailor using the
+`ter:delete` command. This either removes the extension entirely
+or just abandons it if the extension still has public version.
+
+Since you won't have any access to the extension afterwards, the
+command asks for your confirmation before sending the order to the
+REST API.
+
+    ./vendor/bin/tailor ter:delete my_extension
+    
+This will delete / abandon the extension `my_extension`.
+
+**Note**: For automated workflows the confirmation can be skipped
+with the `-f, --force` option.
 
 ### Publish a new version of an extension to TER
 

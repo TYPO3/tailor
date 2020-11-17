@@ -16,6 +16,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
@@ -37,6 +38,9 @@ abstract class AbstractClientRequestCommand extends Command
     /** @var InputInterface */
     protected $input;
 
+    /** @var SymfonyStyle */
+    protected $io;
+
     /** @var RequestService */
     protected $requestService;
 
@@ -44,11 +48,14 @@ abstract class AbstractClientRequestCommand extends Command
     {
         // General option to get a raw result. Can be used for further processing.
         $this->addOption('raw', 'r', InputOption::VALUE_OPTIONAL, 'Return result as raw object (e.g. json)', false);
+        // General option to force execution. This skips all confirmation questions in the commands.
+        $this->addOption('force', 'f', InputOption::VALUE_OPTIONAL, 'Force execution', false);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
+        $this->io = new SymfonyStyle($input, $output);
 
         $requestConfiguration = $this->getRequestConfiguration();
         $requestConfiguration
@@ -57,8 +64,20 @@ abstract class AbstractClientRequestCommand extends Command
 
         $this->requestService = new RequestService(
             $requestConfiguration,
-            new FormatService(new SymfonyStyle($input, $output), $this->getMessages(), $this->resultFormat)
+            new FormatService($this->io, $this->getMessages(), $this->resultFormat)
         );
+    }
+
+    protected function comfirmExecution(bool $default = true): bool
+    {
+        if (!($this->input->getOption('force') ?? true)
+            && !$this->io->askQuestion(new ConfirmationQuestion($this->getMessages()->getConfirmation(), $default))
+        ) {
+            $this->io->writeln('<info>Execution aborted.</info>');
+            return false;
+        }
+
+        return true;
     }
 
     protected function setDefaultAuthMethod(int $defaultAuthMethod): self

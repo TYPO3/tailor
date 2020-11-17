@@ -56,7 +56,10 @@ class RequestService
             $status = $response->getStatusCode();
 
             if ($this->requestConfiguration->isRaw()) {
-                $this->formatService->write($content);
+                // If no content is provided in the response, usually on 200
+                // responses for requests which delete the remote resource,
+                // we ensure to return at least the status code on the CLI.
+                $this->formatService->write($content ?: json_encode(['status' =>  $status]));
                 return true;
             }
 

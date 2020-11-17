@@ -33,7 +33,7 @@ class TransferExtensionCommand extends AbstractClientRequestCommand
     {
         parent::configure();
         $this
-            ->setDescription('Fetch details about an extension version')
+            ->setDescription('Transfer ownership of an extension key')
             ->addArgument(
                 'extensionkey',
                 InputArgument::REQUIRED,
@@ -51,7 +51,7 @@ class TransferExtensionCommand extends AbstractClientRequestCommand
         $this->extensionKey = $input->getArgument('extensionkey');
         $this->username = $input->getArgument('username');
         parent::execute($input, $output);
-        return (int)$this->requestService->run();
+        return $this->comfirmExecution() ? (int)$this->requestService->run() : 0;
     }
 
     protected function getRequestConfiguration(): RequestConfiguration
@@ -64,7 +64,8 @@ class TransferExtensionCommand extends AbstractClientRequestCommand
         return new Messages(
             sprintf('Transfering extension %s to %s', $this->extensionKey, $this->username),
             sprintf('Extension %s successfully transfered to %s.', $this->extensionKey, $this->username),
-            sprintf('Could not transfer extension key %s to %s.', $this->extensionKey, $this->username)
+            sprintf('Could not transfer extension key %s to %s.', $this->extensionKey, $this->username),
+            sprintf('Are you sure you want to transfer the extension %s to %s?', $this->extensionKey, $this->username)
         );
     }
 }

@@ -26,11 +26,19 @@ class Messages
     /** @var string */
     protected $failure;
 
-    public function __construct(string $title = '', string $success = '', string $failure = '')
-    {
+    /** @var string */
+    protected $confirmation;
+
+    public function __construct(
+        string $title = '',
+        string $success = '',
+        string $failure = '',
+        string $confirmation = ''
+    ) {
         $this->title = $title ?: 'Starting the command';
         $this->success = $success ?: 'Request was successful.';
         $this->failure = $failure ?: 'Request has failed.';
+        $this->confirmation = $confirmation ?: 'Are you sure you want to continue?';
     }
 
     public function getTitle(): string
@@ -46,5 +54,10 @@ class Messages
     public function getFailure(): string
     {
         return $this->failure;
+    }
+
+    public function getConfirmation(): string
+    {
+        return $this->confirmation;
     }
 }
