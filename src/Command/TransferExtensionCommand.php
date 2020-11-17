@@ -43,7 +43,7 @@ class TransferExtensionCommand extends AbstractClientRequestCommand
             ->addArgument(
                 'username',
                 InputArgument::REQUIRED,
-                'The TYPO3 username the extension should be transfered to, e.g. georgringer'
+                'The TYPO3 username the extension should be transfered to'
             );
     }
 

@@ -44,7 +44,7 @@ class FindExtensionsCommand extends AbstractClientRequestCommand
                 'author',
                 '',
                 InputOption::VALUE_OPTIONAL,
-                'Filter by a specific author. Use the TYPO3 username, e.g. georgringer'
+                'Filter by a specific author. Use the TYPO3 username.'
             )
             ->addOption(
                 'typo3-version',
