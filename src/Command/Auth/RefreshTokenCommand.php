@@ -13,8 +13,6 @@ declare(strict_types=1);
 namespace TYPO3\Tailor\Command\Auth;
 
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
