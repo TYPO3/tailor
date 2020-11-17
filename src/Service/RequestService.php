@@ -71,7 +71,7 @@ class RequestService
                 );
             }
 
-        } catch (ExceptionInterface|FormDataProcessingException|RequiredOptionMissingException $e) {
+        } catch (ExceptionInterface|\InvalidArgumentException $e) {
             $this->formatService->error('An error occurred: ' . $e->getMessage());
             return false;
         }

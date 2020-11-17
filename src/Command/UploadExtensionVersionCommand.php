@@ -39,11 +39,8 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
     /** @var string */
     protected $version;
 
-    /** @var array */
-    protected $filesToRemove = [];
-
-    /** @var array */
-    protected $directoriesToRemove = [];
+    /** @var string */
+    protected $transactionPath;
 
     protected function configure(): void
     {
@@ -86,6 +83,12 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
     {
         $this->extensionKey = $input->getArgument('extensionkey');
         $this->version = $input->getArgument('version');
+        $this->transactionPath = rtrim(realpath('.'), '/') . '/version-upload';
+
+        if (!is_dir($this->transactionPath) && !mkdir($concurrent = $this->transactionPath) && !is_dir($concurrent)) {
+            throw new \RuntimeException(sprintf('Directory \'%s\' could not be created.', $concurrent));
+        }
+
         parent::execute($input, $output);
         return (int)$this->requestService->run();
     }
@@ -139,7 +142,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
             }
             // Check if we deal with a remote file
             if (preg_match('/^http[s]?:\/\//', $filename)) {
-                $tempFilename = 'remote-archive-' . $this->getVersionFilename(true)  . '.zip';
+                $tempFilename = $this->transactionPath . '/remote-archive-' . $this->getVersionFilename(true)  . '.zip';
                 // Save the remote file temporary on local disk for validation and creation of the final ZipArchive
                 if (file_put_contents($tempFilename, fopen($filename, 'rb')) === false) {
                     throw new FormDataProcessingException('Could not processed remote file.', 1605562356);
@@ -156,7 +159,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
                 throw new FormDataProcessingException('No files in given directory.', 1605562663);
             }
             $firstNameIndex = $zipArchive->getNameIndex(0) ?: '';
-            $extractPath = 'temp-' . $this->getVersionFilename(true);
+            $extractPath = $this->transactionPath . '/temp-' . $this->getVersionFilename(true);
             // If we deal with e.g. Github release zip files, the extension is wrapped into another
             // directory. Therefore we have to add the root path here since the final ZipArchive is
             // required to provide all extension files on root level.
@@ -166,9 +169,6 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
             $zipArchive->extractTo($extractPath);
             $zipArchive->close();
             $this->createZipArchive($extractPath . $rootFolderPath);
-            // Add files and directories for cleanup
-            $this->directoriesToRemove[] = $extractPath;
-            $this->filesToRemove[] = $filename;
         }
 
         $versionFilePath = realpath($this->getVersionFilename());
@@ -176,8 +176,6 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
         if (!$versionFilePath) {
             throw new FormDataProcessingException('Could not find necessary version file.', 1605562674);
         }
-
-        $this->filesToRemove[] = $versionFilePath;
 
         return new FormDataPart([
             'description' => (string)$options['description'],
@@ -293,29 +291,22 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
      */
     protected function getVersionFilename(bool $hash = false): string
     {
-        $filename = sprintf('%s_%s.zip', $this->extensionKey, $this->version);
+        $filename = sprintf('%s/%s_%s.zip', $this->transactionPath, $this->extensionKey, $this->version);
 
         return $hash ? md5($filename): $filename;
     }
 
     /**
-     * Clean up all marked files and directories. This usually
-     * includes the final ZipArchive but not the given path
-     * from which the ZipArchive was created.
+     * Clean the transaction directory and all its content.
+     * This includes the final ZipArchive, but not the given
+     * path from which the ZipArchive was created.
+     *
+     * Note: using __destruct(), we ensure the transaction
+     * directory will be removed in any case. Even if an
+     * exception is thrown.
      */
-    protected function cleanUp(): void
-    {
-        foreach ($this->filesToRemove as $file) {
-            unlink($file);
-        }
-
-        foreach ($this->directoriesToRemove as $directory) {
-            $this->removeDirectory($directory);
-        }
-    }
-
     public function __destruct()
     {
-        $this->cleanUp();
+        $this->removeDirectory(realpath($this->transactionPath));
     }
 }
