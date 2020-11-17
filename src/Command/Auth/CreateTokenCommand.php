@@ -23,42 +23,23 @@ use TYPO3\Tailor\HttpClientFactory;
  */
 class CreateTokenCommand extends AbstractClientRequestCommand
 {
+    private const ALLOWED_QUERY_OPTIONS = ['name', 'expires', 'scope', 'extensions'];
+
     protected function configure(): void
     {
         parent::configure();
         $this
             ->setDescription('Request an access token for the TER')
             ->setDefaultAuthMethod(HttpClientFactory::BASIC_AUTH)
-            ->addOption(
-                'name',
-                '',
-                InputOption::VALUE_OPTIONAL,
-                'The name for the new access token'
-            )
-            ->addOption(
-                'expires',
-                '',
-                InputOption::VALUE_OPTIONAL,
-                'The name for the new access token'
-            )
-            ->addOption(
-                'scope',
-                '',
-                InputOption::VALUE_OPTIONAL,
-                'The scopes for the access token as comma separated list',
-                'extension:read,extension:write'
-            )
-            ->addOption(
-                'extensions',
-                '',
-                InputOption::VALUE_OPTIONAL,
-                'The extensions, the access token should have access to'
-            );
+            ->addOption('name', '', InputOption::VALUE_OPTIONAL, 'Name of the access token')
+            ->addOption('expires', '', InputOption::VALUE_OPTIONAL, 'Expiration in seconds')
+            ->addOption('scope', '', InputOption::VALUE_OPTIONAL, 'Scopes as comma separated list', 'extension:read,extension:write')
+            ->addOption('extensions', '', InputOption::VALUE_OPTIONAL, 'Extensions, the access token should have access to');
     }
 
     protected function getRequestConfiguration(): RequestConfiguration
     {
-        return new RequestConfiguration('POST', 'auth/token', $this->getQuery($this->input->getOptions()));
+        return new RequestConfiguration('POST', 'auth/token', $this->getQuery());
     }
 
     protected function getMessages(): Messages
@@ -70,21 +51,15 @@ class CreateTokenCommand extends AbstractClientRequestCommand
         );
     }
 
-    protected function getQuery(array $options): array
+    protected function getQuery(): array
     {
+        $options = $this->input->getOptions();
         $query = [];
 
-        if ($options['name'] !== null) {
-            $query['name'] = $options['name'];
-        }
-        if ($options['expires'] !== null) {
-            $query['expires'] = $options['expires'];
-        }
-        if ($options['scope'] !== null) {
-            $query['scope'] = $options['scope'];
-        }
-        if ($options['extensions'] !== null) {
-            $query['extensions'] = $options['extensions'];
+        foreach (self::ALLOWED_QUERY_OPTIONS as $name) {
+            if ($options[$name] !== null) {
+                $query[$name] = $options[$name];
+            }
         }
 
         return $query;

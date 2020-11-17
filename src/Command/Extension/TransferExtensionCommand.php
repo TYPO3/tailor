@@ -10,11 +10,12 @@ declare(strict_types=1);
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace TYPO3\Tailor\Command;
+namespace TYPO3\Tailor\Command\Extension;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
 
@@ -35,16 +36,8 @@ class TransferExtensionCommand extends AbstractClientRequestCommand
         $this
             ->setDescription('Transfer ownership of an extension key')
             ->setConfirmationRequired(true)
-            ->addArgument(
-                'extensionkey',
-                InputArgument::REQUIRED,
-                'The extension key'
-            )
-            ->addArgument(
-                'username',
-                InputArgument::REQUIRED,
-                'The TYPO3 username the extension should be transfered to'
-            );
+            ->addArgument('extensionkey', InputArgument::REQUIRED, 'The extension key')
+            ->addArgument('username', InputArgument::REQUIRED, 'The TYPO3 username the extension should be transfered to');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

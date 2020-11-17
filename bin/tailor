@@ -10,7 +10,7 @@
  */
 
 use Symfony\Component\Console\Application;
-use TYPO3\Tailor\Command as Command;
+use TYPO3\Tailor\Command;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -20,12 +20,13 @@ require __DIR__ . '/../vendor/autoload.php';
     $application->add(new Command\Auth\CreateTokenCommand('ter:token:create'));
     $application->add(new Command\Auth\RefreshTokenCommand('ter:token:refresh'));
     $application->add(new Command\Auth\RevokeTokenCommand('ter:token:revoke'));
-    $application->add(new Command\DeleteExtensionCommand('ter:delete'));
-    $application->add(new Command\ExtensionDetailsCommand('ter:details'));
-    $application->add(new Command\FindExtensionsCommand('ter:find'));
-    $application->add(new Command\RegisterExtensionCommand('ter:register'));
-    $application->add(new Command\TransferExtensionCommand('ter:transfer'));
-    $application->add(new Command\UploadExtensionVersionCommand('ter:publish'));
-    $application->add(new Command\VersionDetailsCommand('ter:version'));
+    $application->add(new Command\Extension\DeleteExtensionCommand('ter:delete'));
+    $application->add(new Command\Extension\ExtensionDetailsCommand('ter:details'));
+    $application->add(new Command\Extension\FindExtensionsCommand('ter:find'));
+    $application->add(new Command\Extension\RegisterExtensionCommand('ter:register'));
+    $application->add(new Command\Extension\TransferExtensionCommand('ter:transfer'));
+    $application->add(new Command\Extension\UpdateExtensionCommand('ter:update'));
+    $application->add(new Command\Extension\UploadExtensionVersionCommand('ter:publish'));
+    $application->add(new Command\Extension\VersionDetailsCommand('ter:version'));
     $application->run();
 });

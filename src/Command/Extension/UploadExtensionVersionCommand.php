@@ -10,7 +10,7 @@ declare(strict_types=1);
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace TYPO3\Tailor\Command;
+namespace TYPO3\Tailor\Command\Extension;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
+use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
 use TYPO3\Tailor\Exception\RequiredOptionMissingException;
@@ -46,34 +47,11 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
         $this
             ->setDescription('Publishes a new version of an extension to TER')
             ->setResultFormat(FormatService::FORMAT_DETAIL)
-            ->addArgument(
-                'extensionkey',
-                InputArgument::REQUIRED,
-                'The extension key'
-            )
-            ->addArgument(
-                'version',
-                InputArgument::REQUIRED,
-                'The version to publish, e.g. 1.2.3'
-            )
-            ->addOption(
-                'path',
-                '',
-                InputOption::VALUE_REQUIRED,
-                'Path to the extension folder'
-            )
-            ->addOption(
-                'artefact',
-                '',
-                InputOption::VALUE_REQUIRED,
-                'Path or URL to a zip file'
-            )
-            ->addOption(
-                'comment',
-                '',
-                InputOption::VALUE_OPTIONAL,
-                'Upload comment of the new version (e.g. release notes)'
-            );
+            ->addArgument('extensionkey', InputArgument::REQUIRED, 'The extension key')
+            ->addArgument('version', InputArgument::REQUIRED, 'The version to publish, e.g. 1.2.3')
+            ->addOption('path', '', InputOption::VALUE_REQUIRED, 'Path to the extension folder')
+            ->addOption('artefact', '', InputOption::VALUE_REQUIRED, 'Path or URL to a zip file')
+            ->addOption('comment', '', InputOption::VALUE_OPTIONAL, 'Upload comment of the new version (e.g. release notes)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -10,18 +10,20 @@ declare(strict_types=1);
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace TYPO3\Tailor\Command;
+namespace TYPO3\Tailor\Command\Extension;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
+use TYPO3\Tailor\Service\FormatService;
 
 /**
- * Command for TER REST endpoint `POST /extension/{key}`
+ * Command for TER REST endpoint `GET /extension/{key}`
  */
-class RegisterExtensionCommand extends AbstractClientRequestCommand
+class ExtensionDetailsCommand extends AbstractClientRequestCommand
 {
     /** @var string */
     protected $extensionKey;
@@ -30,8 +32,9 @@ class RegisterExtensionCommand extends AbstractClientRequestCommand
     {
         parent::configure();
         $this
-            ->setDescription('Register a new extension key in TER')
-            ->addArgument('extensionkey', InputArgument::REQUIRED, 'Define an extension key');
+            ->setDescription('Fetch details about an extension')
+            ->setResultFormat(FormatService::FORMAT_DETAIL)
+            ->addArgument('extensionkey', InputArgument::REQUIRED, 'The extension key');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -42,15 +45,15 @@ class RegisterExtensionCommand extends AbstractClientRequestCommand
 
     protected function getRequestConfiguration(): RequestConfiguration
     {
-        return new RequestConfiguration('POST', 'extension/' . $this->extensionKey);
+        return new RequestConfiguration('GET', 'extension/' . $this->extensionKey);
     }
 
     protected function getMessages(): Messages
     {
         return new Messages(
-            sprintf('Registering the extension key %s', $this->extensionKey),
-            sprintf('Successfully registered extension key %s.', $this->extensionKey),
-            sprintf('Could not register extension key %s.', $this->extensionKey)
+            sprintf('Fetching details for extension %s', $this->extensionKey),
+            sprintf('Successfully fetched extensions details for extension %s.', $this->extensionKey),
+            sprintf('Extension details for extension %s could not be fetched.', $this->extensionKey)
         );
     }
 }

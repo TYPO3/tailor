@@ -45,8 +45,6 @@ abstract class AbstractClientRequestCommand extends Command
     {
         // General option to get a raw result. Can be used for further processing.
         $this->addOption('raw', 'r', InputOption::VALUE_OPTIONAL, 'Return result as raw object (e.g. json)', false);
-        // General option to force execution. This skips all confirmation questions in the commands.
-        $this->addOption('force', 'f', InputOption::VALUE_OPTIONAL, 'Force execution', false);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -55,7 +53,6 @@ abstract class AbstractClientRequestCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if ($this->confirmationRequired
-            && !($this->input->getOption('force') ?? true)
             && !$io->askQuestion(new ConfirmationQuestion($this->getMessages()->getConfirmation()))
         ) {
             $io->writeln('<info>Execution aborted.</info>');
