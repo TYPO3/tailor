@@ -90,7 +90,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
         return (int)$this->requestService->run();
     }
 
-    protected function generateRequestConfiguration(): RequestConfiguration
+    protected function getRequestConfiguration(): RequestConfiguration
     {
         $formDataPart = $this->getFormDataPart($this->input->getOptions());
 
@@ -114,7 +114,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
 
     /**
      * Create FormDataPart from given options.
-     * This also creates a proper DataPart (containing the version ZipArchive)
+     * This also creates a proper DataPart (containing the version as ZipArchive)
      * from either a given path or an existing ZipArchive (local or remote).
      *
      * @param array $options
@@ -135,7 +135,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
         } else {
             $filename = strtolower(trim((string)$options['artefact']));
             if (!preg_match('/\.zip$/', $filename)) {
-                throw new FormDataProcessingException('Can only process \'.zip\' files', 1605562904);
+                throw new FormDataProcessingException('Can only process \'.zip\' files.', 1605562904);
             }
             // Check if we deal with a remote file
             if (preg_match('/^http[s]?:\/\//', $filename)) {
@@ -161,7 +161,8 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
             // directory. Therefore we have to add the root path here since the final ZipArchive is
             // required to provide all extension files on root level.
             $rootFolderPath = preg_match('/\/$/', $firstNameIndex) ? '/' . trim($firstNameIndex, '/') : '';
-            // Extract the given zip file so validation is possible
+            // Extract the given zip file so we can validate the content
+            // and create a proper ZipArchive for the request.
             $zipArchive->extractTo($extractPath);
             $zipArchive->close();
             $this->createZipArchive($extractPath . $rootFolderPath);
@@ -189,7 +190,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
      * Create the final ZipArchive for the given directory after validation
      * of the given files (e.g. ext_emconf.php).
      *
-     * @param string $path Path to the directory, whose contest should be added to the ZipArchive
+     * @param string $path Path to the directory, whose content should be added to the ZipArchive
      * @return ZipArchive The generated ZipArchive
      */
     protected function createZipArchive(string $path): ZipArchive
@@ -260,7 +261,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
     }
 
     /**
-     * Remove a directory and its contents recursive
+     * Remove a directory and its content recursive
      *
      * @param string $directory The directory to remove
      * @return bool TRUE if the directory was removed successfully, FALSE otherwise

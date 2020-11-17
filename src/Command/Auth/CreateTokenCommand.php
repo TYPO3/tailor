@@ -64,7 +64,7 @@ class CreateTokenCommand extends AbstractClientRequestCommand
         return (int)$this->requestService->run();
     }
 
-    protected function generateRequestConfiguration(): RequestConfiguration
+    protected function getRequestConfiguration(): RequestConfiguration
     {
         return new RequestConfiguration('POST', 'auth/token', $this->getQuery($this->input->getOptions()));
     }

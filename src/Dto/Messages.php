@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace TYPO3\Tailor\Dto;
 
 /**
- * DTO of console messages for an individual request
+ * DTO for console messages of an individual request
  */
 class Messages
 {
@@ -28,7 +28,7 @@ class Messages
 
     public function __construct(string $title = '', string $success = '', string $failure = '')
     {
-        $this->title = $title ?: 'Starting the command.';
+        $this->title = $title ?: 'Starting the command';
         $this->success = $success ?: 'Request was successful.';
         $this->failure = $failure ?: 'Request has failed.';
     }

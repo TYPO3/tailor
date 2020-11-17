@@ -48,7 +48,7 @@ class VersionDetailsCommand extends AbstractClientRequestCommand
         return (int)$this->requestService->run();
     }
 
-    protected function generateRequestConfiguration(): RequestConfiguration
+    protected function getRequestConfiguration(): RequestConfiguration
     {
         return new RequestConfiguration('GET', 'extension/' . $this->extensionKey . '/' . $this->version);
     }
@@ -57,8 +57,8 @@ class VersionDetailsCommand extends AbstractClientRequestCommand
     {
         return new Messages(
             sprintf('Fetching details about version %s of extension %s', $this->version, $this->extensionKey),
-            sprintf('Successfully fetched version details for version %s of extension %s.', $this->version, $this->extensionKey),
-            sprintf('Could not fetch version details for version %s of extension %s.', $this->version, $this->extensionKey)
+            sprintf('Successfully fetched details for version %s of extension %s.', $this->version, $this->extensionKey),
+            sprintf('Could not fetch details for version %s of extension %s.', $this->version, $this->extensionKey)
         );
     }
 }

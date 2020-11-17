@@ -16,7 +16,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\Tailor\Dto\Messages;
 
 /**
- * Service for formatting the console output especially the response content
+ * Service for formatting the console output, especially the response content
  */
 class FormatService
 {
@@ -63,7 +63,7 @@ class FormatService
 
     public function writeFailure(string $reason): void
     {
-        $this->io->warning($this->messages->getFailure() . PHP_EOL . 'Reason: '.  $reason);
+        $this->io->warning($this->messages->getFailure() . PHP_EOL . 'Reason: ' .  $reason);
     }
 
     public function formatResult(array $content): void
@@ -163,7 +163,7 @@ class FormatService
         }
 
         if (!empty($filter['typo3_version'])) {
-            $content .= ', ' . $filter['typo3_version']. ' (TYPO3 version)';
+            $content .= ', ' . $filter['typo3_version'] . ' (TYPO3 version)';
         }
 
         return trim($content, ', ');

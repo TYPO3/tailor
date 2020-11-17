@@ -50,7 +50,7 @@ abstract class AbstractClientRequestCommand extends Command
     {
         $this->input = $input;
 
-        $requestConfiguration = $this->generateRequestConfiguration();
+        $requestConfiguration = $this->getRequestConfiguration();
         $requestConfiguration
             ->setRaw($input->getOption('raw') !== false)
             ->setDefaultAuthMethod($this->defaultAuthMethod);
@@ -73,6 +73,6 @@ abstract class AbstractClientRequestCommand extends Command
         return $this;
     }
 
-    abstract protected function generateRequestConfiguration(): RequestConfiguration;
+    abstract protected function getRequestConfiguration(): RequestConfiguration;
     abstract protected function getMessages(): Messages;
 }

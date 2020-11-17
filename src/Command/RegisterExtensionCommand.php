@@ -41,7 +41,7 @@ class RegisterExtensionCommand extends AbstractClientRequestCommand
         return (int)$this->requestService->run();
     }
 
-    protected function generateRequestConfiguration(): RequestConfiguration
+    protected function getRequestConfiguration(): RequestConfiguration
     {
         return new RequestConfiguration('POST', 'extension/' . $this->extensionKey);
     }
@@ -50,7 +50,7 @@ class RegisterExtensionCommand extends AbstractClientRequestCommand
     {
         return new Messages(
             sprintf('Registering the extension key %s', $this->extensionKey),
-            sprintf('Successfully fetched extensions details for extension %s.', $this->extensionKey),
+            sprintf('Successfully registered extension key %s.', $this->extensionKey),
             sprintf('Could not register extension key %s.', $this->extensionKey)
         );
     }

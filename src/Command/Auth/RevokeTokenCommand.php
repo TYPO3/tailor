@@ -42,7 +42,7 @@ class RevokeTokenCommand extends AbstractClientRequestCommand
         return (int)$this->requestService->run();
     }
 
-    protected function generateRequestConfiguration(): RequestConfiguration
+    protected function getRequestConfiguration(): RequestConfiguration
     {
         return new RequestConfiguration(
             'POST',

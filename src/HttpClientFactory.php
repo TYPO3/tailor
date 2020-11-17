@@ -16,6 +16,9 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use TYPO3\Tailor\Dto\RequestConfiguration;
 
+/**
+ * Factory for creating a Symfony HTTP client
+ */
 final class HttpClientFactory
 {
     public const BEARER_AUTH = 1;

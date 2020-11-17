@@ -13,13 +13,14 @@ declare(strict_types=1);
 namespace TYPO3\Tailor\Service;
 
 use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use TYPO3\Tailor\Dto\RequestConfiguration;
+use TYPO3\Tailor\Exception\FormDataProcessingException;
+use TYPO3\Tailor\Exception\RequiredOptionMissingException;
 use TYPO3\Tailor\HttpClientFactory;
 
 /**
- * Service for performing HTTP request to the TER REST API
+ * Service for performing HTTP requests to the TER REST API
  */
 class RequestService
 {
@@ -40,8 +41,8 @@ class RequestService
     }
 
     /**
-     * Run the request by the given request configuration and format
-     * the result using the FormatService.
+     * Run the request by the given request configuration and
+     * format the result using the FormatService.
      *
      * @return bool
      */
@@ -70,7 +71,7 @@ class RequestService
                 );
             }
 
-        } catch (HttpExceptionInterface|TransportExceptionInterface $e) {
+        } catch (ExceptionInterface|FormDataProcessingException|RequiredOptionMissingException $e) {
             $this->formatService->error('An error occurred: ' . $e->getMessage());
             return false;
         }
