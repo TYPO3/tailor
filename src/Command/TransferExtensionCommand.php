@@ -62,8 +62,8 @@ class TransferExtensionCommand extends AbstractClientRequestCommand
     protected function getMessages(): Messages
     {
         return new Messages(
-            sprintf('Transfering extension %s to %s', $this->extensionKey, $this->username),
-            sprintf('Extension %s successfully transfered to %s.', $this->extensionKey, $this->username),
+            sprintf('Transferring extension %s to %s', $this->extensionKey, $this->username),
+            sprintf('Extension %s successfully transferred to %s.', $this->extensionKey, $this->username),
             sprintf('Could not transfer extension key %s to %s.', $this->extensionKey, $this->username),
             sprintf('Are you sure you want to transfer the extension %s to %s?', $this->extensionKey, $this->username)
         );

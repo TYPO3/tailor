@@ -26,6 +26,7 @@ use TYPO3\Tailor\Dto\RequestConfiguration;
 use TYPO3\Tailor\Exception\FormDataProcessingException;
 use TYPO3\Tailor\Exception\RequiredOptionMissingException;
 use TYPO3\Tailor\Service\FormatService;
+use TYPO3\Tailor\Validation\VersionValidator;
 use ZipArchive;
 
 /**
@@ -221,7 +222,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
             }
 
             if ($filename === 'ext_emconf.php') {
-                $emConfAvailable = $this->validateEmConf($fileRealPath);
+                $emConfAvailable = (new VersionValidator($fileRealPath))->isValid($this->version);
             }
 
             // Add the files including their directories
@@ -235,29 +236,6 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
         $zipArchive->close();
 
         return $zipArchive;
-    }
-
-    /**
-     * Check if the version in ext_emconf matches the given version
-     * and a proper TYPO3 dependency is included.
-     *
-     * @param string $filePath Path to the ext_emconf.php file
-     * @return bool TRUE if the ext_emconf is valid, FALSE otherwise
-     */
-    protected function validateEmConf(string $filePath): bool
-    {
-        $_EXTKEY = $this->extensionKey;
-        include $filePath;
-        if (!isset($EM_CONF[$_EXTKEY])) {
-            return false;
-        }
-        if (!isset($EM_CONF[$_EXTKEY]['version'], $EM_CONF[$_EXTKEY]['constraints']['depends']['typo3'])
-            || (string)$EM_CONF[$_EXTKEY]['version'] !== $this->version
-        ) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
