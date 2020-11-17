@@ -34,12 +34,6 @@ class RefreshTokenCommand extends AbstractClientRequestCommand
             ->addArgument('token', InputArgument::REQUIRED, 'The refresh token, recieved with the access token.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        parent::execute($input, $output);
-        return (int)$this->requestService->run();
-    }
-
     protected function getRequestConfiguration(): RequestConfiguration
     {
         return new RequestConfiguration(

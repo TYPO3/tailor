@@ -44,8 +44,7 @@ class VersionDetailsCommand extends AbstractClientRequestCommand
     {
         $this->extensionKey = $input->getArgument('extensionkey');
         $this->version = $input->getArgument('version');
-        parent::execute($input, $output);
-        return (int)$this->requestService->run();
+        return parent::execute($input, $output);
     }
 
     protected function getRequestConfiguration(): RequestConfiguration

@@ -35,14 +35,11 @@ abstract class AbstractClientRequestCommand extends Command
     /** @var int */
     private $resultFormat = FormatService::FORMAT_KEY_VALUE;
 
+    /** @var bool */
+    private $confirmationRequired = false;
+
     /** @var InputInterface */
     protected $input;
-
-    /** @var SymfonyStyle */
-    protected $io;
-
-    /** @var RequestService */
-    protected $requestService;
 
     protected function configure(): void
     {
@@ -52,32 +49,28 @@ abstract class AbstractClientRequestCommand extends Command
         $this->addOption('force', 'f', InputOption::VALUE_OPTIONAL, 'Force execution', false);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
-        $this->io = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
+
+        if ($this->confirmationRequired
+            && !($this->input->getOption('force') ?? true)
+            && !$io->askQuestion(new ConfirmationQuestion($this->getMessages()->getConfirmation()))
+        ) {
+            $io->writeln('<info>Execution aborted.</info>');
+            return 0;
+        }
 
         $requestConfiguration = $this->getRequestConfiguration();
         $requestConfiguration
             ->setRaw($input->getOption('raw') !== false)
             ->setDefaultAuthMethod($this->defaultAuthMethod);
 
-        $this->requestService = new RequestService(
+        return (int)(new RequestService(
             $requestConfiguration,
-            new FormatService($this->io, $this->getMessages(), $this->resultFormat)
-        );
-    }
-
-    protected function comfirmExecution(bool $default = true): bool
-    {
-        if (!($this->input->getOption('force') ?? true)
-            && !$this->io->askQuestion(new ConfirmationQuestion($this->getMessages()->getConfirmation(), $default))
-        ) {
-            $this->io->writeln('<info>Execution aborted.</info>');
-            return false;
-        }
-
-        return true;
+            new FormatService($io, $this->getMessages(), $this->resultFormat)
+        ))->run();
     }
 
     protected function setDefaultAuthMethod(int $defaultAuthMethod): self
@@ -89,6 +82,12 @@ abstract class AbstractClientRequestCommand extends Command
     protected function setResultFormat(int $resultFormat): self
     {
         $this->resultFormat = $resultFormat;
+        return $this;
+    }
+
+    protected function setConfirmationRequired(bool $confirmationRequired): self
+    {
+        $this->confirmationRequired = $confirmationRequired;
         return $this;
     }
 

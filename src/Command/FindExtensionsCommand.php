@@ -56,12 +56,6 @@ class FindExtensionsCommand extends AbstractClientRequestCommand
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        parent::execute($input, $output);
-        return (int)$this->requestService->run();
-    }
-
     protected function getRequestConfiguration(): RequestConfiguration
     {
         return new RequestConfiguration('GET', 'extension', $this->getQuery($this->input->getOptions()));

@@ -89,8 +89,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
             throw new \RuntimeException(sprintf('Directory \'%s\' could not be created.', $concurrent));
         }
 
-        parent::execute($input, $output);
-        return (int)$this->requestService->run();
+        return parent::execute($input, $output);
     }
 
     protected function getRequestConfiguration(): RequestConfiguration

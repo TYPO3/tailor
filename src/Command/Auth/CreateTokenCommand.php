@@ -58,12 +58,6 @@ class CreateTokenCommand extends AbstractClientRequestCommand
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        parent::execute($input, $output);
-        return (int)$this->requestService->run();
-    }
-
     protected function getRequestConfiguration(): RequestConfiguration
     {
         return new RequestConfiguration('POST', 'auth/token', $this->getQuery($this->input->getOptions()));

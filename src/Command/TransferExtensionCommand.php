@@ -34,6 +34,7 @@ class TransferExtensionCommand extends AbstractClientRequestCommand
         parent::configure();
         $this
             ->setDescription('Transfer ownership of an extension key')
+            ->setConfirmationRequired(true)
             ->addArgument(
                 'extensionkey',
                 InputArgument::REQUIRED,
@@ -50,8 +51,7 @@ class TransferExtensionCommand extends AbstractClientRequestCommand
     {
         $this->extensionKey = $input->getArgument('extensionkey');
         $this->username = $input->getArgument('username');
-        parent::execute($input, $output);
-        return $this->comfirmExecution() ? (int)$this->requestService->run() : 0;
+        return parent::execute($input, $output);
     }
 
     protected function getRequestConfiguration(): RequestConfiguration

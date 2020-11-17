@@ -36,12 +36,6 @@ class RevokeTokenCommand extends AbstractClientRequestCommand
             ->addArgument('token', InputArgument::REQUIRED, 'The access token to revoke.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        parent::execute($input, $output);
-        return (int)$this->requestService->run();
-    }
-
     protected function getRequestConfiguration(): RequestConfiguration
     {
         return new RequestConfiguration(

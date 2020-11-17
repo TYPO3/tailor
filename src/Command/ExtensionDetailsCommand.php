@@ -39,8 +39,7 @@ class ExtensionDetailsCommand extends AbstractClientRequestCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->extensionKey = $input->getArgument('extensionkey');
-        parent::execute($input, $output);
-        return (int)$this->requestService->run();
+        return parent::execute($input, $output);
     }
 
     protected function getRequestConfiguration(): RequestConfiguration
