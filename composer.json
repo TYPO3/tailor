@@ -1,6 +1,6 @@
 {
     "name": "typo3/tailor",
-    "description": "A CLI tool to make extension handling easier, also uploading extensions to extensions.typo3.org (TER)",
+    "description": "A CLI tool to make TYPO3 extension handling easier",
     "license": "MIT",
     "authors": [{
         "name": "Benni Mack",

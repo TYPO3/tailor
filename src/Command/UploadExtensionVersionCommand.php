@@ -60,12 +60,6 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
                 'The version to publish, e.g. 1.2.3'
             )
             ->addOption(
-                'description',
-                '',
-                InputOption::VALUE_REQUIRED,
-                'Description of the new version (e.g. release notes)'
-            )
-            ->addOption(
                 'path',
                 '',
                 InputOption::VALUE_REQUIRED,
@@ -76,6 +70,12 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
                 '',
                 InputOption::VALUE_REQUIRED,
                 'Path or URL to a zip file'
+            )
+            ->addOption(
+                'comment',
+                '',
+                InputOption::VALUE_OPTIONAL,
+                'Upload comment of the new version (e.g. release notes)'
             );
     }
 
@@ -129,8 +129,11 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
             throw new RequiredOptionMissingException('Either \'path\' or \'artefact\' must be defined.', 1605529398);
         }
 
-        if ($options['description'] === null) {
-            throw new RequiredOptionMissingException('Please add a \'description\' for the new version.', 1605529399);
+        if ($options['comment'] === null) {
+            // The REST API requires a description to be set (just like the GUI does).
+            // For now we just generate a description from the given version.
+            // @todo Maybe make this also mandatory in the command
+            $options['comment'] = 'Updated extension to ' . $this->version;
         }
 
         if ($options['path'] !== null) {
@@ -178,7 +181,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
         }
 
         return new FormDataPart([
-            'description' => (string)$options['description'],
+            'description' => (string)$options['comment'],
             'gplCompliant' => '1',
             'file' => DataPart::fromPath($versionFilePath)
         ]);
@@ -301,12 +304,16 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
      * This includes the final ZipArchive, but not the given
      * path from which the ZipArchive was created.
      *
-     * Note: using __destruct(), we ensure the transaction
+     * Note: Using __destruct(), we ensure the transaction
      * directory will be removed in any case. Even if an
      * exception is thrown.
      */
     public function __destruct()
     {
-        $this->removeDirectory(realpath($this->transactionPath));
+        if (!(bool)($this->transactionPath ?? false)) {
+            return;
+        }
+
+        $this->removeDirectory($this->transactionPath);
     }
 }
