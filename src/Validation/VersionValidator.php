@@ -54,5 +54,4 @@ class VersionValidator
         }
         return true;
     }
-
 }

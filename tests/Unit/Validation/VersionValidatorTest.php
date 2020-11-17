@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Tests\Unit\Validation;
 
-
 use PHPUnit\Framework\TestCase;
 use TYPO3\Tailor\Validation\VersionValidator;
 

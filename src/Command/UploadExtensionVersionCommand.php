@@ -145,7 +145,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
             }
             // Check if we deal with a remote file
             if (preg_match('/^http[s]?:\/\//', $filename)) {
-                $tempFilename = $this->transactionPath . '/remote-archive-' . $this->getVersionFilename(true)  . '.zip';
+                $tempFilename = $this->transactionPath . '/remote-archive-' . $this->getVersionFilename(true) . '.zip';
                 // Save the remote file temporary on local disk for validation and creation of the final ZipArchive
                 if (file_put_contents($tempFilename, fopen($filename, 'rb')) === false) {
                     throw new FormDataProcessingException('Could not processed remote file.', 1605562356);
@@ -252,7 +252,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
             RecursiveIteratorIterator::CHILD_FIRST
         );
 
-        foreach($iterator as $file) {
+        foreach ($iterator as $file) {
             if ($file->isDir()) {
                 rmdir($file->getPathname());
                 continue;

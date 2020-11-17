@@ -63,7 +63,7 @@ class FormatService
 
     public function writeFailure(string $reason): void
     {
-        $this->io->warning($this->messages->getFailure() . PHP_EOL . 'Reason: ' .  $reason);
+        $this->io->warning($this->messages->getFailure() . PHP_EOL . 'Reason: ' . $reason);
     }
 
     public function formatResult(array $content): void

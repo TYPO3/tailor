@@ -7,6 +7,9 @@
         "email": "benni@typo3.org",
         "role": "Maintainer"
     }],
+    "config": {
+        "sort-packages": true
+    },
     "require": {
         "php": "^7.1",
         "ext-json": "*",
@@ -30,7 +33,12 @@
             "TYPO3\\Tailor\\Tests\\": "tests/"
         }
     },
-    "config": {
-        "sort-packages": true
+    "scripts": {
+        "tests:unit": [
+            "@php vendor/bin/phpunit --testsuite Unit"
+        ],
+        "cs": [
+            "@php vendor/bin/php-cs-fixer fix --config=vendor/typo3/coding-standards/templates/extension_php_cs.dist src/ tests/"
+        ]
     }
 }

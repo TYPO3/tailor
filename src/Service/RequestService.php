@@ -15,8 +15,6 @@ namespace TYPO3\Tailor\Service;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use TYPO3\Tailor\Dto\RequestConfiguration;
-use TYPO3\Tailor\Exception\FormDataProcessingException;
-use TYPO3\Tailor\Exception\RequiredOptionMissingException;
 use TYPO3\Tailor\HttpClientFactory;
 
 /**
@@ -73,7 +71,6 @@ class RequestService
                     (string)($content['error_description'] ?? $content['message'] ?? 'Unknown (Status ' . $status . ')')
                 );
             }
-
         } catch (ExceptionInterface|\InvalidArgumentException $e) {
             $this->formatService->error('An error occurred: ' . $e->getMessage());
             return false;
