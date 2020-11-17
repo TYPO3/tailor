@@ -209,26 +209,28 @@ extension, `ter:version` can be used:
 This will return details about version `1.0.0` of extension
 `some_ext_key`.
 
-__Overview of all available commands__
-| __Methods__           | __Arguments__                     | __Options__                                                                               | __Description__                                 |
-| --------------------- | --------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| ``ter:delete``        | ``extensionkey``                  | ``composer``<br/>``version``                                                              | Delete an extension.                            |
-| ``ter:details``       | ``extensionkey``                  |                                                                                           | Fetch details about an extension.               |
-| ``ter:find``          |                                   | ``page``<br/>``per-page``<br/>``author``<br/>``typo3-version``                            | Fetch a list of extensions from TER.            |
-| ``ter:publish``       | ``extensionkey``<br/>``version``  | ``path``<br/>``artefact``<br/>``comment``                                                 | Publishes a new version of an extension to TER. |
-| ``ter:register``      | ``extensionkey``                  |                                                                                           | Register a new extension key in TER.            |
-| ``ter:token:create``  |                                   | ``name``<br/>``expires``<br/>``scope``<br/>``extensions``                                 | Request an access token for the TER.            |
-| ``ter:token:refresh`` | ``token``                         |                                                                                           | Refresh an access token for the TER.            |
-| ``ter:token:revoke``  | ``token``                         |                                                                                           | Revoke an access token for the TER.             |
-| ``ter:transfer``      | ``extensionkey``<br/>``username`` |                                                                                           | Transfer ownership of an extension key.         |
-| ``ter:update``        | ``extensionkey``                  | ``composer``<br/>``issues``<br/>``repository``<br/>``manual``<br/>``paypal``<br/>``tags`` | Update extension meta information.              |
-| ``ter:version``       | ``extensionkey``<br/>``version``  |                                                                                           | Fetch details about an extension version.       |
+**Overview of all available commands**
+
+| Commands              | Arguments                         | Options                                                                                               | Description                                     |
+| --------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| ``ter:delete``        | ``extensionkey``                  |                                                                                                       | Delete an extension.                            |
+| ``ter:details``       | ``extensionkey``                  |                                                                                                       | Fetch details about an extension.               |
+| ``ter:find``          |                                   | ``--page``<br/>``--per-page``<br/>``--author``<br/>``--typo3-version``                                | Fetch a list of extensions from TER.            |
+| ``ter:publish``       | ``extensionkey``<br/>``version``  | ``--path``<br/>``--artefact``<br/>``--comment``                                                       | Publishes a new version of an extension to TER. |
+| ``ter:register``      | ``extensionkey``                  |                                                                                                       | Register a new extension key in TER.            |
+| ``ter:token:create``  |                                   | ``--name``<br/>``--expires``<br/>``--scope``<br/>``--extensions``                                     | Request an access token for the TER.            |
+| ``ter:token:refresh`` | ``token``                         |                                                                                                       | Refresh an access token for the TER.            |
+| ``ter:token:revoke``  | ``token``                         |                                                                                                       | Revoke an access token for the TER.             |
+| ``ter:transfer``      | ``extensionkey``<br/>``username`` |                                                                                                       | Transfer ownership of an extension key.         |
+| ``ter:update``        | ``extensionkey``                  | ``--composer``<br/>``--issues``<br/>``--repository``<br/>``--manual``<br/>``--paypal``<br/>``--tags`` | Update extension meta information.              |
+| ``ter:version``       | ``extensionkey``<br/>``version``  |                                                                                                       | Fetch details about an extension version.       |
 
 **General options for all commands**
+
 - ``-r, --raw`` Return result as raw object (e.g. json)
 - ``-h, --help`` Display help message
 - ``-q, --quiet`` Do not output any message
-- ``-v, --version`` Display this application version
+- ``-v, --version`` Display the CLI applications' version
 - ``-n, --no-interaction`` Do not ask any interactive question
 - ``--ansi`` Force ANSI output
 - ``--no-ansi`` Disable ANSI output
