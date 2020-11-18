@@ -55,7 +55,7 @@ class ConsoleFormatter
         return $this->formattedParts;
     }
 
-    public function formatKeyValue(array $content): void
+    protected function formatKeyValue(array $content): void
     {
         foreach ($content as $key => $value) {
             if (!is_string($key)) {
@@ -70,7 +70,7 @@ class ConsoleFormatter
         }
     }
 
-    public function formatDetailsResult(array $content): void
+    protected function formatDetailsResult(array $content): void
     {
         foreach ($content as $key => $value) {
             if (is_array($value)) {
@@ -99,7 +99,7 @@ class ConsoleFormatter
         }
     }
 
-    public function formatTable(array $content): void
+    protected function formatTable(array $content): void
     {
         $extensions = [];
         foreach ($content['extensions'] as $extensionData) {
@@ -121,12 +121,12 @@ class ConsoleFormatter
         ];
     }
 
-    public function normalizeFieldName(string $fieldName): string
+    protected function normalizeFieldName(string $fieldName): string
     {
         return ucfirst(implode(' ', explode('_', $fieldName)));
     }
 
-    public function getPaginationOptions(array $content): string
+    protected function getPaginationOptions(array $content): string
     {
         return sprintf(
             'Page: %d, Per page: %d, Filter: %s',
@@ -136,7 +136,7 @@ class ConsoleFormatter
         );
     }
 
-    public function getFilterString(array $filter): string
+    protected function getFilterString(array $filter): string
     {
         if ($filter === []) {
             return '-';

@@ -21,7 +21,6 @@ use TYPO3\Tailor\Formatter\ConsoleFormatter;
  */
 class ConsoleWriter
 {
-    public const OUTPUT_WRITE = 'write';
     public const OUTPUT_WRITE_LINE = 'writeln';
     public const OUTPUT_TABLE = 'table';
 
