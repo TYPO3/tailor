@@ -12,7 +12,8 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Formatter;
 
-use TYPO3\Tailor\Writer\ConsoleWriter;
+use TYPO3\Tailor\Output\OutputPart;
+use TYPO3\Tailor\Output\OutputParts;
 
 /**
  * Format the console output, especially the response content
@@ -27,15 +28,16 @@ class ConsoleFormatter
     /** @var int */
     protected $formatType;
 
-    /** @var array */
-    protected $formattedParts = [];
+    /** @var OutputParts */
+    protected $formattedParts;
 
     public function __construct(int $formatType)
     {
         $this->formatType = $formatType;
+        $this->formattedParts = new OutputParts();
     }
 
-    public function format(array $content): array
+    public function format(array $content): OutputParts
     {
         switch ($this->formatType) {
             case self::FORMAT_NONE:
@@ -59,14 +61,12 @@ class ConsoleFormatter
     {
         foreach ($content as $key => $value) {
             if (!is_string($key)) {
-                $this->formattedParts[ConsoleWriter::OUTPUT_WRITE_LINE][] = [
-                    (string)$value
-                ];
+                $this->formattedParts->addPart(new OutputPart([(string)$value]));
                 continue;
             }
-            $this->formattedParts[ConsoleWriter::OUTPUT_WRITE_LINE][] = [
-                sprintf('%s: %s', '<info>' . $this->normalizeFieldName($key) . '</info>', (string)$value)
-            ];
+            $this->formattedParts->addPart(
+                new OutputPart([sprintf('%s: %s', '<info>' . $this->normalizeFieldName($key) . '</info>', (string)$value)])
+            );
         }
     }
 
@@ -78,9 +78,7 @@ class ConsoleFormatter
                     continue;
                 }
                 if (is_string($key)) {
-                    $this->formattedParts[ConsoleWriter::OUTPUT_WRITE_LINE][] = [
-                        PHP_EOL . $this->normalizeFieldName($key)
-                    ];
+                    $this->formattedParts->addPart(new OutputPart([PHP_EOL . $this->normalizeFieldName($key)]));
                 }
                 $this->formatDetailsResult($value);
             }
@@ -88,14 +86,12 @@ class ConsoleFormatter
                 continue;
             }
             if (!is_string($key)) {
-                $this->formattedParts[ConsoleWriter::OUTPUT_WRITE_LINE][] = [
-                    (string)$value
-                ];
+                $this->formattedParts->addPart(new OutputPart([(string)$value]));
                 continue;
             }
-            $this->formattedParts[ConsoleWriter::OUTPUT_WRITE_LINE][] = [
-                sprintf('%s: %s', '<info>' . $this->normalizeFieldName($key) . '</info>', (string)$value)
-            ];
+            $this->formattedParts->addPart(
+                new OutputPart([sprintf('%s: %s', '<info>' . $this->normalizeFieldName($key) . '</info>', (string)$value)])
+            );
         }
     }
 
@@ -112,13 +108,18 @@ class ConsoleFormatter
             ];
         }
         ksort($extensions);
-        $this->formattedParts[ConsoleWriter::OUTPUT_TABLE][] = [
-            ['Extension Key', 'Title', 'Latest Version', 'Last Updated on', 'Composer Name'],
-            $extensions
-        ];
-        $this->formattedParts[ConsoleWriter::OUTPUT_WRITE_LINE][] = [
-            ($extensions === [] ? 'No extensions found for options ' : '') . $this->getPaginationOptions($content)
-        ];
+        $this->formattedParts->addPart(
+            new OutputPart(
+                [
+                    ['Extension Key', 'Title', 'Latest Version', 'Last Updated on', 'Composer Name'],
+                    $extensions
+                ],
+                OutputPart::OUTPUT_TABLE
+            )
+        );
+        $this->formattedParts->addPart(
+            new OutputPart([($extensions === [] ? 'No extensions found for options ' : '') . $this->getPaginationOptions($content)])
+        );
     }
 
     protected function normalizeFieldName(string $fieldName): string

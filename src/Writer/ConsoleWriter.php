@@ -21,9 +21,6 @@ use TYPO3\Tailor\Formatter\ConsoleFormatter;
  */
 class ConsoleWriter
 {
-    public const OUTPUT_WRITE_LINE = 'writeln';
-    public const OUTPUT_TABLE = 'table';
-
     /** @var SymfonyStyle */
     protected $io;
 
@@ -67,10 +64,8 @@ class ConsoleWriter
 
     public function writeFormattedResult(array $content): void
     {
-        foreach ((new ConsoleFormatter($this->resultFormat))->format($content) as $type => $parts) {
-            foreach ($parts as $values) {
-                $this->{$type}(...$values);
-            }
+        foreach ((new ConsoleFormatter($this->resultFormat))->format($content)->getParts() as $part) {
+            $this->{$part->getOutputStyle()}(...$part->getValues());
         }
     }
 }
