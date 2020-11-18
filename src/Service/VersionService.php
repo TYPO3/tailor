@@ -18,7 +18,7 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use TYPO3\Tailor\Exception\FormDataProcessingException;
 use TYPO3\Tailor\Exception\RequiredConfigurationMissing;
-use TYPO3\Tailor\Validation\VersionValidator;
+use TYPO3\Tailor\Validation\EmConfVersionValidator;
 use ZipArchive;
 
 /**
@@ -97,7 +97,7 @@ class VersionService
             }
 
             if ($filename === 'ext_emconf.php') {
-                $emConfValid = (new VersionValidator($fileRealPath))->isValid($this->version);
+                $emConfValid = (new EmConfVersionValidator($fileRealPath))->isValid($this->version);
             }
 
             // Add the files including their directories

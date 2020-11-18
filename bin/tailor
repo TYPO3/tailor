@@ -39,5 +39,6 @@ foreach ([__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php
     $application->add(new Command\Extension\UpdateExtensionCommand('ter:update'));
     $application->add(new Command\Extension\UploadExtensionVersionCommand('ter:publish'));
     $application->add(new Command\Extension\VersionDetailsCommand('ter:version'));
+    $application->add(new Command\Extension\SetExtensionVersionCommand('set-version'));
     $application->run();
 });

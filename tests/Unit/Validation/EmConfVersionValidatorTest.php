@@ -13,16 +13,16 @@ declare(strict_types=1);
 namespace TYPO3\Tailor\Tests\Unit\Validation;
 
 use PHPUnit\Framework\TestCase;
-use TYPO3\Tailor\Validation\VersionValidator;
+use TYPO3\Tailor\Validation\EmConfVersionValidator;
 
-class VersionValidatorTest extends TestCase
+class EmConfVersionValidatorTest extends TestCase
 {
     /**
      * @test
      */
     public function isInvalidIfNoFileFound()
     {
-        $subject = new VersionValidator(__DIR__ . '/no-file');
+        $subject = new EmConfVersionValidator(__DIR__ . '/no-file');
         self::assertFalse($subject->isValid('1.2.0'));
     }
 
@@ -31,7 +31,7 @@ class VersionValidatorTest extends TestCase
      */
     public function isInvalidIfFileDoesNotMatchEmConfStructure()
     {
-        $subject = new VersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_invalid.php');
+        $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_invalid.php');
         self::assertFalse($subject->isValid('1.0.0'));
     }
 
@@ -40,7 +40,7 @@ class VersionValidatorTest extends TestCase
      */
     public function isInvalidIfNoVersionGiven()
     {
-        $subject = new VersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_no_version.php');
+        $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_no_version.php');
         self::assertFalse($subject->isValid('1.0.0'));
     }
 
@@ -49,7 +49,7 @@ class VersionValidatorTest extends TestCase
      */
     public function isValidMatchesVersion()
     {
-        $subject = new VersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_valid.php');
+        $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_valid.php');
         self::assertFalse($subject->isValid('1.2.0'));
         self::assertTrue($subject->isValid('1.0.0'));
     }

@@ -13,44 +13,28 @@ declare(strict_types=1);
 namespace TYPO3\Tailor\Validation;
 
 /**
- * Check if the version in ext_emconf matches the given version
- * and a proper TYPO3 dependency is included.
+ * Checks if the version is of format x.y.z with all digits in it.
  */
 class VersionValidator
 {
     /**
-     * @var string
-     */
-    protected $emConfFilePath;
-
-    /**
-     * @param string $filePath Full path to the ext_emconf.php file
-     */
-    public function __construct(string $filePath)
-    {
-        $this->emConfFilePath = $filePath;
-    }
-
-    /**
      * @param string $givenVersion
-     * @return bool TRUE if the ext_emconf is valid, FALSE otherwise
+     * @return bool TRUE if the version is valid, FALSE otherwise
      */
     public function isValid(string $givenVersion): bool
     {
-        $_EXTKEY = 'dummy';
-        @include $this->emConfFilePath;
-        if (!isset($EM_CONF)) {
+        $versionParts = explode('.', $givenVersion);
+        if (count($versionParts) !== 3) {
             return false;
         }
-        $emConfDetails = reset($EM_CONF);
-        if (!is_array($emConfDetails)) {
-            return false;
-        }
-        if (!isset($emConfDetails['version'], $emConfDetails['constraints']['depends']['typo3'])) {
-            return false;
-        }
-        if ((string)$emConfDetails['version'] !== $givenVersion) {
-            return false;
+        foreach ($versionParts as $versionPart) {
+            if (!is_numeric($versionPart)) {
+                return false;
+            }
+            $versionPart = (int)$versionPart;
+            if ($versionPart < 0 || $versionPart > 999) {
+                return false;
+            }
         }
         return true;
     }

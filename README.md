@@ -284,11 +284,12 @@ normal output, 2 for more verbose output and 3 for debug
 - ``--no-ansi`` Disable ANSI output
 
 ---
+
 TODO:
 ## Integration into your CI pipeline
 
     # Step 1: Update the version in ext_emconf.php
-    ./vendor/bin/tailor set-version 1.5.0
+    ./vendor/bin/tailor set-version 1.5.0 --path=./
     # Step 2: Commit the changes and add a tag
     git commit -m "[RELEASE] A new version was published"
     git tag -a 1.5.0
