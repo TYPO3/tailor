@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
-use TYPO3\Tailor\Service\FormatService;
+use TYPO3\Tailor\Formatter\ConsoleFormatter;
 
 /**
  * Command for TER REST endpoint `GET /extension`
@@ -31,7 +31,7 @@ class FindExtensionsCommand extends AbstractClientRequestCommand
         parent::configure();
         $this
             ->setDescription('Fetch a list of extensions from TER')
-            ->setResultFormat(FormatService::FORMAT_TABLE)
+            ->setResultFormat(ConsoleFormatter::FORMAT_TABLE)
             ->addOption('page', '', InputOption::VALUE_OPTIONAL, 'Page number for paginated result')
             ->addOption('per-page', '', InputOption::VALUE_OPTIONAL, 'Per page limit for paginated result')
             ->addOption('author', '', InputOption::VALUE_OPTIONAL, 'Filter by a specific author. Use the TYPO3 username.')

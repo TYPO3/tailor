@@ -16,6 +16,7 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use TYPO3\Tailor\Dto\RequestConfiguration;
 use TYPO3\Tailor\HttpClientFactory;
+use TYPO3\Tailor\Writer\ConsoleWriter;
 
 /**
  * Service for performing HTTP requests to the TER REST API
@@ -28,25 +29,25 @@ class RequestService
     /** @var RequestConfiguration */
     protected $requestConfiguration;
 
-    /** @var FormatService */
-    protected $formatService;
+    /** @var ConsoleWriter */
+    protected $consoleWriter;
 
-    public function __construct(RequestConfiguration $requestConfiguration, FormatService $formatService)
+    public function __construct(RequestConfiguration $requestConfiguration, ConsoleWriter $consoleWriter)
     {
         $this->client = HttpClientFactory::create($requestConfiguration);
         $this->requestConfiguration = $requestConfiguration;
-        $this->formatService = $formatService;
+        $this->consoleWriter = $consoleWriter;
     }
 
     /**
      * Run the request by the given request configuration and
-     * format the result using the FormatService.
+     * format the result using the ConsoleWriter.
      *
      * @return bool
      */
     public function run(): bool
     {
-        $this->formatService->writeTitle();
+        $this->consoleWriter->writeTitle();
 
         try {
             $response = $this->client->request($this->requestConfiguration->getMethod(), $this->requestConfiguration->getEndpoint());
@@ -57,22 +58,22 @@ class RequestService
                 // If no content is provided in the response, usually on 200
                 // responses for requests which delete the remote resource,
                 // we ensure to return at least the status code on the CLI.
-                $this->formatService->write($content ?: json_encode(['status' =>  $status]));
+                $this->consoleWriter->write($content ?: json_encode(['status' =>  $status]));
                 return true;
             }
 
             $content = (array)(json_decode($content, true) ?? []);
 
             if ($this->requestConfiguration->isSuccessful($status)) {
-                $this->formatService->writeSuccess();
-                $this->formatService->formatResult($content);
+                $this->consoleWriter->writeSuccess();
+                $this->consoleWriter->writeFormattedResult($content);
             } else {
-                $this->formatService->writeFailure(
+                $this->consoleWriter->writeFailure(
                     (string)($content['error_description'] ?? $content['message'] ?? 'Unknown (Status ' . $status . ')')
                 );
             }
         } catch (ExceptionInterface|\InvalidArgumentException $e) {
-            $this->formatService->error('An error occurred: ' . $e->getMessage());
+            $this->consoleWriter->error('An error occurred: ' . $e->getMessage());
             return false;
         }
 

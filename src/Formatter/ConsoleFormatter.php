@@ -10,65 +10,34 @@ declare(strict_types=1);
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace TYPO3\Tailor\Service;
+namespace TYPO3\Tailor\Formatter;
 
-use Symfony\Component\Console\Style\SymfonyStyle;
-use TYPO3\Tailor\Dto\Messages;
+use TYPO3\Tailor\Writer\ConsoleWriter;
 
 /**
- * Service for formatting the console output, especially the response content
+ * Format the console output, especially the response content
  */
-class FormatService
+class ConsoleFormatter
 {
     public const FORMAT_NONE = 0;
     public const FORMAT_KEY_VALUE = 1;
     public const FORMAT_DETAIL = 2;
     public const FORMAT_TABLE = 3;
 
-    /** @var SymfonyStyle */
-    protected $io;
-
-    /** @var Messages */
-    protected $messages;
-
     /** @var int */
-    protected $resultFormat;
+    protected $formatType;
 
-    public function __construct(SymfonyStyle $io, Messages $messages, int $resultFormat)
+    /** @var array */
+    protected $formattedParts = [];
+
+    public function __construct(int $formatType)
     {
-        $this->io = $io;
-        $this->messages = $messages;
-        $this->resultFormat = $resultFormat;
+        $this->formatType = $formatType;
     }
 
-    public function __call(string $name, array $arguments)
+    public function format(array $content): array
     {
-        if (is_callable([$this->messages, $name])) {
-            $this->io->writeln($this->messages->{$name}());
-        }
-        if (is_callable([$this->io, $name])) {
-            $this->io->{$name}(...$arguments);
-        }
-    }
-
-    public function writeTitle(): void
-    {
-        $this->io->title($this->messages->getTitle());
-    }
-
-    public function writeSuccess(): void
-    {
-        $this->io->success($this->messages->getSuccess());
-    }
-
-    public function writeFailure(string $reason): void
-    {
-        $this->io->warning($this->messages->getFailure() . PHP_EOL . 'Reason: ' . $reason);
-    }
-
-    public function formatResult(array $content): void
-    {
-        switch ($this->resultFormat) {
+        switch ($this->formatType) {
             case self::FORMAT_NONE:
                 break;
             case self::FORMAT_DETAIL:
@@ -82,20 +51,26 @@ class FormatService
                 $this->formatKeyValue($content);
                 break;
         }
+
+        return $this->formattedParts;
     }
 
-    protected function formatKeyValue(array $content): void
+    public function formatKeyValue(array $content): void
     {
         foreach ($content as $key => $value) {
             if (!is_string($key)) {
-                $this->io->writeln((string)$value);
+                $this->formattedParts[ConsoleWriter::OUTPUT_WRITE_LINE][] = [
+                    (string)$value
+                ];
                 continue;
             }
-            $this->io->writeln(sprintf('%s: %s', '<info>' . $this->normalizeFieldName($key) . '</info>', (string)$value));
+            $this->formattedParts[ConsoleWriter::OUTPUT_WRITE_LINE][] = [
+                sprintf('%s: %s', '<info>' . $this->normalizeFieldName($key) . '</info>', (string)$value)
+            ];
         }
     }
 
-    protected function formatDetailsResult(array $content): void
+    public function formatDetailsResult(array $content): void
     {
         foreach ($content as $key => $value) {
             if (is_array($value)) {
@@ -103,7 +78,9 @@ class FormatService
                     continue;
                 }
                 if (is_string($key)) {
-                    $this->io->writeln(PHP_EOL . $this->normalizeFieldName($key));
+                    $this->formattedParts[ConsoleWriter::OUTPUT_WRITE_LINE][] = [
+                        PHP_EOL . $this->normalizeFieldName($key)
+                    ];
                 }
                 $this->formatDetailsResult($value);
             }
@@ -111,14 +88,18 @@ class FormatService
                 continue;
             }
             if (!is_string($key)) {
-                $this->io->writeln((string)$value);
+                $this->formattedParts[ConsoleWriter::OUTPUT_WRITE_LINE][] = [
+                    (string)$value
+                ];
                 continue;
             }
-            $this->io->writeln(sprintf('%s: %s', '<info>' . $this->normalizeFieldName($key) . '</info>', (string)$value));
+            $this->formattedParts[ConsoleWriter::OUTPUT_WRITE_LINE][] = [
+                sprintf('%s: %s', '<info>' . $this->normalizeFieldName($key) . '</info>', (string)$value)
+            ];
         }
     }
 
-    protected function formatTable(array $content): void
+    public function formatTable(array $content): void
     {
         $extensions = [];
         foreach ($content['extensions'] as $extensionData) {
@@ -131,16 +112,21 @@ class FormatService
             ];
         }
         ksort($extensions);
-        $this->io->table(['Extension Key', 'Title', 'Latest Version', 'Last Updated on', 'Composer Name'], $extensions);
-        $this->io->writeln(($extensions === [] ? 'No extensions found for options ' : '') . $this->getPaginationOptions($content));
+        $this->formattedParts[ConsoleWriter::OUTPUT_TABLE][] = [
+            ['Extension Key', 'Title', 'Latest Version', 'Last Updated on', 'Composer Name'],
+            $extensions
+        ];
+        $this->formattedParts[ConsoleWriter::OUTPUT_WRITE_LINE][] = [
+            ($extensions === [] ? 'No extensions found for options ' : '') . $this->getPaginationOptions($content)
+        ];
     }
 
-    protected function normalizeFieldName(string $fieldName): string
+    public function normalizeFieldName(string $fieldName): string
     {
         return ucfirst(implode(' ', explode('_', $fieldName)));
     }
 
-    protected function getPaginationOptions(array $content): string
+    public function getPaginationOptions(array $content): string
     {
         return sprintf(
             'Page: %d, Per page: %d, Filter: %s',
@@ -150,7 +136,7 @@ class FormatService
         );
     }
 
-    protected function getFilterString(array $filter): string
+    public function getFilterString(array $filter): string
     {
         if ($filter === []) {
             return '-';

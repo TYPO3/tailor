@@ -16,8 +16,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
+use TYPO3\Tailor\Formatter\ConsoleFormatter;
 use TYPO3\Tailor\HttpClientFactory;
-use TYPO3\Tailor\Service\FormatService;
 
 /**
  * Command for TER REST endpoint `POST /auth/token/revoke`
@@ -30,7 +30,7 @@ class RevokeTokenCommand extends AbstractClientRequestCommand
         $this
             ->setDescription('Revoke an access token for the TER')
             ->setDefaultAuthMethod(HttpClientFactory::BASIC_AUTH)
-            ->setResultFormat(FormatService::FORMAT_NONE)
+            ->setResultFormat(ConsoleFormatter::FORMAT_NONE)
             ->addArgument('token', InputArgument::REQUIRED, 'The access token to revoke.');
     }
 

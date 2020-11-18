@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
-use TYPO3\Tailor\Service\FormatService;
+use TYPO3\Tailor\Formatter\ConsoleFormatter;
 
 /**
  * Command for TER REST endpoint `GET /extension/{key}/versions`
@@ -33,7 +33,7 @@ class ExtensionVersionsCommand extends AbstractClientRequestCommand
         parent::configure();
         $this
             ->setDescription('Fetch details for all versions of the extension')
-            ->setResultFormat(FormatService::FORMAT_DETAIL)
+            ->setResultFormat(ConsoleFormatter::FORMAT_DETAIL)
             ->addArgument('extensionkey', InputArgument::OPTIONAL, 'The extension key');
     }
 

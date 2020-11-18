@@ -21,9 +21,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
 use TYPO3\Tailor\Exception\ExtensionKeyMissingException;
+use TYPO3\Tailor\Formatter\ConsoleFormatter;
 use TYPO3\Tailor\HttpClientFactory;
-use TYPO3\Tailor\Service\FormatService;
 use TYPO3\Tailor\Service\RequestService;
+use TYPO3\Tailor\Writer\ConsoleWriter;
 
 /**
  * Abstract class to be used by commands, requesting an TER API endpoint
@@ -34,7 +35,7 @@ abstract class AbstractClientRequestCommand extends Command
     private $defaultAuthMethod = HttpClientFactory::ALL_AUTH;
 
     /** @var int */
-    private $resultFormat = FormatService::FORMAT_KEY_VALUE;
+    private $resultFormat = ConsoleFormatter::FORMAT_KEY_VALUE;
 
     /** @var bool */
     private $confirmationRequired = false;
@@ -67,7 +68,7 @@ abstract class AbstractClientRequestCommand extends Command
 
         return (int)(new RequestService(
             $requestConfiguration,
-            new FormatService($io, $this->getMessages(), $this->resultFormat)
+            new ConsoleWriter($io, $this->getMessages(), $this->resultFormat)
         ))->run();
     }
 

@@ -23,7 +23,7 @@ use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
 use TYPO3\Tailor\Exception\RequiredOptionMissingException;
 use TYPO3\Tailor\Filesystem;
-use TYPO3\Tailor\Service\FormatService;
+use TYPO3\Tailor\Formatter\ConsoleFormatter;
 use TYPO3\Tailor\Service\VersionService;
 
 /**
@@ -46,7 +46,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
 
         $this
             ->setDescription('Publishes a new version of an extension to TER')
-            ->setResultFormat(FormatService::FORMAT_DETAIL)
+            ->setResultFormat(ConsoleFormatter::FORMAT_DETAIL)
             ->addArgument('version', InputArgument::REQUIRED, 'The version to publish, e.g. 1.2.3')
             ->addArgument('extensionkey', InputArgument::OPTIONAL, 'The extension key')
             ->addOption('path', '', InputOption::VALUE_REQUIRED, 'Path to the extension folder')

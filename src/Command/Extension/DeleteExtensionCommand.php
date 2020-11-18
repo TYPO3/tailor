@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
-use TYPO3\Tailor\Service\FormatService;
+use TYPO3\Tailor\Formatter\ConsoleFormatter;
 
 /**
  * Command for TER REST endpoint `DELETE /extension/{key}`
@@ -33,7 +33,7 @@ class DeleteExtensionCommand extends AbstractClientRequestCommand
         parent::configure();
         $this
             ->setDescription('Delete an extension')
-            ->setResultFormat(FormatService::FORMAT_NONE)
+            ->setResultFormat(ConsoleFormatter::FORMAT_NONE)
             ->setConfirmationRequired(true)
             ->addArgument('extensionkey', InputArgument::OPTIONAL, 'The extension key');
     }
