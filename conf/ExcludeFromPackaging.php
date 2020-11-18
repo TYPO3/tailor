@@ -5,7 +5,8 @@
 // and make sure the file returns an array with the keys `directories` and `files`
 // on root level.
 
-// Note: The filter is case insensitive.
+// Note: The filter is case insensitive. There is furthermore no need to define the
+// filenames with / without a leading dot. This is taken into account automatically.
 
 return [
     'directories' => [
