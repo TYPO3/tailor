@@ -118,10 +118,23 @@ Using a remote `--artefact`:
 
     ./vendor/bin/tailor ter:publish 1.2.0 my_extension --artefact=https://github.com/my-name/my_extension/archive/1.2.0.zip
     
-If the extension key is defined as environment variable,
-it can be skipped:
+Using the root direcotry:
 
-    ./vendor/bin/tailor ter:publish 1.2.0 --artefact=https://github.com/my-name/my_extension/archive/1.2.0.zip
+    ./vendor/bin/tailor ter:publish 1.2.0 my_extension
+    
+If the extension key is defined as environment variable,
+it can also be skipped. So using the current root directory
+the whole command simplifies to:
+
+    ./vendor/bin/tailor ter:publish 1.2.0
+    
+**Important**: A couple of directories and files are excluded
+from packaging by default. You can find the configuration in
+`conf/ExcludeFromPackaging.php`. If you like, you can also
+use a custom configuration. Just add the path to your custom
+configuration file to the environment variable
+`TYPO3_EXCLUDE_FROM_PACKAGING`. This file must return an
+`array` with the keys `directories` and `files` on root level.
     
 **Note**: The REST API, just like the the [TER][ter], requires
 an upload comment to be set. This can be achieved using the

@@ -12,6 +12,6 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Exception;
 
-class RequiredOptionMissingException extends \InvalidArgumentException
+class RequiredConfigurationMissing extends \InvalidArgumentException
 {
 }

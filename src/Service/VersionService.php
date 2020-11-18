@@ -12,9 +12,12 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Service;
 
+use FilesystemIterator;
+use RecursiveCallbackFilterIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use TYPO3\Tailor\Exception\FormDataProcessingException;
+use TYPO3\Tailor\Exception\RequiredConfigurationMissing;
 use TYPO3\Tailor\Validation\VersionValidator;
 use ZipArchive;
 
@@ -32,11 +35,15 @@ class VersionService
     /** @var string */
     protected $transactionPath;
 
+    /** @var array */
+    protected $excludeConfiguration = [];
+
     public function __construct(string $version, string $extension, string $transactionPath)
     {
         $this->version = $version;
         $this->extension = $extension;
         $this->transactionPath = $transactionPath;
+        $this->excludeConfiguration = $this->getExcludeConfiguration();
     }
 
     /**
@@ -58,18 +65,34 @@ class VersionService
         $zipArchive->open($this->getVersionFilename(), ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
         $emConfValid = false;
-        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($fullPath), RecursiveIteratorIterator::LEAVES_ONLY);
+
+        $iterator = new RecursiveDirectoryIterator($fullPath, FilesystemIterator::SKIP_DOTS);
+        $files = new RecursiveIteratorIterator(
+            new RecursiveCallbackFilterIterator($iterator, function ($current) use ($fullPath) {
+                // @todo Find a more performant way for filtering
+                $path = substr($current->getRealPath(), strlen($fullPath) + 1);
+                foreach ($this->excludeConfiguration['directories'] as $excludeDirectory) {
+                    if (preg_match('/^' . $excludeDirectory . '/i', $path)) {
+                        return false;
+                    }
+                }
+                $filename = $current->getFilename();
+                foreach ($this->excludeConfiguration['files'] as $excludeFile) {
+                    if (preg_match('/' . $excludeFile . '$/i', $filename)) {
+                        return false;
+                    }
+                }
+                return true;
+            }),
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
 
         foreach ($files as $file) {
             $filename = $file->getFilename();
             $fileRealPath = $file->getRealPath();
 
             // Do not add directories (will be added with the corresponding file anyways).
-            // Also exclude Dotfiles (e.g. `.gitignore`) and files in hidden directories (e.g. `.git`).
-            if ($file->isDir()
-                || strpos($filename, '.') === 0
-                || strpos($fileRealPath, '/.') !== false
-            ) {
+            if ($file->isDir()) {
                 continue;
             }
 
@@ -165,5 +188,34 @@ class VersionService
         $filename = sprintf('%s/%s_%s.zip', $this->transactionPath, $this->extension, $this->version);
 
         return $hash ? md5($filename): $filename;
+    }
+
+    /**
+     * Return the configuration for directories and files which
+     * should be excluded from packaging (the final ZipArchive).
+     *
+     * @return array
+     */
+    protected function getExcludeConfiguration(): array
+    {
+        $exludeConfigurationFile = $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] ?? __DIR__ . '/../../conf/ExcludeFromPackaging.php';
+
+        if (!file_exists($exludeConfigurationFile)) {
+            throw new \InvalidArgumentException(
+                'Given file \'' . $exludeConfigurationFile . '\' does not exist',
+                1605734677
+            );
+        }
+
+        $configuration = require $exludeConfigurationFile;
+
+        if (!is_array($configuration) || !isset($configuration['directories'], $configuration['files'])) {
+            throw new RequiredConfigurationMissing(
+                'Given file does not include \'directories\' and \'files\' configuration',
+                1605734681
+            );
+        }
+
+        return $configuration;
     }
 }

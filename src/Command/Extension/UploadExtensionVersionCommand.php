@@ -21,7 +21,6 @@ use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
-use TYPO3\Tailor\Exception\RequiredOptionMissingException;
 use TYPO3\Tailor\Filesystem;
 use TYPO3\Tailor\Formatter\ConsoleFormatter;
 use TYPO3\Tailor\Service\VersionService;
@@ -49,8 +48,8 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
             ->setResultFormat(ConsoleFormatter::FORMAT_DETAIL)
             ->addArgument('version', InputArgument::REQUIRED, 'The version to publish, e.g. 1.2.3')
             ->addArgument('extensionkey', InputArgument::OPTIONAL, 'The extension key')
-            ->addOption('path', '', InputOption::VALUE_REQUIRED, 'Path to the extension folder')
-            ->addOption('artefact', '', InputOption::VALUE_REQUIRED, 'Path or URL to a zip file')
+            ->addOption('path', '', InputOption::VALUE_OPTIONAL, 'Path to the extension folder')
+            ->addOption('artefact', '', InputOption::VALUE_OPTIONAL, 'Path or URL to a zip file')
             ->addOption('comment', '', InputOption::VALUE_OPTIONAL, 'Upload comment of the new version (e.g. release notes)');
     }
 
@@ -58,10 +57,10 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
     {
         $this->version = $input->getArgument('version');
         $this->extensionKey = $this->getExtensionKey($input);
-        $this->transactionPath = rtrim(realpath('.'), '/') . '/version-upload';
+        $this->transactionPath = rtrim(realpath('.'), '/') . '/tailor-version-upload';
 
-        if (!is_dir($this->transactionPath) && !mkdir($concurrent = $this->transactionPath) && !is_dir($concurrent)) {
-            throw new \RuntimeException(sprintf('Directory \'%s\' could not be created.', $concurrent));
+        if (!(new Filesystem\Directory())->create($this->transactionPath)) {
+            throw new \RuntimeException(sprintf('Directory could not be created.'));
         }
 
         return parent::execute($input, $output);
@@ -101,13 +100,9 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
      */
     protected function getFormDataPart(array $options): FormDataPart
     {
-        if ($options['path'] === null && $options['artefact'] === null) {
-            throw new RequiredOptionMissingException('Either \'path\' or \'artefact\' must be defined.', 1605529398);
-        }
-
         if ($options['comment'] === null) {
             // The REST API requires a description to be set (just like the GUI does).
-            // For now we just generate a description from the given version.
+            // For now we just generate a description from the given version if non is given.
             $options['comment'] = 'Updated extension to ' . $this->version;
         }
 
@@ -115,8 +110,12 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
 
         if ($options['path'] !== null) {
             $versionService->createZipArchiveFromPath((string)$options['path']);
-        } else {
+        } elseif ($options['artefact'] !== null) {
             $versionService->createZipArchiveFromArtefact(trim((string)$options['artefact']));
+        } else {
+            // If neither `path` nor `artefact` is defined, we just
+            // create the ZipArchive from the current directory.
+            $versionService->createZipArchiveFromPath('./');
         }
 
         return new FormDataPart([

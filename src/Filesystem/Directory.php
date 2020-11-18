@@ -22,6 +22,18 @@ use RecursiveIteratorIterator;
 class Directory
 {
     /**
+     * Create directories recursive
+     *
+     * @param string $path The directory path to create
+     * @param int $mode The mode for the directories
+     * @return bool TRUE if the directories were created successfully, FALSE otherwise
+     */
+    public function create(string $path, int $mode = 0777): bool
+    {
+        return !(!is_dir($path) && !mkdir($concurrent = $path, $mode, true) && !is_dir($concurrent));
+    }
+
+    /**
      * Remove a directory and its content recursive
      *
      * @param string $directory The directory to remove
