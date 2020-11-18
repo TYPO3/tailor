@@ -12,10 +12,20 @@
 use Symfony\Component\Console\Application;
 use TYPO3\Tailor\Command;
 
-require __DIR__ . '/../vendor/autoload.php';
+foreach ([__DIR__ . '/../../../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $file) {
+    if (file_exists($file)) {
+        require $file;
+        break;
+    }
+}
 
 \call_user_func(static function() {
-    (new Symfony\Component\Dotenv\Dotenv())->loadEnv(__DIR__ . '/../.env', 'dist');
+    foreach ([__DIR__ . '/../../../../.env', __DIR__ . '/../.env'] as $file) {
+        if (file_exists($file)) {
+            (new Symfony\Component\Dotenv\Dotenv())->loadEnv($file, 'dist');
+            break;
+        }
+    }
     $application = new Application('Tailor - Your TYPO3 Extension Helper', '1.0.0');
     $application->add(new Command\Auth\CreateTokenCommand('ter:token:create'));
     $application->add(new Command\Auth\RefreshTokenCommand('ter:token:refresh'));
