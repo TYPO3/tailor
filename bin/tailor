@@ -22,6 +22,7 @@ require __DIR__ . '/../vendor/autoload.php';
     $application->add(new Command\Auth\RevokeTokenCommand('ter:token:revoke'));
     $application->add(new Command\Extension\DeleteExtensionCommand('ter:delete'));
     $application->add(new Command\Extension\ExtensionDetailsCommand('ter:details'));
+    $application->add(new Command\Extension\ExtensionVersionsCommand('ter:versions'));
     $application->add(new Command\Extension\FindExtensionsCommand('ter:find'));
     $application->add(new Command\Extension\RegisterExtensionCommand('ter:register'));
     $application->add(new Command\Extension\TransferExtensionCommand('ter:transfer'));
