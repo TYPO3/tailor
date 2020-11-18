@@ -39,9 +39,6 @@ class ConsoleWriter
 
     public function __call(string $name, array $arguments)
     {
-        if (is_callable([$this->messages, $name])) {
-            $this->io->writeln($this->messages->{$name}());
-        }
         if (is_callable([$this->io, $name])) {
             $this->io->{$name}(...$arguments);
         }
@@ -65,7 +62,7 @@ class ConsoleWriter
     public function writeFormattedResult(array $content): void
     {
         foreach ((new ConsoleFormatter($this->resultFormat))->format($content)->getParts() as $part) {
-            $this->{$part->getOutputStyle()}(...$part->getValues());
+            $this->io->{$part->getOutputStyle()}(...$part->getValues());
         }
     }
 }
