@@ -32,10 +32,10 @@ use TYPO3\Tailor\Service\VersionService;
 class UploadExtensionVersionCommand extends AbstractClientRequestCommand
 {
     /** @var string */
-    protected $extensionKey;
+    protected $version;
 
     /** @var string */
-    protected $version;
+    protected $extensionKey;
 
     /** @var string */
     protected $transactionPath;
@@ -47,8 +47,8 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
         $this
             ->setDescription('Publishes a new version of an extension to TER')
             ->setResultFormat(FormatService::FORMAT_DETAIL)
-            ->addArgument('extensionkey', InputArgument::REQUIRED, 'The extension key')
             ->addArgument('version', InputArgument::REQUIRED, 'The version to publish, e.g. 1.2.3')
+            ->addArgument('extensionkey', InputArgument::OPTIONAL, 'The extension key')
             ->addOption('path', '', InputOption::VALUE_REQUIRED, 'Path to the extension folder')
             ->addOption('artefact', '', InputOption::VALUE_REQUIRED, 'Path or URL to a zip file')
             ->addOption('comment', '', InputOption::VALUE_OPTIONAL, 'Upload comment of the new version (e.g. release notes)');
@@ -56,8 +56,8 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->extensionKey = $input->getArgument('extensionkey');
         $this->version = $input->getArgument('version');
+        $this->extensionKey = $this->getExtensionKey($input);
         $this->transactionPath = rtrim(realpath('.'), '/') . '/version-upload';
 
         if (!is_dir($this->transactionPath) && !mkdir($concurrent = $this->transactionPath) && !is_dir($concurrent)) {
@@ -82,10 +82,12 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
 
     protected function getMessages(): Messages
     {
+        $variables = [$this->version, $this->extensionKey];
+
         return new Messages(
-            sprintf('Publishing version %s of extension %s', $this->version, $this->extensionKey),
-            sprintf('Version %s of extension %s successfully published.', $this->version, $this->extensionKey),
-            sprintf('Could not publish version %s of extension %s.', $this->version, $this->extensionKey)
+            sprintf('Publishing version %s of extension %s', ...$variables),
+            sprintf('Version %s of extension %s successfully published.', ...$variables),
+            sprintf('Could not publish version %s of extension %s.', ...$variables)
         );
     }
 

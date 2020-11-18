@@ -25,10 +25,10 @@ use TYPO3\Tailor\Dto\RequestConfiguration;
 class TransferExtensionCommand extends AbstractClientRequestCommand
 {
     /** @var string */
-    protected $extensionKey;
+    protected $username;
 
     /** @var string */
-    protected $username;
+    protected $extensionKey;
 
     protected function configure(): void
     {
@@ -36,14 +36,14 @@ class TransferExtensionCommand extends AbstractClientRequestCommand
         $this
             ->setDescription('Transfer ownership of an extension key')
             ->setConfirmationRequired(true)
-            ->addArgument('extensionkey', InputArgument::REQUIRED, 'The extension key')
-            ->addArgument('username', InputArgument::REQUIRED, 'The TYPO3 username the extension should be transfered to');
+            ->addArgument('username', InputArgument::REQUIRED, 'The TYPO3 username the extension should be transfered to')
+            ->addArgument('extensionkey', InputArgument::OPTIONAL, 'The extension key');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->extensionKey = $input->getArgument('extensionkey');
         $this->username = $input->getArgument('username');
+        $this->extensionKey = $this->getExtensionKey($input);
         return parent::execute($input, $output);
     }
 
@@ -54,11 +54,13 @@ class TransferExtensionCommand extends AbstractClientRequestCommand
 
     protected function getMessages(): Messages
     {
+        $variables = [$this->extensionKey, $this->username];
+
         return new Messages(
-            sprintf('Transferring extension %s to %s', $this->extensionKey, $this->username),
-            sprintf('Extension %s successfully transferred to %s.', $this->extensionKey, $this->username),
-            sprintf('Could not transfer extension key %s to %s.', $this->extensionKey, $this->username),
-            sprintf('Are you sure you want to transfer the extension %s to %s?', $this->extensionKey, $this->username)
+            sprintf('Transferring extension %s to %s', ...$variables),
+            sprintf('Extension %s successfully transferred to %s.', ...$variables),
+            sprintf('Could not transfer extension key %s to %s.', ...$variables),
+            sprintf('Are you sure you want to transfer the extension %s to %s?', ...$variables)
         );
     }
 }

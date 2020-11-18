@@ -35,12 +35,12 @@ class DeleteExtensionCommand extends AbstractClientRequestCommand
             ->setDescription('Delete an extension')
             ->setResultFormat(FormatService::FORMAT_NONE)
             ->setConfirmationRequired(true)
-            ->addArgument('extensionkey', InputArgument::REQUIRED, 'The extension key');
+            ->addArgument('extensionkey', InputArgument::OPTIONAL, 'The extension key');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->extensionKey = $input->getArgument('extensionkey');
+        $this->extensionKey = $this->getExtensionKey($input);
         return parent::execute($input, $output);
     }
 

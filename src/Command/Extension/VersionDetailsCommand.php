@@ -26,10 +26,10 @@ use TYPO3\Tailor\Service\FormatService;
 class VersionDetailsCommand extends AbstractClientRequestCommand
 {
     /** @var string */
-    protected $extensionKey;
+    protected $version;
 
     /** @var string */
-    protected $version;
+    protected $extensionKey;
 
     protected function configure(): void
     {
@@ -37,14 +37,14 @@ class VersionDetailsCommand extends AbstractClientRequestCommand
         $this
             ->setDescription('Fetch details about an extension version')
             ->setResultFormat(FormatService::FORMAT_DETAIL)
-            ->addArgument('extensionkey', InputArgument::REQUIRED, 'The extension key')
-            ->addArgument('version', InputArgument::REQUIRED, 'The version to publish, e.g. 1.2.3');
+            ->addArgument('version', InputArgument::REQUIRED, 'The version to publish, e.g. 1.2.3')
+            ->addArgument('extensionkey', InputArgument::OPTIONAL, 'The extension key');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->extensionKey = $input->getArgument('extensionkey');
         $this->version = $input->getArgument('version');
+        $this->extensionKey = $this->getExtensionKey($input);
         return parent::execute($input, $output);
     }
 
@@ -55,10 +55,12 @@ class VersionDetailsCommand extends AbstractClientRequestCommand
 
     protected function getMessages(): Messages
     {
+        $variables = [$this->version, $this->extensionKey];
+
         return new Messages(
-            sprintf('Fetching details about version %s of extension %s', $this->version, $this->extensionKey),
-            sprintf('Successfully fetched details for version %s of extension %s.', $this->version, $this->extensionKey),
-            sprintf('Could not fetch details for version %s of extension %s.', $this->version, $this->extensionKey)
+            sprintf('Fetching details about version %s of extension %s', ...$variables),
+            sprintf('Successfully fetched details for version %s of extension %s.', ...$variables),
+            sprintf('Could not fetch details for version %s of extension %s.', ...$variables)
         );
     }
 }

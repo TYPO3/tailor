@@ -20,6 +20,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
+use TYPO3\Tailor\Exception\ExtensionKeyMissingException;
 use TYPO3\Tailor\HttpClientFactory;
 use TYPO3\Tailor\Service\FormatService;
 use TYPO3\Tailor\Service\RequestService;
@@ -86,6 +87,24 @@ abstract class AbstractClientRequestCommand extends Command
     {
         $this->confirmationRequired = $confirmationRequired;
         return $this;
+    }
+
+    protected function getExtensionKey(InputInterface $input): string
+    {
+        if ($input->hasArgument('extensionkey')
+            && ($key = ($input->getArgument('extensionkey') ?? '')) !== ''
+        ) {
+            $extensionKey = $key;
+        } elseif ((bool)($_ENV['TYPO3_EXTENSION_KEY'] ?? false)) {
+            $extensionKey = (string)$_ENV['TYPO3_EXTENSION_KEY'];
+        } else {
+            throw new ExtensionKeyMissingException(
+                'The extension key must either be set as argument or as environment variable',
+                1605706548
+            );
+        }
+
+        return $extensionKey;
     }
 
     abstract protected function getRequestConfiguration(): RequestConfiguration;

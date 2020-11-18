@@ -37,6 +37,17 @@ All commands provide the `-r, --raw` option. If set, the raw result
 will be returned. This can be used for further processing e.g. by
 using some JSON processor.
 
+Most of the commands require an extension key to work with.
+However, since Tailor can be required as a dev dependency into
+any single TYPO3 extension project it's also possible to define
+the extension key as an environment variable with
+`TYPO3_EXTENSION_KEY` globally. So you don't have to add it on
+each command exceution manually.
+
+**Note:** If no extension key is defined, neither as environment
+variable nor as argument, commands which require an extension
+key to be set, will throw an exception.
+
 ### Manage your personal access token
 
 Use the `ter:token:create` command to create a new token:
@@ -92,15 +103,20 @@ extension). The latter can be either local or a remote file.
 
 Using `--path`:
 
-    ./vendor/bin/tailor ter:publish my_extension 1.2.0 --path=/path/to/my_extension
+    ./vendor/bin/tailor ter:publish 1.2.0 my_extension --path=/path/to/my_extension
     
 Using a local `--artefact`:
     
-    ./vendor/bin/tailor ter:publish my_extension 1.2.0 --artefact=/path/to/any-zip-file/my_extension.zip
+    ./vendor/bin/tailor ter:publish 1.2.0 my_extension --artefact=/path/to/any-zip-file/my_extension.zip
     
 Using a remote `--artefact`:
 
-    ./vendor/bin/tailor ter:publish my_extension 1.2.0 --artefact=https://github.com/my-name/my_extension/archive/1.2.0.zip
+    ./vendor/bin/tailor ter:publish 1.2.0 my_extension --artefact=https://github.com/my-name/my_extension/archive/1.2.0.zip
+    
+If the extension key is defined as environment variable,
+it can be skipped:
+
+    ./vendor/bin/tailor ter:publish 1.2.0 --artefact=https://github.com/my-name/my_extension/archive/1.2.0.zip
     
 **Note**: The REST API, just like the the [TER][ter], requires
 an upload comment to be set. This can be achieved using the
@@ -139,7 +155,7 @@ Since you won't have any access to the extension afterwards, the
 command asks for your confirmation before sending the order to
 the REST API.
 
-    ./vendor/bin/tailor ter:transfer my_extension some_user
+    ./vendor/bin/tailor ter:transfer some_user my_extension
     
 This transfers the extension `my_extension`  to the user
 `some_user` and returns following confirmation:
@@ -205,7 +221,7 @@ and more. Similar to the extension detail page on
 If you like to get details about a specific version of an
 extension, `ter:version` can be used:
 
-    ./vendor/bin/tailor ter:version my_extension 1.0.0
+    ./vendor/bin/tailor ter:version 1.0.0 my_extension
     
 This will return details about version `1.0.0` of extension
 `my_extension`.
@@ -227,14 +243,14 @@ This will return the details for all version of the extension
 | ``ter:delete``        | ``extensionkey``                  |                                                                                                       | Delete an extension.                             |
 | ``ter:details``       | ``extensionkey``                  |                                                                                                       | Fetch details about an extension.                |
 | ``ter:find``          |                                   | ``--page``<br/>``--per-page``<br/>``--author``<br/>``--typo3-version``                                | Fetch a list of extensions from TER.             |
-| ``ter:publish``       | ``extensionkey``<br/>``version``  | ``--path``<br/>``--artefact``<br/>``--comment``                                                       | Publishes a new version of an extension to TER.  |
+| ``ter:publish``       | ``version``<br/>``extensionkey``  | ``--path``<br/>``--artefact``<br/>``--comment``                                                       | Publishes a new version of an extension to TER.  |
 | ``ter:register``      | ``extensionkey``                  |                                                                                                       | Register a new extension key in TER.             |
 | ``ter:token:create``  |                                   | ``--name``<br/>``--expires``<br/>``--scope``<br/>``--extensions``                                     | Request an access token for the TER.             |
 | ``ter:token:refresh`` | ``token``                         |                                                                                                       | Refresh an access token for the TER.             |
 | ``ter:token:revoke``  | ``token``                         |                                                                                                       | Revoke an access token for the TER.              |
-| ``ter:transfer``      | ``extensionkey``<br/>``username`` |                                                                                                       | Transfer ownership of an extension key.          |
+| ``ter:transfer``      | ``username``<br/>``extensionkey`` |                                                                                                       | Transfer ownership of an extension key.          |
 | ``ter:update``        | ``extensionkey``                  | ``--composer``<br/>``--issues``<br/>``--repository``<br/>``--manual``<br/>``--paypal``<br/>``--tags`` | Update extension meta information.               |
-| ``ter:version``       | ``extensionkey``<br/>``version``  |                                                                                                       | Fetch details about an extension version.        |
+| ``ter:version``       | ``version``<br/>``extensionkey``  |                                                                                                       | Fetch details about an extension version.        |
 | ``ter:versions``      | ``extensionkey``                  |                                                                                                       | Fetch details for all versions of an extension.  |
 
 **General options for all commands**
@@ -244,10 +260,10 @@ This will return the details for all version of the extension
 - ``-q, --quiet`` Do not output any message
 - ``-v, --version`` Display the CLI applications' version
 - ``-n, --no-interaction`` Do not ask any interactive question
+- ``-v|vv|vvv, --verbose`` Increase the verbosity of messages: 1 for
+normal output, 2 for more verbose output and 3 for debug
 - ``--ansi`` Force ANSI output
 - ``--no-ansi`` Disable ANSI output
-- ``-v|vv|vvv, --verbose`` Increase the verbosity of messages: 1 for normal
-output, 2 for more verbose output and 3 for debug
 
 ---
 TODO:

@@ -34,12 +34,12 @@ class ExtensionVersionsCommand extends AbstractClientRequestCommand
         $this
             ->setDescription('Fetch details for all versions of the extension')
             ->setResultFormat(FormatService::FORMAT_DETAIL)
-            ->addArgument('extensionkey', InputArgument::REQUIRED, 'The extension key');
+            ->addArgument('extensionkey', InputArgument::OPTIONAL, 'The extension key');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->extensionKey = $input->getArgument('extensionkey');
+        $this->extensionKey = $this->getExtensionKey($input);
         // @todo the response format needs to be adjusted!
         return parent::execute($input, $output);
     }

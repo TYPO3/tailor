@@ -44,7 +44,7 @@ class UpdateExtensionCommand extends AbstractClientRequestCommand
         $this
             ->setDescription('Update extension meta information')
             ->setResultFormat(FormatService::FORMAT_DETAIL)
-            ->addArgument('extensionkey', InputArgument::REQUIRED, 'The extension key')
+            ->addArgument('extensionkey', InputArgument::OPTIONAL, 'The extension key')
             ->addOption('composer', '', InputOption::VALUE_OPTIONAL, 'The extensions composer name')
             ->addOption('issues', '', InputOption::VALUE_OPTIONAL, 'Link to the issue tracker')
             ->addOption('repository', '', InputOption::VALUE_OPTIONAL, 'Link to the repository')
@@ -55,7 +55,7 @@ class UpdateExtensionCommand extends AbstractClientRequestCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->extensionKey = $input->getArgument('extensionkey');
+        $this->extensionKey = $this->getExtensionKey($input);
         return parent::execute($input, $output);
     }
 

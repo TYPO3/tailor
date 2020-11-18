@@ -32,12 +32,12 @@ class RegisterExtensionCommand extends AbstractClientRequestCommand
         parent::configure();
         $this
             ->setDescription('Register a new extension key in TER')
-            ->addArgument('extensionkey', InputArgument::REQUIRED, 'Define an extension key');
+            ->addArgument('extensionkey', InputArgument::OPTIONAL, 'Define an extension key');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->extensionKey = $input->getArgument('extensionkey');
+        $this->extensionKey = $this->getExtensionKey($input);
         return parent::execute($input, $output);
     }
 
