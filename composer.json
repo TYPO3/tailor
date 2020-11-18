@@ -2,11 +2,18 @@
     "name": "typo3/tailor",
     "description": "A CLI tool to make TYPO3 extension handling easier",
     "license": "MIT",
-    "authors": [{
-        "name": "Benni Mack",
-        "email": "benni@typo3.org",
-        "role": "Maintainer"
-    }],
+    "authors": [
+        {
+            "name": "Benni Mack",
+            "email": "benni@typo3.org",
+            "role": "Maintainer"
+        },
+        {
+            "name": "Oliver Bartsch",
+            "email": "bo@cedev.de",
+            "role": "Maintainer"
+        }
+    ],
     "config": {
         "sort-packages": true
     },
@@ -23,6 +30,9 @@
         "phpunit/phpunit": "^9.4",
         "typo3/coding-standards": "^0.2.0"
     },
+    "bin": [
+        "bin/tailor"
+    ],
     "autoload": {
         "psr-4": {
             "TYPO3\\Tailor\\": "src/"
