@@ -48,6 +48,11 @@ each command exceution manually.
 variable nor as argument, commands which require an extension
 key to be set, will throw an exception.
 
+**Tip:** Definition of an extension key as argument precedes the
+value from the environment variable. This means, even if you have
+an extension key defined globally, you can still run all commands
+for different extensions by adding them as argument to the command.
+
 ### Manage your personal access token
 
 Use the `ter:token:create` command to create a new token:
