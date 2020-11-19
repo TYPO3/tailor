@@ -60,7 +60,12 @@ class ConsoleFormatter
     protected function formatKeyValue(array $content): void
     {
         foreach ($content as $key => $value) {
+            if (is_array($value)) {
+                // Not a key value pair
+                continue;
+            }
             if (!is_string($key)) {
+                // Just output the value for a non-string key
                 $this->formattedParts->addPart(new OutputPart([(string)$value]));
                 continue;
             }
@@ -82,7 +87,7 @@ class ConsoleFormatter
                 }
                 $this->formatDetailsResult($value);
             }
-            if ((string)$value === 'Array') {
+            if (is_array($value) || (string)$value === 'Array') {
                 continue;
             }
             if (!is_string($key)) {
