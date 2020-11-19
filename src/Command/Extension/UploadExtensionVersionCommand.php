@@ -57,7 +57,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
     {
         $this->version = $input->getArgument('version');
         $this->extensionKey = $this->getExtensionKey($input);
-        $this->transactionPath = rtrim(realpath('.'), '/') . '/tailor-version-upload';
+        $this->transactionPath = rtrim(realpath(getcwd() ?: './'), '/') . '/tailor-version-upload';
 
         if (!(new Filesystem\Directory())->create($this->transactionPath)) {
             throw new \RuntimeException(sprintf('Directory could not be created.'));
