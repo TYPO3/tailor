@@ -26,6 +26,8 @@ final class HttpClientFactory
     public const ALL_AUTH = 4;
 
     private const API_ENTRY_POINT = '/api/';
+
+    private const DEFAULT_BASE_URI = 'https://extensions.typo3.org';
     private const DEFAULT_API_VERSION = 'v1';
 
     public static function create(RequestConfiguration $requestConfiguration): HttpClientInterface
@@ -62,7 +64,7 @@ final class HttpClientFactory
 
     private static function getBaseUri(): string
     {
-        $remoteBaseUri = $_ENV['TYPO3_REMOTE_BASE_URI'] ?? '';
+        $remoteBaseUri = $_ENV['TYPO3_REMOTE_BASE_URI'] ?? self::DEFAULT_BASE_URI;
         $apiVersion = $_ENV['TYPO3_API_VERSION'] ?? self::DEFAULT_API_VERSION;
 
         if ($remoteBaseUri === '') {

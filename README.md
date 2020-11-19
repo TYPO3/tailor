@@ -24,6 +24,9 @@ system to this PHP script:
     TYPO3_API_TOKEN=<your-token>
     TYPO3_API_USERNAME=<your-t3o-username>
     TYPO3_API_PASSWORD=<your-t3o-password>
+    
+**Note**: For an overview of all available environment variables,
+have a look at the `.env.dist`. 
 
 ## Installation
 
