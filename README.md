@@ -33,9 +33,9 @@ Use Tailor as a dev dependency via composer of your extensions:
 
 ## Usage
 
-All commands provide the `-r, --raw` option. If set, the raw result
-will be returned. This can be used for further processing e.g. by
-using some JSON processor.
+All commands, requesting the TER API, provide the `-r, --raw`
+option. If set, the raw result will be returned. This can be
+used for further processing e.g. by using some JSON processor.
 
 Most of the commands require an extension key to work with.
 However, since Tailor can be required as a dev dependency into
@@ -97,6 +97,19 @@ confirmation:
 
     Key: my_extension
     Owner: your_username
+    
+### Update the version of your extension in `ext_emconf.php`
+
+Prior to publishing a new version, you have to update the
+version in your extensions `ext_emconf.php` file. This can
+be done using the `set-version` command.
+
+    ./vendor/bin/tailor set-version 1.2.0
+    
+**Note**: It's also possible to use the `--path` option to
+specify the location of your extension. If not given, your
+current working directory is search for the `ext_emconf.php`
+file.
 
 ### Publish a new version of an extension to TER
 
@@ -256,49 +269,58 @@ This will return the details for all version of the extension
 
 **Overview of all available commands**
 
-| Commands              | Arguments                         | Options                                                                                               | Description                                      |
-| --------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| ``ter:delete``        | ``extensionkey``                  |                                                                                                       | Delete an extension.                             |
-| ``ter:details``       | ``extensionkey``                  |                                                                                                       | Fetch details about an extension.                |
-| ``ter:find``          |                                   | ``--page``<br/>``--per-page``<br/>``--author``<br/>``--typo3-version``                                | Fetch a list of extensions from TER.             |
-| ``ter:publish``       | ``version``<br/>``extensionkey``  | ``--path``<br/>``--artefact``<br/>``--comment``                                                       | Publishes a new version of an extension to TER.  |
-| ``ter:register``      | ``extensionkey``                  |                                                                                                       | Register a new extension key in TER.             |
-| ``ter:token:create``  |                                   | ``--name``<br/>``--expires``<br/>``--scope``<br/>``--extensions``                                     | Request an access token for the TER.             |
-| ``ter:token:refresh`` | ``token``                         |                                                                                                       | Refresh an access token for the TER.             |
-| ``ter:token:revoke``  | ``token``                         |                                                                                                       | Revoke an access token for the TER.              |
-| ``ter:transfer``      | ``username``<br/>``extensionkey`` |                                                                                                       | Transfer ownership of an extension key.          |
-| ``ter:update``        | ``extensionkey``                  | ``--composer``<br/>``--issues``<br/>``--repository``<br/>``--manual``<br/>``--paypal``<br/>``--tags`` | Update extension meta information.               |
-| ``ter:version``       | ``version``<br/>``extensionkey``  |                                                                                                       | Fetch details about an extension version.        |
-| ``ter:versions``      | ``extensionkey``                  |                                                                                                       | Fetch details for all versions of an extension.  |
+| Commands              | Arguments                         | Options                                                                                               | Description                                     |
+| --------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| ``set-version``       | ``version``                       | ``--path``                                                                                            | Update the version in ``ext_emconf.php``        |
+| ``ter:delete``        | ``extensionkey``                  |                                                                                                       | Delete an extension.                            |
+| ``ter:details``       | ``extensionkey``                  |                                                                                                       | Fetch details about an extension.               |
+| ``ter:find``          |                                   | ``--page``<br/>``--per-page``<br/>``--author``<br/>``--typo3-version``                                | Fetch a list of extensions from TER.            |
+| ``ter:publish``       | ``version``<br/>``extensionkey``  | ``--path``<br/>``--artefact``<br/>``--comment``                                                       | Publishes a new version of an extension to TER. |
+| ``ter:register``      | ``extensionkey``                  |                                                                                                       | Register a new extension key in TER.            |
+| ``ter:token:create``  |                                   | ``--name``<br/>``--expires``<br/>``--scope``<br/>``--extensions``                                     | Request an access token for the TER.            |
+| ``ter:token:refresh`` | ``token``                         |                                                                                                       | Refresh an access token for the TER.            |
+| ``ter:token:revoke``  | ``token``                         |                                                                                                       | Revoke an access token for the TER.             |
+| ``ter:transfer``      | ``username``<br/>``extensionkey`` |                                                                                                       | Transfer ownership of an extension key.         |
+| ``ter:update``        | ``extensionkey``                  | ``--composer``<br/>``--issues``<br/>``--repository``<br/>``--manual``<br/>``--paypal``<br/>``--tags`` | Update extension meta information.              |
+| ``ter:version``       | ``version``<br/>``extensionkey``  |                                                                                                       | Fetch details about an extension version.       |
+| ``ter:versions``      | ``extensionkey``                  |                                                                                                       | Fetch details for all versions of an extension. |
 
 **General options for all commands**
 
-- ``-r, --raw`` Return result as raw object (e.g. json)
+- ``-r, --raw`` Return result as raw object (e.g. json) - Only for 
+commands, requesting the TER API
 - ``-h, --help`` Display help message
 - ``-q, --quiet`` Do not output any message
 - ``-v, --version`` Display the CLI applications' version
 - ``-n, --no-interaction`` Do not ask any interactive question
-- ``-v|vv|vvv, --verbose`` Increase the verbosity of messages: 1 for
-normal output, 2 for more verbose output and 3 for debug
+- ``-v|vv|vvv, --verbose`` Increase the verbosity of messages:
+1 for normal output, 2 for more verbose output and 3 for debug
 - ``--ansi`` Force ANSI output
 - ``--no-ansi`` Disable ANSI output
 
----
-
-TODO:
 ## Integration into your CI pipeline
 
-    # Step 1: Update the version in ext_emconf.php
-    ./vendor/bin/tailor set-version 1.5.0 --path=./
-    # Step 2: Commit the changes and add a tag
-    git commit -m "[RELEASE] A new version was published"
-    git tag -a 1.5.0
-    # Step 3: Push this to your remote repository
-    git push origin --tags
-    # Step 4: Push this version to TER
-    ./vendor/bin/tailor ter:publish 1.5.0
+**Step 1: Update the version in ext_emconf.php**
 
----
+    ./vendor/bin/tailor set-version 1.5.0
+
+**Step 2: Commit the changes and add a tag**
+ 
+    git commit -am "[RELEASE] A new version was published"
+    git tag -a 1.5.0
+
+**Step 3: Push this to your remote repository**
+
+    git push origin --tags
+
+**Step 4: Push this version to TER**
+
+    ./vendor/bin/tailor ter:publish 1.5.0
+    
+**Note:** Both `set-version` and `ter:publish` provide options
+to specify the location of your extension. If, like in the example
+above, non is set, Tailor automatically uses your current working
+directory.
 
 ## Author & License
 

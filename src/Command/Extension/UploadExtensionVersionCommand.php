@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
  * This file is part of the TYPO3 project  - inspiring people to share!
- * (c) 2020 Benni Mack
+ * (c) 2020 Oliver Bartsch & Benni Mack
  *
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
@@ -115,7 +115,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
         } else {
             // If neither `path` nor `artefact` is defined, we just
             // create the ZipArchive from the current directory.
-            $versionService->createZipArchiveFromPath('./');
+            $versionService->createZipArchiveFromPath(getcwd() ?: './');
         }
 
         return new FormDataPart([

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
  * This file is part of the TYPO3 project  - inspiring people to share!
- * (c) 2020 Oliver Bartsch
+ * (c) 2020 Oliver Bartsch & Benni Mack
  *
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
@@ -41,7 +41,7 @@ class RequestService
 
     /**
      * Run the request by the given request configuration and
-     * format the result using the ConsoleWriter.
+     * output the formatted result using the ConsoleWriter.
      *
      * @return bool
      */

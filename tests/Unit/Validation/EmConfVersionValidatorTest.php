@@ -20,7 +20,7 @@ class EmConfVersionValidatorTest extends TestCase
     /**
      * @test
      */
-    public function isInvalidIfNoFileFound()
+    public function isInvalidIfNoFileFound(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/no-file');
         self::assertFalse($subject->isValid('1.2.0'));
@@ -29,7 +29,7 @@ class EmConfVersionValidatorTest extends TestCase
     /**
      * @test
      */
-    public function isInvalidIfFileDoesNotMatchEmConfStructure()
+    public function isInvalidIfFileDoesNotMatchEmConfStructure(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_invalid.php');
         self::assertFalse($subject->isValid('1.0.0'));
@@ -38,7 +38,7 @@ class EmConfVersionValidatorTest extends TestCase
     /**
      * @test
      */
-    public function isInvalidIfNoVersionGiven()
+    public function isInvalidIfNoVersionGiven(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_no_version.php');
         self::assertFalse($subject->isValid('1.0.0'));
@@ -47,7 +47,7 @@ class EmConfVersionValidatorTest extends TestCase
     /**
      * @test
      */
-    public function isValidMatchesVersion()
+    public function isValidMatchesVersion(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_valid.php');
         self::assertFalse($subject->isValid('1.2.0'));

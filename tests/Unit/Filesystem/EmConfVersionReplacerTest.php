@@ -10,7 +10,7 @@ declare(strict_types=1);
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace TYPO3\Tailor\Tests\Unit\Validation;
+namespace TYPO3\Tailor\Tests\Unit\Filesystem;
 
 use PHPUnit\Framework\TestCase;
 use TYPO3\Tailor\Filesystem\EmConfVersionReplacer;
@@ -20,7 +20,7 @@ class EmConfVersionReplacerTest extends TestCase
     /**
      * @test
      */
-    public function replaceVersionReplacesProperVersion()
+    public function replaceVersionReplacesProperVersion(): void
     {
         $emConfContents = file_get_contents(__DIR__ . '/../Fixtures/EmConf/emconf_valid.php');
         $tempFile = tempnam('/tmp/', 'tailer_emconf.php');

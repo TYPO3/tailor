@@ -3,7 +3,7 @@
 
 /*
  * This file is part of the TYPO3 project  - inspiring people to share!
- * (c) 2020 Benni Mack
+ * (c) 2020 Oliver Bartsch & Benni Mack
  *
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
@@ -35,10 +35,10 @@ foreach ([__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php
     $application->add(new Command\Extension\ExtensionVersionsCommand('ter:versions'));
     $application->add(new Command\Extension\FindExtensionsCommand('ter:find'));
     $application->add(new Command\Extension\RegisterExtensionCommand('ter:register'));
+    $application->add(new Command\Extension\SetExtensionVersionCommand('set-version'));
     $application->add(new Command\Extension\TransferExtensionCommand('ter:transfer'));
     $application->add(new Command\Extension\UpdateExtensionCommand('ter:update'));
     $application->add(new Command\Extension\UploadExtensionVersionCommand('ter:publish'));
     $application->add(new Command\Extension\VersionDetailsCommand('ter:version'));
-    $application->add(new Command\Extension\SetExtensionVersionCommand('set-version'));
     $application->run();
 });

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
  * This file is part of the TYPO3 project  - inspiring people to share!
- * (c) 2020 Oliver Bartsch
+ * (c) 2020 Oliver Bartsch & Benni Mack
  *
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
@@ -57,10 +57,10 @@ class TransferExtensionCommand extends AbstractClientRequestCommand
         $variables = [$this->extensionKey, $this->username];
 
         return new Messages(
-            sprintf('Transferring extension %s to %s', ...$variables),
-            sprintf('Extension %s successfully transferred to %s.', ...$variables),
+            sprintf('Transferring extension key %s to %s', ...$variables),
+            sprintf('Extension key %s successfully transferred to %s.', ...$variables),
             sprintf('Could not transfer extension key %s to %s.', ...$variables),
-            sprintf('Are you sure you want to transfer the extension %s to %s?', ...$variables)
+            sprintf('Are you sure you want to transfer the extension key %s to %s?', ...$variables)
         );
     }
 }

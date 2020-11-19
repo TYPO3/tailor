@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
  * This file is part of the TYPO3 project  - inspiring people to share!
- * (c) 2020 Benni Mack
+ * (c) 2020 Oliver Bartsch & Benni Mack
  *
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
@@ -26,22 +26,18 @@ use TYPO3\Tailor\Validation\VersionValidator;
  */
 class SetExtensionVersionCommand extends Command
 {
-    /** @var string */
-    protected $extensionKey;
-
     protected function configure(): void
     {
         parent::configure();
         $this
             ->setDescription('Update the extensions ext_emconf.php version to a specific version. Useful in CI environments')
             ->addArgument('version', InputArgument::REQUIRED, 'The version to publish, e.g. 1.2.3. Must have three digits.')
-            ->addOption('path', '', InputOption::VALUE_OPTIONAL, 'Path to the extension folder', getcwd());
+            ->addOption('path', '', InputOption::VALUE_OPTIONAL, 'Path to the extension folder', getcwd() ?: './');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-
         $version = (string)$input->getArgument('version');
 
         if (!(new VersionValidator())->isValid($version)) {
@@ -49,17 +45,25 @@ class SetExtensionVersionCommand extends Command
             return 1;
         }
 
-        $path = $input->getOption('path');
-        $path = realpath($path);
-        $path = ltrim($path, '/');
-        $emConfFile = $path . '/ext_emconf.php';
+        $path = realpath($input->getOption('path'));
+        if (!$path) {
+            $io->error(sprintf('Given path %s does not exist.', $path));
+            return 1;
+        }
+
+        $emConfFile = rtrim($path, '/') . '/ext_emconf.php';
+        if (!file_exists($emConfFile)) {
+            $io->error(sprintf('No \'ext_emconf.php\' found in the given path %s.', $path));
+            return 1;
+        }
+
         try {
-            $replacer = new EmConfVersionReplacer($emConfFile);
-            $replacer->setVersion($version);
+            (new EmConfVersionReplacer($emConfFile))->setVersion($version);
         } catch (\InvalidArgumentException $e) {
             $io->error(sprintf('An error occurred while setting the ext_emconf.php version to %s.', $version));
             return 1;
         }
+
         return 0;
     }
 }
