@@ -39,10 +39,8 @@ final class HttpClientFactory
                 'Accept' => 'application/json',
                 'User-Agent' => 'Tailor - Your TYPO3 Extension Helper',
             ], $requestConfiguration->getHeaders()),
-            'max_redirects' => 0,
-            // @todo: Below options needs to be "true" for live
-            'verify_peer' => false,
-            'verify_host' => false,
+            // REST API does not perform redirects
+            'max_redirects' => 0
         ];
         if ($requestConfiguration->getQuery() !== []) {
             $options['query'] = $requestConfiguration->getQuery();
@@ -62,7 +60,7 @@ final class HttpClientFactory
         return HttpClient::create($options);
     }
 
-    private static function getBaseUri(): string
+    protected static function getBaseUri(): string
     {
         $remoteBaseUri = $_ENV['TYPO3_REMOTE_BASE_URI'] ?? self::DEFAULT_BASE_URI;
         $apiVersion = $_ENV['TYPO3_API_VERSION'] ?? self::DEFAULT_API_VERSION;
