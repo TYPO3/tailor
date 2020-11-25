@@ -32,11 +32,15 @@ class RequestService
     /** @var ConsoleWriter */
     protected $consoleWriter;
 
+    /** @var bool */
+    protected $isRaw;
+
     public function __construct(RequestConfiguration $requestConfiguration, ConsoleWriter $consoleWriter)
     {
         $this->client = HttpClientFactory::create($requestConfiguration);
         $this->requestConfiguration = $requestConfiguration;
         $this->consoleWriter = $consoleWriter;
+        $this->isRaw = $this->requestConfiguration->isRaw();
     }
 
     /**
@@ -47,14 +51,16 @@ class RequestService
      */
     public function run(): bool
     {
-        $this->consoleWriter->writeTitle();
+        if (!$this->isRaw) {
+            $this->consoleWriter->writeTitle();
+        }
 
         try {
             $response = $this->client->request($this->requestConfiguration->getMethod(), $this->requestConfiguration->getEndpoint());
             $content = $response->getContent(false);
             $status = $response->getStatusCode();
 
-            if ($this->requestConfiguration->isRaw()) {
+            if ($this->isRaw) {
                 // If no content is provided in the response, usually on 200
                 // responses for requests which delete the remote resource,
                 // we ensure to return at least the status code on the CLI.
