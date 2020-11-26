@@ -128,40 +128,32 @@ class ConsoleFormatterTest extends TestCase
                 ['<info>Key</info>: some_ext'],
                 ['<info>Downloads</info>: 4321'],
                 ['<info>Version count</info>: 2'],
-                ['
-Meta'],
+                [PHP_EOL . 'Meta'],
                 ['<info>Composer name</info>: vendor/some_ext'],
-                ['
-Tags'],
+                [PHP_EOL . 'Tags'],
                 ['<info>Title</info>: sometag'],
                 ['<info>Title</info>: anothertag'],
-                ['
-Current version'],
+                [PHP_EOL . 'Current version'],
                 ['<info>Title</info>: foobar'],
                 ['<info>Description</info>: barbaz'],
                 ['<info>Number</info>: 1.0.0'],
                 ['<info>State</info>: stable'],
                 ['<info>Category</info>: be'],
-                ['
-Typo3 versions'],
+                [PHP_EOL . 'Typo3 versions'],
                 ['9'],
                 ['10'],
-                ['
-Dependencies'],
+                [PHP_EOL . 'Dependencies'],
                 ['<info>Typo3</info>: 10.0.0 - 10.99.99'],
-                ['
-Conflicts'],
+                [PHP_EOL . 'Conflicts'],
                 ['<info>Templavoila</info>: *'],
                 ['<info>Downloads</info>: 1234'],
                 ['<info>Upload date</info>: 1606400890'],
                 ['<info>Review state</info>: 0'],
-                ['
-Download'],
+                [PHP_EOL . 'Download'],
                 ['<info>Composer</info>: composer req vendor/some_ext'],
                 ['<info>Zip</info>: https://extensions.typo3.org/extension/download/some_ext/1.0.0/zip'],
                 ['<info>T3x</info>: https://extensions.typo3.org/extension/download/some_ext/1.0.0/t3x'],
-                ['
-Author'],
+                [PHP_EOL . 'Author'],
                 ['<info>Name</info>: John Doe'],
                 ['<info>Email</info>: some-mail@example.com'],
                 ['<info>Company</info>: ACME Inc']
@@ -169,8 +161,7 @@ Author'],
             [],
             ConsoleFormatter::FORMAT_DETAIL
         ];
-
-        yield 'Details with empty array ' => [
+        yield 'Details with empty array' => [
             [
                 'key' => 'some_ext',
                 'downloads' => 60,
@@ -185,9 +176,8 @@ Author'],
                 ['<info>Key</info>: some_ext'],
                 ['<info>Downloads</info>: 60'],
                 ['<info>Version count</info>: 2'],
-                ['
-Meta'],
-                ['<info>Composer name</info>: vendor/some_ext'],
+                [PHP_EOL . 'Meta'],
+                ['<info>Composer name</info>: vendor/some_ext']
             ],
             [],
             ConsoleFormatter::FORMAT_DETAIL
