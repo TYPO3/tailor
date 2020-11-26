@@ -87,7 +87,7 @@ class ConsoleFormatter
                 }
                 $this->formatDetailsResult($value);
             }
-            if (is_array($value) || (string)$value === 'Array') {
+            if (is_array($value) || (string)$value === 'Array' || (is_string($value) && $value === '')) {
                 continue;
             }
             if (!is_string($key)) {
