@@ -114,6 +114,9 @@ specify the location of your extension. If not given, your
 current working directory is search for the `ext_emconf.php`
 file.
 
+**Note**: The version will only be updated if already present
+in your `ext_emconf.php`. It won't be added by this command.
+
 ### Publish a new version of an extension to TER
 
 You can publish a new version of your extension using the
