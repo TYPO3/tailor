@@ -26,6 +26,8 @@ use ZipArchive;
  */
 class VersionService
 {
+    private const EXCLUDE_FROM_PACKAGING = __DIR__ . '/../../conf/ExcludeFromPackaging.php';
+
     /** @var string */
     protected $version;
 
@@ -198,11 +200,15 @@ class VersionService
      */
     protected function getExcludeConfiguration(): array
     {
-        $exludeConfigurationFile = $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] ?? __DIR__ . '/../../conf/ExcludeFromPackaging.php';
+        $exludeConfigurationFile = (string)($_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] ?? '');
+
+        if ($exludeConfigurationFile === '') {
+            $exludeConfigurationFile = self::EXCLUDE_FROM_PACKAGING;
+        }
 
         if (!file_exists($exludeConfigurationFile)) {
             throw new \InvalidArgumentException(
-                'Given file \'' . $exludeConfigurationFile . '\' does not exist',
+                'The exclude from packaging configuration file \'' . $exludeConfigurationFile . '\' does not exist.',
                 1605734677
             );
         }
@@ -211,7 +217,7 @@ class VersionService
 
         if (!is_array($configuration) || !isset($configuration['directories'], $configuration['files'])) {
             throw new RequiredConfigurationMissing(
-                'Given file does not include \'directories\' and \'files\' configuration',
+                'Given exclude from packaging configuration must include \'directories\' and \'files\'.',
                 1605734681
             );
         }

@@ -22,19 +22,40 @@ class VersionServiceTest extends TestCase
     /**
      * @test
      */
+    public function defaultExcludeFromPackagingConfiurationIsUsedOnNonExistingEnvVar(): void
+    {
+        unset($_ENV['TYPO3_EXCLUDE_FROM_PACKAGING']);
+
+        $this::assertContains(
+            'vendor',
+            $this->invokeMethod('getExcludeConfiguration', [])['directories']
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function defaultExcludeFromPackagingConfiurationIsUsedOnEmptyPath(): void
+    {
+        $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] = '';
+
+        $this::assertContains(
+            'vendor',
+            $this->invokeMethod('getExcludeConfiguration', [])['directories']
+        );
+    }
+
+    /**
+     * @test
+     */
     public function customExcludeFromPackagingConfiurationIsUsed(): void
     {
         $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] = __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_valid.php';
 
-        $mock = $this
-            ->getMockBuilder(VersionService::class)
-            ->setConstructorArgs(['1.0.0', 'my_ext', '/dummyPath'])
-            ->getMock();
-
-        $method = new ReflectionMethod(VersionService::class, 'getExcludeConfiguration');
-        $method->setAccessible(true);
-
-        $this::assertSame(['directories' => ['dummy'], 'files' => ['dummy']], $method->invokeArgs($mock, []));
+        $this::assertSame(
+            ['directories' => ['dummy'], 'files' => ['dummy']],
+            $this->invokeMethod('getExcludeConfiguration', [])
+        );
     }
 
     /**
@@ -70,15 +91,10 @@ class VersionServiceTest extends TestCase
     {
         $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] = __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_valid.php';
 
-        $mock = $this
-            ->getMockBuilder(VersionService::class)
-            ->setConstructorArgs(['1.0.0', 'my_ext', '/dummyPath'])
-            ->getMock();
-
-        $method = new ReflectionMethod(VersionService::class, 'getVersionFilename');
-        $method->setAccessible(true);
-
-        $this::assertSame('/dummyPath/my_ext_1.0.0.zip', $method->invokeArgs($mock, []));
+        $this::assertSame(
+            '/dummyPath/my_ext_1.0.0.zip',
+            $this->invokeMethod('getVersionFilename', [])
+        );
     }
 
     /**
@@ -88,14 +104,31 @@ class VersionServiceTest extends TestCase
     {
         $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] = __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_valid.php';
 
+        $this::assertSame(
+            'cf2d6e211e53d983056761055c95791b',
+            $this->invokeMethod('getVersionFilename', [true])
+        );
+    }
+
+    /**
+     * Invoke a protected / private method from VersionService
+     *
+     * @param string $methodName
+     * @param array  $arguments
+     *
+     * @return mixed
+     * @throws \ReflectionException
+     */
+    protected function invokeMethod(string $methodName, array $arguments)
+    {
         $mock = $this
             ->getMockBuilder(VersionService::class)
             ->setConstructorArgs(['1.0.0', 'my_ext', '/dummyPath'])
             ->getMock();
 
-        $method = new ReflectionMethod(VersionService::class, 'getVersionFilename');
+        $method = new ReflectionMethod(VersionService::class, $methodName);
         $method->setAccessible(true);
 
-        $this::assertSame('cf2d6e211e53d983056761055c95791b', $method->invokeArgs($mock, [true]));
+        return $method->invokeArgs($mock, $arguments);
     }
 }
