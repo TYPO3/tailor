@@ -72,18 +72,27 @@ class VersionService
         $files = new RecursiveIteratorIterator(
             new RecursiveCallbackFilterIterator($iterator, function ($current) use ($fullPath) {
                 // @todo Find a more performant way for filtering
-                $path = substr($current->getRealPath(), strlen($fullPath) + 1);
+
+                $filepath = $current->getRealPath();
+                $filename = $current->getFilename();
+
+                if (!$filepath || !$filename || !($path = substr($filepath, strlen($fullPath) + 1))) {
+                    return false;
+                }
+
+                // check directories
                 foreach ($this->excludeConfiguration['directories'] as $excludeDirectory) {
                     if (preg_match('/^' . $excludeDirectory . '/i', $path)) {
                         return false;
                     }
                 }
-                $filename = $current->getFilename();
+                // check files
                 foreach ($this->excludeConfiguration['files'] as $excludeFile) {
                     if (preg_match('/' . $excludeFile . '$/i', $filename)) {
                         return false;
                     }
                 }
+
                 return true;
             }),
             RecursiveIteratorIterator::LEAVES_ONLY

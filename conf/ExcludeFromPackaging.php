@@ -12,6 +12,7 @@ return [
     'directories' => [
         'bin',
         'build',
+        '.build',
         '.ddev',
         '.git',
         '.github',
@@ -42,7 +43,7 @@ return [
         'Makefile',
         'package-lock.json',
         'package.json',
-        'php_cs.dist',
+        'php_cs',
         'phplint.yml',
         'phpstan.neon',
         'phpunit.xml',
