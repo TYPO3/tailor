@@ -217,7 +217,7 @@ class VersionService
         if (!file_exists($exludeConfigurationFile)) {
             throw new \InvalidArgumentException(
                 'The exclude from packaging configuration file \'' . $exludeConfigurationFile . '\' does not exist.',
-                1605734681
+                1605734677
             );
         }
 
