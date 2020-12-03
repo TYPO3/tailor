@@ -24,7 +24,7 @@ class VersionValidatorTest extends TestCase
      * @param string $input
      * @param bool $expected
      */
-    public function isValidTest(string$input, bool $expected): void
+    public function isValidTest(string $input, bool $expected): void
     {
         self::assertEquals($expected, (new VersionValidator())->isValid($input));
     }
