@@ -16,6 +16,7 @@ use FilesystemIterator;
 use RecursiveCallbackFilterIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use TYPO3\Tailor\Environment\Variables;
 use TYPO3\Tailor\Exception\FormDataProcessingException;
 use TYPO3\Tailor\Exception\RequiredConfigurationMissing;
 use TYPO3\Tailor\Validation\EmConfVersionValidator;
@@ -209,11 +210,9 @@ class VersionService
      */
     protected function getExcludeConfiguration(): array
     {
-        $exludeConfigurationFile = (string)($_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] ?? '');
-
-        if ($exludeConfigurationFile === '') {
-            $exludeConfigurationFile = self::EXCLUDE_FROM_PACKAGING;
-        }
+        $exludeConfigurationFile = Variables::has('TYPO3_EXCLUDE_FROM_PACKAGING')
+            ? Variables::get('TYPO3_EXCLUDE_FROM_PACKAGING')
+            : self::EXCLUDE_FROM_PACKAGING;
 
         if (!file_exists($exludeConfigurationFile)) {
             throw new \InvalidArgumentException(

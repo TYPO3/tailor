@@ -20,9 +20,9 @@ foreach ([__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php
 }
 
 \call_user_func(static function() {
-    foreach ([ __DIR__ . '/../.env', __DIR__ . '/../../../../.env'] as $file) {
+    foreach ([ __DIR__ . '/../.env', __DIR__ . '/../../../../.env', __DIR__ . '/../../../../../.env'] as $file) {
         if (file_exists($file)) {
-            (new Symfony\Component\Dotenv\Dotenv())->loadEnv($file, 'dist');
+            (new Symfony\Component\Dotenv\Dotenv())->usePutenv(true)->loadEnv($file);
             break;
         }
     }

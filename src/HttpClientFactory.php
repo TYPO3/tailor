@@ -15,6 +15,7 @@ namespace TYPO3\Tailor;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use TYPO3\Tailor\Dto\RequestConfiguration;
+use TYPO3\Tailor\Environment\Variables;
 
 /**
  * Factory for creating a Symfony HTTP client
@@ -48,29 +49,26 @@ final class HttpClientFactory
         if ($requestConfiguration->getBody() !== []) {
             $options['body'] = $requestConfiguration->getBody();
         }
-        if (!empty($_ENV['TYPO3_API_TOKEN'])
-            && ($defaultAuthMethod === self::BEARER_AUTH || $defaultAuthMethod === self::ALL_AUTH)
+        if (($defaultAuthMethod === self::BEARER_AUTH || $defaultAuthMethod === self::ALL_AUTH)
+            && Variables::has('TYPO3_API_TOKEN')
         ) {
-            $options['auth_bearer'] = $_ENV['TYPO3_API_TOKEN'];
-        } elseif (!empty($_ENV['TYPO3_API_USERNAME']) && !empty($_ENV['TYPO3_API_PASSWORD'])
-            && ($defaultAuthMethod === self::BASIC_AUTH || $defaultAuthMethod === self::ALL_AUTH)
+            $options['auth_bearer'] = Variables::get('TYPO3_API_TOKEN');
+        } elseif (($defaultAuthMethod === self::BASIC_AUTH || $defaultAuthMethod === self::ALL_AUTH)
+            && (Variables::has('TYPO3_API_USERNAME') && Variables::has('TYPO3_API_PASSWORD'))
         ) {
-            $options['auth_basic'] = [$_ENV['TYPO3_API_USERNAME'], $_ENV['TYPO3_API_PASSWORD']];
+            $options['auth_basic'] = [Variables::get('TYPO3_API_USERNAME'), Variables::get('TYPO3_API_PASSWORD')];
+        } else {
+            // Since currently only requests to access restricted endpoints are implemented,
+            // we can throw an exception if the request lacks authentication credentials.
+            throw new \InvalidArgumentException('No authentication credentials are defined.', 1606995339);
         }
         return HttpClient::create($options);
     }
 
     protected static function getBaseUri(): string
     {
-        $remoteBaseUri = $_ENV['TYPO3_REMOTE_BASE_URI'] ?? self::DEFAULT_BASE_URI;
-        $apiVersion = $_ENV['TYPO3_API_VERSION'] ?? self::DEFAULT_API_VERSION;
-
-        if ($remoteBaseUri === '') {
-            throw new \InvalidArgumentException(
-                'Environment variable \'TYPO3_REMOTE_BASE_URI\' is not set',
-                1605276986
-            );
-        }
+        $remoteBaseUri = Variables::get('TYPO3_REMOTE_BASE_URI') ?: self::DEFAULT_BASE_URI;
+        $apiVersion =  Variables::get('TYPO3_API_VERSION') ?: self::DEFAULT_API_VERSION;
 
         return trim($remoteBaseUri, '/') . self::API_ENTRY_POINT . trim($apiVersion, '/') . '/';
     }

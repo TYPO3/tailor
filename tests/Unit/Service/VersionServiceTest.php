@@ -24,7 +24,7 @@ class VersionServiceTest extends TestCase
      */
     public function defaultExcludeFromPackagingConfiurationIsUsedOnNonExistingEnvVar(): void
     {
-        unset($_ENV['TYPO3_EXCLUDE_FROM_PACKAGING']);
+        unset($_ENV);
 
         $this::assertContains(
             'vendor',
@@ -37,6 +37,8 @@ class VersionServiceTest extends TestCase
      */
     public function defaultExcludeFromPackagingConfiurationIsUsedOnEmptyPath(): void
     {
+        unset($_ENV);
+        putenv('TYPO3_EXCLUDE_FROM_PACKAGING=');
         $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] = '';
 
         $this::assertContains(
@@ -50,6 +52,8 @@ class VersionServiceTest extends TestCase
      */
     public function customExcludeFromPackagingConfiurationIsUsed(): void
     {
+        unset($_ENV);
+        putenv('TYPO3_EXCLUDE_FROM_PACKAGING=');
         $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] = __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_valid.php';
 
         $this::assertSame(
@@ -63,7 +67,8 @@ class VersionServiceTest extends TestCase
      */
     public function throwsExceptionOnMissingCustomConfiguration(): void
     {
-        $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] = __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_invalid_path.php';
+        unset($_ENV);
+        putenv('TYPO3_EXCLUDE_FROM_PACKAGING=' . __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_invalid_path.php');
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1605734677);
@@ -76,7 +81,8 @@ class VersionServiceTest extends TestCase
      */
     public function throwsExceptionOnInvalidCustomConfiguration(): void
     {
-        $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] = __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_invalid.php';
+        unset($_ENV);
+        putenv('TYPO3_EXCLUDE_FROM_PACKAGING=' . __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_invalid.php');
 
         $this->expectException(RequiredConfigurationMissing::class);
         $this->expectExceptionCode(1605734681);
@@ -89,7 +95,8 @@ class VersionServiceTest extends TestCase
      */
     public function getVersionFilenameTest(): void
     {
-        $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] = __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_valid.php';
+        unset($_ENV);
+        putenv('TYPO3_EXCLUDE_FROM_PACKAGING=' . __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_valid.php');
 
         $this::assertSame(
             '/dummyPath/my_ext_1.0.0.zip',
@@ -102,6 +109,8 @@ class VersionServiceTest extends TestCase
      */
     public function getVersionFilenameAsMd5Test(): void
     {
+        unset($_ENV);
+        putenv('TYPO3_EXCLUDE_FROM_PACKAGING=');
         $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] = __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_valid.php';
 
         $this::assertSame(

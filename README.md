@@ -1,15 +1,16 @@
 # Tailor
 
 Tailor is a CLI application to help you maintain your extensions.
-Tailor talks with the TER REST API and enables you to register new
-keys, update extension information and publish new versions to the
-[extension repository][ter].
+Tailor talks with the [TER REST API][rest-api] and enables you to
+register new keys, update extension information and publish new
+versions to the [extension repository][ter].
 
 ## Prerequisites
 
-The TER REST API can be accessed providing a personal access token.
-You can create such token either on [https://extensions.typo3.org/][ter]
-after you've logged in, or directly using Tailor.
+The [TER REST API][rest-api] can be accessed providing a personal
+access token. You can create such token either on
+[https://extensions.typo3.org/][ter] after you've logged in, or
+directly using Tailor.
 
 **Note:** To create an access token with Tailor, you have to add your
 TYPO3.org credentials (see below). Even if it is possible to execute
@@ -26,7 +27,19 @@ system to this PHP script:
     TYPO3_API_PASSWORD=<your-t3o-password>
     
 **Note**: For an overview of all available environment variables,
-have a look at the `.env.dist` file. 
+have a look at the `.env.dist` file.
+    
+**Note**: You can also add environment variables directly on
+executing a command. This overrides any variable, defined in
+the `.env` file.
+
+Example:
+
+    TYPO3_API_TOKEN="someToken" TYPO3_EXTENSION_KEY="ext_key" bin/tailor ter:details
+    
+This will display the extension details for extension `ext_key` if
+`someToken` is valid (not expired/revoked and having at least the
+`extension:read` scope assigned).
 
 ## Installation
 
@@ -230,7 +243,7 @@ filters:
     ./vendor/bin/tailor ter:find
     ./vendor/bin/tailor ter:find --typo3-version=9
     ./vendor/bin/tailor ter:find --typo3-author=some_user
-    `
+
 First command will find all public extensions. The second
 and third one will only return extensions which match the
 filter. In this case being compatible with TYPO3 version
@@ -332,4 +345,5 @@ directory.
 
 Created by Benni Mack and Oliver Bartsch in 2020.
 
+[rest-api]: https://extensions.typo3.org/faq/rest-api/
 [ter]: https://extensions.typo3.org
