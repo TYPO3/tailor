@@ -1,3 +1,12 @@
+---
+name: Feature request
+about: Suggest an idea to help us improving tailor
+title: "[FEATURE] Suggestion for some new feature"
+labels: feature
+assignees: ''
+
+---
+
 ## Summary / Description
 
 Summarize your idea for a new feature.

@@ -1,3 +1,12 @@
+---
+name: Bug report
+about: Create a  bug report to help us improving tailor
+title: "[BUG] Something does not work properly"
+labels: bug
+assignees: ''
+
+---
+
 ## Summary / Description
 
 Short description of the bug.
