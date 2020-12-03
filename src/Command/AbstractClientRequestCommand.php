@@ -67,7 +67,10 @@ abstract class AbstractClientRequestCommand extends Command
             ->setRaw($input->getOption('raw') !== false)
             ->setDefaultAuthMethod($this->defaultAuthMethod);
 
-        return (int)(new RequestService(
+        // RequestService returns a boolean for whether the request was successful or not.
+        // Since we have to return an exit code, this must be negated and casted to return
+        // 0 on success and 1 on failure.
+        return (int)!(new RequestService(
             $requestConfiguration,
             new ConsoleWriter($io, $this->getMessages(), $this->resultFormat)
         ))->run();

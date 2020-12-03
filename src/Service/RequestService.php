@@ -77,6 +77,7 @@ class RequestService
                 $this->consoleWriter->writeFailure(
                     (string)($content['error_description'] ?? $content['message'] ?? 'Unknown (Status ' . $status . ')')
                 );
+                return false;
             }
         } catch (ExceptionInterface|\InvalidArgumentException $e) {
             $this->consoleWriter->error('An error occurred: ' . $e->getMessage());
