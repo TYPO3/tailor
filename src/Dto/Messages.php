@@ -18,7 +18,7 @@ namespace TYPO3\Tailor\Dto;
 class Messages
 {
     /** @var string */
-    protected $title;
+      protected $title  ;
 
     /** @var string */
     protected $success;
