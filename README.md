@@ -341,6 +341,36 @@ to specify the location of your extension. If, like in the example
 above, non is set, Tailor automatically uses your current working
 directory.
 
+### GitLab CI example
+
+This job runs only when setting a Git tag. The upload comment is taken
+from the message in the Git tag.
+
+**Note:** Be sure that you set a valid access token (`TYPO3_API_TOKEN`) 
+and the extension key (`TYPO3_EXTENSION_KEY`) into GitLab variables. The
+variable `CI_COMMIT_TAG` is set by GitLab automatically.
+
+```yaml
+"Upload to TER":
+  stage: release
+  image: composer:2
+  only:
+    - tags
+  before_script:
+    - composer global require typo3/tailor
+  script:
+    - >
+      if [ -n "$CI_COMMIT_TAG" ] && [ -n "$TYPO3_API_TOKEN" ] && [ -n "$TYPO3_EXTENSION_KEY" ]; then
+        echo -e "Preparing upload of release ${CI_COMMIT_TAG} to TER\n"
+        # Cleanup before we upload
+        git reset --hard HEAD && git clean -fx
+        # Upload
+        TAG_MESSAGE=`git tag -n10 -l $CI_COMMIT_TAG | sed 's/^[0-9.]*[ ]*//g'`
+        echo "Uploading release ${CI_COMMIT_TAG} to TER"
+        /tmp/vendor/bin/tailor ter:publish --comment "$TAG_MESSAGE" "$CI_COMMIT_TAG" "$TYPO3_EXTENSION_KEY"
+      fi;
+```
+
 ## Author & License
 
 Created by Benni Mack and Oliver Bartsch in 2020.
