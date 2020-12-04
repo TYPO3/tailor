@@ -370,6 +370,10 @@ validated to match the required pattern.
 The commit message from **Step 2** is used as the release
 comment. If it's empty, a static text will be used.
 
+To see the following workflow in action, please have a
+look at the [tailor_ext][tailor-ext] example extension.
+
+
 ```yaml
 name: publish
 on:
@@ -458,3 +462,4 @@ Created by Benni Mack and Oliver Bartsch in 2020.
 
 [rest-api]: https://extensions.typo3.org/faq/rest-api/
 [ter]: https://extensions.typo3.org
+[tailor-ext]: https://github.com/o-ba/tailor_ext
