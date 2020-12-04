@@ -1,5 +1,7 @@
 # Tailor
 
+![Tests](https://github.com/TYPO3/tailor/workflows/tests/badge.svg)
+
 Tailor is a CLI application to help you maintain your extensions.
 Tailor talks with the [TER REST API][rest-api] and enables you to
 register new keys, update extension information and publish new
