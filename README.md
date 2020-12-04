@@ -341,7 +341,7 @@ to specify the location of your extension. If, like in the example
 above, non is set, Tailor automatically uses your current working
 directory.
 
-## Integration into your CI
+## Publish a new version using your CI
 
 You can also integrate tailor into you GitHub workflow respectively
 your GitLab pipline. Therefore, **Step 1**, **Step 2** and **Step 3**
