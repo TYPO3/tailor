@@ -317,7 +317,7 @@ commands, requesting the TER API
 - ``--ansi`` Force ANSI output
 - ``--no-ansi`` Disable ANSI output
 
-## Integration into your CI pipeline
+## Publish a new version using tailor locally
 
 **Step 1: Update the version in ext_emconf.php**
 
@@ -341,17 +341,96 @@ to specify the location of your extension. If, like in the example
 above, non is set, Tailor automatically uses your current working
 directory.
 
-### GitLab CI example
+## Integration into your CI
 
-This job runs only when setting a Git tag. The upload comment is taken
-from the message in the Git tag.
+You can also integrate tailor into you GitHub workflow respectively
+your GitLab pipline. Therefore, **Step 1**, **Step 2** and **Step 3**
+from the above example are the same. **Step 4** could then be
+done by your integration.
 
-**Note:** Be sure that you set a valid access token (`TYPO3_API_TOKEN`) 
-and the extension key (`TYPO3_EXTENSION_KEY`) into GitLab variables. The
-variable `CI_COMMIT_TAG` is set by GitLab automatically.
+Please have a look at the following examples describing how
+such integration could look like for GitHub workflows and
+GitLab pipelines. 
+
+### Github workflow
+
+The workflow will only be executed when pushing a new tag.
+This can either be done using **Step 3** from above example
+or by creating a new GitHub release which will also add a
+new tag.
+
+The workflow furthermore requires the GitHub secrets
+`TYPO3_EXTENSION_KEY` and `TYPO3_API_TOKEN` to be set.
+
+The version is automatically fetched from the tag and
+validated to match the required pattern.
+
+The commit message from **Step 2** is used as the release
+comment. If it's empty, a static text will be used.
 
 ```yaml
-"Upload to TER":
+name: publish
+on:
+  push:
+    tag:
+jobs:
+  publish:
+    name: Publish new version to TER
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-20.04
+    env:
+      TYPO3_EXTENSION_KEY: ${{ secrets.TYPO3_EXTENSION_KEY }}
+      TYPO3_API_TOKEN: ${{ secrets.TYPO3_API_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Check tag
+        run: |
+          if ! [[ ${{ github.ref }} =~ ^refs/tags/[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$ ]]; then
+            exit 1
+          fi
+
+      - name: Get version
+        id: get-version
+        run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\//}
+
+      - name: Get comment
+        id: get-comment
+        run: |
+          readonly local comment=$(git tag -n10 -l ${{ steps.get-version.outputs.version }} | sed "s/^[0-9.]*[ ]*//g")
+
+          if [[ -z "${comment// }" ]]; then
+            echo ::set-output name=comment::Released version ${{ steps.get-version.outputs.version }} of ${{ env.TYPO3_EXTENSION_KEY }}
+          else
+            echo ::set-output name=comment::$comment
+          fi
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+          extensions: intl, mbstring, json, zip, curl
+
+      - name: Install tailor
+        run: composer global require typo3/tailor --prefer-dist --no-progress --no-suggest
+
+      - name: Publish to TER
+        run: php ~/.composer/vendor/bin/tailor ter:publish --comment "${{ steps.get-comment.outputs.comment }}" ${{ steps.get-version.outputs.version }}
+```
+
+### GitLab pipeline
+
+The job will only be executed when pushing a new tag.
+The upload comment is taken from the message in the tag.
+
+The job furthermore requires the GitLab variables
+`TYPO3_EXTENSION_KEY` and `TYPO3_API_TOKEN` to be set.
+
+The variable `CI_COMMIT_TAG` is set by GitLab automatically.
+
+```yaml
+"Publish new version to TER":
   stage: release
   image: composer:2
   only:
