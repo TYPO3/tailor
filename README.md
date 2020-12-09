@@ -429,7 +429,7 @@ jobs:
 
 1. The regular expression in step **Check tag** should be:
 
-```bash
+```
 ^refs/tags/v[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$
 ```
 
