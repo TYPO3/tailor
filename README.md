@@ -425,6 +425,26 @@ jobs:
         run: php ~/.composer/vendor/bin/tailor ter:publish --comment "${{ steps.get-comment.outputs.comment }}" ${{ steps.get-version.outputs.version }}
 ```
 
+**Note**: If you're using tags with a leading `v` the above example needs to be adjusted.
+
+1. The regular expression in step **Check tag** should be:
+
+```bash
+^refs/tags/v[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$
+```
+
+2. The output format in step **Get version** should be:
+
+```bash
+${GITHUB_REF#refs/tags/v}
+```
+
+3. The variable declaration in step **Get comment** should be:
+
+```bash
+$(git tag -n10 -l v${{ steps.get-version.outputs.version }} | sed "s/^v[0-9.]*[ ]*//g")
+```
+
 ### GitLab pipeline
 
 The job will only be executed when pushing a new tag.
