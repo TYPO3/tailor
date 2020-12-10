@@ -10,6 +10,7 @@
  */
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Dotenv\Dotenv;
 use TYPO3\Tailor\Command;
 
 foreach ([__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php'] as $file) {
@@ -22,7 +23,12 @@ foreach ([__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php
 \call_user_func(static function() {
     foreach ([ __DIR__ . '/../.env', __DIR__ . '/../../../../.env', __DIR__ . '/../../../../../.env'] as $file) {
         if (file_exists($file)) {
-            (new Symfony\Component\Dotenv\Dotenv())->usePutenv(true)->loadEnv($file);
+            if (method_exists(Dotenv::class, 'usePutenv')) {
+                $dotEnv = (new Dotenv())->usePutenv(true);
+            } else {
+                $dotEnv = new Dotenv(true);
+            }
+            $dotEnv->loadEnv($file);
             break;
         }
     }
