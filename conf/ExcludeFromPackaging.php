@@ -28,7 +28,6 @@ return [
         'DS_Store',
         'Dockerfile',
         'ExtensionBuilder.json',
-        'ExtensionBuilder.json',
         'Makefile',
         'bower.json',
         'codeception.yml',
