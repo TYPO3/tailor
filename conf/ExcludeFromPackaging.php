@@ -64,6 +64,6 @@ return [
         'tslint.yml',
         'webpack.config.js',
         'webpack.mix.js',
-        'yarn.lock'
+        'yarn.lock',
     ],
 ];
