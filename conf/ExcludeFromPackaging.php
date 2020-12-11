@@ -10,37 +10,37 @@
 
 return [
     'directories' => [
-        'bin',
-        'build',
         '.build',
         '.ddev',
         '.git',
         '.github',
-        '.gitlab-ci',
         '.gitlab',
+        '.gitlab-ci',
         '.idea',
+        'bin',
+        'build',
         'tailor-version-upload',
         'tests',
-        'vendor'
+        'vendor',
     ],
     'files' => [
+        'DS_Store',
+        'Dockerfile',
+        'ExtensionBuilder.json',
+        'Makefile',
         'bower.json',
         'codeception.yml',
         'composer.lock',
         'crowdin.yaml',
         'docker-compose.yml',
-        'Dockerfile',
-        'DS_Store',
         'dynamicReturnTypeMeta.json',
         'editorconfig',
         'env',
-        'ExtensionBuilder.json',
         'gitattributes',
         'gitignore',
         'gitlab-ci.yml',
         'gitmodules',
         'gitreview',
-        'Makefile',
         'package-lock.json',
         'package.json',
         'php_cs',
@@ -54,5 +54,5 @@ return [
         'webpack.config.js',
         'webpack.mix.js',
         'yarn.lock'
-    ]
+    ],
 ];
