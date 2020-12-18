@@ -53,4 +53,13 @@ class EmConfVersionValidatorTest extends TestCase
         self::assertFalse($subject->isValid('1.2.0'));
         self::assertTrue($subject->isValid('1.0.0'));
     }
+
+    /**
+     * @test
+     */
+    public function isValidWithStringArrayKey(): void
+    {
+        $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_valid_string_array_key.php');
+        self::assertTrue($subject->isValid('1.0.0'));
+    }
 }
