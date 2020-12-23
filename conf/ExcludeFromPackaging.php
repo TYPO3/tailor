@@ -19,6 +19,7 @@ return [
         '.idea',
         'bin',
         'build',
+        'public',
         'tailor-version-upload',
         'tests',
         'vendor',
