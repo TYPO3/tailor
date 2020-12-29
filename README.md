@@ -417,6 +417,7 @@ jobs:
         with:
           php-version: 7.4
           extensions: intl, mbstring, json, zip, curl
+          tools: composer:v2
 
       - name: Install tailor
         run: composer global require typo3/tailor --prefer-dist --no-progress --no-suggest

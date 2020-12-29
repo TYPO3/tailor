@@ -16,6 +16,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: zip
+          tools: composer:v2
 
       - name: Get composer cache directory
         id: composer-cache
