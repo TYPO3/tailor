@@ -48,7 +48,7 @@ return [
         'package-lock.json',
         'package.json',
         'php_cs',
-        'php_cs.pp',
+        'php_cs.php',
         'phpcs.xml',
         'phpcs.xml.dist',
         'phplint.yml',
