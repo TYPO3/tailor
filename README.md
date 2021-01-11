@@ -127,8 +127,8 @@ be done using the `set-version` command.
 If your extension also contains a `Documentation/Settings.cfg`
 file, the command will also update the `release` and `version`
 information in it. You can disable this feature by either
-using the option `--docs=0` or by setting the environment
-variable `TYPO3_DISABLE_DOCS_VERSION_UPDATE=1`.
+using `--no-docs` or by setting the environment variable
+`TYPO3_DISABLE_DOCS_VERSION_UPDATE=1`.
 
 **Note**: It's also possible to use the `--path` option to
 specify the location of your extension. If not given, your
@@ -298,7 +298,7 @@ This will return the details for all version of the extension
 
 | Commands              | Arguments                         | Options                                                                                               | Description                                     |
 | --------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| ``set-version``       | ``version``                       | ``--path``<br/>``--docs``                                                                             | Update the version in extension files           |
+| ``set-version``       | ``version``                       | ``--path``<br/>``--no-docs``                                                                          | Update the version in extension files           |
 | ``ter:delete``        | ``extensionkey``                  |                                                                                                       | Delete an extension.                            |
 | ``ter:details``       | ``extensionkey``                  |                                                                                                       | Fetch details about an extension.               |
 | ``ter:find``          |                                   | ``--page``<br/>``--per-page``<br/>``--author``<br/>``--typo3-version``                                | Fetch a list of extensions from TER.            |

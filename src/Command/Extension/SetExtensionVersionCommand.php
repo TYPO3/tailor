@@ -39,7 +39,7 @@ class SetExtensionVersionCommand extends Command
             ->setDescription('Update the extensions ext_emconf.php version to a specific version. Useful in CI environments')
             ->addArgument('version', InputArgument::REQUIRED, 'The version to publish, e.g. 1.2.3. Must have three digits.')
             ->addOption('path', '', InputOption::VALUE_OPTIONAL, 'Path to the extension folder', getcwd() ?: './')
-            ->addOption('docs', '', InputOption::VALUE_OPTIONAL, 'Update version in the documentation settings', true);
+            ->addOption('no-docs', '', InputOption::VALUE_OPTIONAL, 'Disable version update in documentation settings', false);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -73,7 +73,8 @@ class SetExtensionVersionCommand extends Command
             return 1;
         }
 
-        if ((bool)$input->getOption('docs') === false
+        if ($input->getOption('no-docs') === null
+            || (bool)$input->getOption('no-docs') === true
             || Variables::has('TYPO3_DISABLE_DOCS_VERSION_UPDATE')
         ) {
             return 0;
