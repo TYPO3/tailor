@@ -69,6 +69,5 @@ class VersionReplacerTest extends TestCase
     {
         $this->expectExceptionCode(1605741968);
         (new VersionReplacer('6.9.0'))->setVersion('some/invalid/file/path.php', 'version\s*=\s*([0-9.]+)');
-
     }
 }
