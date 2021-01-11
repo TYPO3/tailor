@@ -56,7 +56,7 @@ class VersionReplacerTest extends TestCase
         $tempFile = tempnam('/tmp/', 'tailor_settings.cfg');
         file_put_contents($tempFile, $docSettings);
         $subject = new VersionReplacer('6.9.0');
-        $subject->setVersion($tempFile, 'version\s*=\s*([0-9.]+)');
+        $subject->setVersion($tempFile, 'version\s*=\s*([0-9.]+)', 2);
         $contents = file_get_contents($tempFile);
         self::assertStringContainsString('version=6.9', preg_replace('/\s+/', '', $contents));
         unlink($tempFile);

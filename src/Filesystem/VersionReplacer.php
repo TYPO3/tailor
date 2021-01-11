@@ -17,33 +17,27 @@ namespace TYPO3\Tailor\Filesystem;
  *
  * The pattern must contain one capturing group which is the version
  * string which should be replaced.
+ *
+ * Note: The provided new version number is not validated. This must
+ * be done by the calling code.
  */
 class VersionReplacer
 {
-    /** @var string */
-    protected $newVersion;
-
     /** @var string[] */
     protected $versionParts;
 
     public function __construct(string $newVersion)
     {
-        $this->newVersion = $newVersion;
         $this->versionParts = explode('.', $newVersion);
     }
 
     public function setVersion(string $filePath, string $pattern, int $versionPartsToUse = 3): void
     {
         $newVersion = '';
-
-        if ($versionPartsToUse === 3) {
-            $newVersion = $this->newVersion;
-        } else {
-            for ($i = 0; $i < $versionPartsToUse; $i++) {
-                $newVersion .= $this->versionParts[$i] . '.';
-            }
-            $newVersion = rtrim($newVersion, '.');
+        for ($i = 0; $i < $versionPartsToUse; $i++) {
+            $newVersion .= $this->versionParts[$i] . '.';
         }
+        $newVersion = rtrim($newVersion, '.');
 
         $fileContents = @file_get_contents($filePath);
         if ($fileContents === false) {
