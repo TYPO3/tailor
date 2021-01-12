@@ -29,7 +29,7 @@ use TYPO3\Tailor\Validation\VersionValidator;
 class SetExtensionVersionCommand extends Command
 {
     private const EMCONF_PATTERN = '["\']version["\']\s=>\s["\']((?:[0-9]+)\.[0-9]+\.[0-9]+\s*)["\']';
-    private const DOCUMENTATION_VERSION_PATTERN = 'version\s*=\s*([0-9.]+)';
+    private const DOCUMENTATION_VERSION_PATTERN = 'version\s*=\s*([0-9]+\.[0-9]+)';
     private const DOCUMENTATION_RELEASE_PATTERN = 'release\s*=\s*([0-9]+\.[0-9]+\.[0-9]+)';
 
     protected function configure(): void
@@ -82,11 +82,10 @@ class SetExtensionVersionCommand extends Command
 
         $documentationSettingsFile = rtrim($path, '/') . '/Documentation/Settings.cfg';
         if (!file_exists($documentationSettingsFile)) {
-            $io->warning(
-                sprintf(
-                    'Documentation version update is enabled but was not performed because the file %s does not exist.',
-                    $documentationSettingsFile
-                )
+            $io->info(
+                'Documentation version update is enabled but was not performed because the file '
+                . $documentationSettingsFile . ' does not exist. To disable this operation use the \'--no-docs\' '
+                . 'option or set the \'TYPO3_DISABLE_DOCS_VERSION_UPDATE\' environment variable.'
             );
             return 0;
         }
