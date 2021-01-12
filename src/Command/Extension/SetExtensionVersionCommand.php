@@ -18,21 +18,28 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use TYPO3\Tailor\Filesystem\EmConfVersionReplacer;
+use TYPO3\Tailor\Environment\Variables;
+use TYPO3\Tailor\Filesystem\VersionReplacer;
 use TYPO3\Tailor\Validation\VersionValidator;
 
 /**
- * Command for changing the ext_emconf.php to set the "version" property to a specific version.
+ * Command for updating the extension version in ext_emconf.php and
+ * the extension documentation configuration file Settings.cfg.
  */
 class SetExtensionVersionCommand extends Command
 {
+    private const EMCONF_PATTERN = '["\']version["\']\s=>\s["\']((?:[0-9]+)\.[0-9]+\.[0-9]+\s*)["\']';
+    private const DOCUMENTATION_VERSION_PATTERN = 'version\s*=\s*([0-9.]+)';
+    private const DOCUMENTATION_RELEASE_PATTERN = 'release\s*=\s*([0-9]+\.[0-9]+\.[0-9]+)';
+
     protected function configure(): void
     {
         parent::configure();
         $this
             ->setDescription('Update the extensions ext_emconf.php version to a specific version. Useful in CI environments')
             ->addArgument('version', InputArgument::REQUIRED, 'The version to publish, e.g. 1.2.3. Must have three digits.')
-            ->addOption('path', '', InputOption::VALUE_OPTIONAL, 'Path to the extension folder', getcwd() ?: './');
+            ->addOption('path', '', InputOption::VALUE_OPTIONAL, 'Path to the extension folder', getcwd() ?: './')
+            ->addOption('no-docs', '', InputOption::VALUE_OPTIONAL, 'Disable version update in documentation settings', false);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -57,10 +64,44 @@ class SetExtensionVersionCommand extends Command
             return 1;
         }
 
+        $versionReplacer = new VersionReplacer($version);
+
         try {
-            (new EmConfVersionReplacer($emConfFile))->setVersion($version);
+            $versionReplacer->setVersion($emConfFile, self::EMCONF_PATTERN);
         } catch (\InvalidArgumentException $e) {
             $io->error(sprintf('An error occurred while setting the ext_emconf.php version to %s.', $version));
+            return 1;
+        }
+
+        if ($input->getOption('no-docs') === null
+            || (bool)$input->getOption('no-docs') === true
+            || Variables::has('TYPO3_DISABLE_DOCS_VERSION_UPDATE')
+        ) {
+            return 0;
+        }
+
+        $documentationSettingsFile = rtrim($path, '/') . '/Documentation/Settings.cfg';
+        if (!file_exists($documentationSettingsFile)) {
+            $io->warning(
+                sprintf(
+                    'Documentation version update is enabled but was not performed because the file %s does not exist.',
+                    $documentationSettingsFile
+                )
+            );
+            return 0;
+        }
+
+        try {
+            $versionReplacer->setVersion($documentationSettingsFile, self::DOCUMENTATION_RELEASE_PATTERN);
+        } catch (\InvalidArgumentException $e) {
+            $io->error(sprintf('An error occurred while updating the release number in %s', $documentationSettingsFile));
+            return 1;
+        }
+
+        try {
+            $versionReplacer->setVersion($documentationSettingsFile, self::DOCUMENTATION_VERSION_PATTERN, 2);
+        } catch (\InvalidArgumentException $e) {
+            $io->error(sprintf('An error occurred while updating the version number in %s', $documentationSettingsFile));
             return 1;
         }
 
