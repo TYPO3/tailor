@@ -1,0 +1,20 @@
+{
+  "name": "acme/my_extension",
+  "type": "typo3-cms-extension",
+  "description": "Great extension - everyone needs it",
+  "authors": [
+    {
+      "name": "John Doe",
+      "role": "Dev"
+    }
+  ],
+  "license": [
+    "GPL-2.0-or-later"
+  ],
+  "require": {
+    "typo3/cms-core": "^10.4"
+  },
+  "replace": {
+    "typo3-ter/news": "self.version"
+  }
+}
