@@ -56,20 +56,21 @@ option. If set, the raw result will be returned. This can be
 used for further processing e.g. by using some JSON processor.
 
 Most of the commands require an extension key to work with.
-However, since Tailor can be required as a dev dependency into
-any single TYPO3 extension project it's also possible to define
-the extension key as an environment variable with
-`TYPO3_EXTENSION_KEY` globally. So you don't have to add it on
-each command exceution manually.
+There are multiple possibilities to provide an extension key.
+These are - in the order in which they are checked:
 
-**Note:** If no extension key is defined, neither as environment
-variable nor as argument, commands which require an extension
-key to be set, will throw an exception.
+* As argument, e.g. `./vendor/bin/tailor ter:details my_key`
+* As environment variable, `TYPO3_EXTENSION_KEY=my_key`
+* In your `composer.json`, `[extra][typo3/cms][extension-key] = 'my_key'`
 
-**Tip:** Definition of an extension key as argument precedes the
-value from the environment variable. This means, even if you have
-an extension key defined globally, you can still run all commands
-for different extensions by adding them as argument to the command.
+This means, even if you have an extension key defined globally,
+either as environment variable or in your `composer.json`, you
+can still run all commands for different extensions by adding
+the desired extension key as argument to the command.
+
+**Note:** If no extension key is defined, neither as an argument,
+as environment variable, nor in your `composer.json`, commands
+which require an extension key to be set, will throw an exception.
 
 ### Manage your personal access token
 
@@ -116,7 +117,7 @@ confirmation:
     Key: my_extension
     Owner: your_username
     
-### Update the version of your extension in `ext_emconf.php`
+### Update the version in your extension files
 
 Prior to publishing a new version, you have to update the
 version in your extensions `ext_emconf.php` file. This can
@@ -162,9 +163,9 @@ Using the root direcotry:
 
     ./vendor/bin/tailor ter:publish 1.2.0 my_extension
     
-If the extension key is defined as environment variable,
-it can also be skipped. So using the current root directory
-the whole command simplifies to:
+If the extension key is defined as environment variable or
+in your `composer.json`, it can also be skipped. So using the
+current root directory the whole command simplifies to:
 
     ./vendor/bin/tailor ter:publish 1.2.0
     
@@ -327,7 +328,7 @@ commands, requesting the TER API
 
 ## Publish a new version using tailor locally
 
-**Step 1: Update the version in ext_emconf.php**
+**Step 1: Update the version in your extension files**
 
     ./vendor/bin/tailor set-version 1.5.0
 
@@ -369,6 +370,11 @@ new tag.
 
 The workflow furthermore requires the GitHub secrets
 `TYPO3_EXTENSION_KEY` and `TYPO3_API_TOKEN` to be set.
+
+**Note**: If your `composer.json` file contains your extension
+key, you can remove the `TYPO3_EXTENSION_KEY` secret and the
+assignment in the GitHub action, since Tailor automatically
+fetches this key then.
 
 The version is automatically fetched from the tag and
 validated to match the required pattern.
@@ -459,6 +465,11 @@ The upload comment is taken from the message in the tag.
 
 The job furthermore requires the GitLab variables
 `TYPO3_EXTENSION_KEY` and `TYPO3_API_TOKEN` to be set.
+
+**Note**: If your `composer.json` file contains your extension
+key, you can remove the `TYPO3_EXTENSION_KEY` variable, the
+check and the assignment in the GitLab pipeline, since Tailor
+automatically fetches this key then.
 
 The variable `CI_COMMIT_TAG` is set by GitLab automatically.
 
