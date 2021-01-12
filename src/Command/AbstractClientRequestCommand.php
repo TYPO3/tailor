@@ -22,6 +22,7 @@ use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
 use TYPO3\Tailor\Environment\Variables;
 use TYPO3\Tailor\Exception\ExtensionKeyMissingException;
+use TYPO3\Tailor\Exception\InvalidComposerJsonException;
 use TYPO3\Tailor\Filesystem\ComposerReader;
 use TYPO3\Tailor\Formatter\ConsoleFormatter;
 use TYPO3\Tailor\HttpClientFactory;

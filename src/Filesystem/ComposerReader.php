@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Filesystem;
 
+use TYPO3\Tailor\Exception\InvalidComposerJsonException;
+
 /**
  * Reading information from composer.json
  */
@@ -32,7 +34,7 @@ class ComposerReader
         }
         $this->composerSchema = json_decode($content, true);
         if (!$this->composerSchema || $this->composerSchema === []) {
-            throw new \InvalidArgumentException('The composer.json found is invalid!', 1610442954);
+            throw new InvalidComposerJsonException('The composer.json found is invalid!', 1610442954);
         }
     }
 

@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace TYPO3\Tailor\Tests\Unit\Filesystem;
 
 use PHPUnit\Framework\TestCase;
+use TYPO3\Tailor\Exception\InvalidComposerJsonException;
 use TYPO3\Tailor\Filesystem\ComposerReader;
 
 class ComposerReaderTest extends TestCase
@@ -38,6 +39,7 @@ class ComposerReaderTest extends TestCase
     public function throwsExceptionOnEmptyComposerJsonFile(): void
     {
         $this->expectExceptionCode(1610442954);
+        $this->expectException(InvalidComposerJsonException::class);
         file_put_contents(self::COMPOSER_FILE, '');
         new ComposerReader('tmp');
     }
@@ -48,6 +50,7 @@ class ComposerReaderTest extends TestCase
     public function throwsExceptionOnInvalidComposerJsonFile(): void
     {
         $this->expectExceptionCode(1610442954);
+        $this->expectException(InvalidComposerJsonException::class);
         $composerContent = file_get_contents(__DIR__ . '/../Fixtures/EmConf/emconf_valid.php');
         file_put_contents(self::COMPOSER_FILE, $composerContent);
         new ComposerReader('tmp');
