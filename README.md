@@ -7,6 +7,30 @@ Tailor talks with the [TER REST API][rest-api] and enables you to
 register new keys, update extension information and publish new
 versions to the [extension repository][ter].
 
+## Contents
+
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Manage your personal access token](#manage-your-personal-access-token)
+  - [Register a new extension key](#register-a-new-extension-key)
+  - [Update the version in your extension files](#update-the-version-in-your-extension-files)
+  - [Publish a new version of an extension to TER](#publish-a-new-version-of-an-extension-to-ter)
+  - [Update extension meta information](#update-extension-meta-information)
+  - [Transfer ownership of an extension to another user](#transfer-ownership-of-an-extension-to-another-user)
+  - [Delete / abandon an extension](#delete--abandon-an-extension)
+  - [Find and filter extensions on TER](#find-and-filter-extensions-on-ter)
+    - [Specific extension details](#specific-extension-details)
+    - [Specific extension version details](#specific-extension-version-details)
+    - [Details for all versions of an extension](#details-for-all-versions-of-an-extension)
+- [Publish a new version using tailor locally](#publish-a-new-version-using-tailor-locally)
+- [Publish a new version using your CI](#publish-a-new-version-using-your-ci)
+  - [Github actions workflow](#github-actions-workflow)
+  - [GitLab pipeline](#gitlab-pipeline)
+- [Overview of all available commands](#overview-of-all-available-commands)
+  - [General options for all commands](#general-options-for-all-commands)
+- [Author & License](#author--license)
+
 ## Prerequisites
 
 The [TER REST API][rest-api] can be accessed providing a personal
@@ -204,7 +228,7 @@ existing data. Therefore, if you, for example, just want to add
 another tag, you have to add the current ones along with the new
 one. You can use `ter:details` to get the current state.
 
-### Transfer the ownership of an extension to another user
+### Transfer ownership of an extension to another user
 
 It's possible to transfer one of your extensions to another user.
 Therefore, use the `ter:transfer` command providing the extension
@@ -295,37 +319,6 @@ with `ter:versions`:
 This will return the details for all version of the extension
 `my_extension`.
 
-**Overview of all available commands**
-
-| Commands              | Arguments                         | Options                                                                                               | Description                                     |
-| --------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| ``set-version``       | ``version``                       | ``--path``<br/>``--no-docs``                                                                          | Update the version in extension files           |
-| ``ter:delete``        | ``extensionkey``                  |                                                                                                       | Delete an extension.                            |
-| ``ter:details``       | ``extensionkey``                  |                                                                                                       | Fetch details about an extension.               |
-| ``ter:find``          |                                   | ``--page``<br/>``--per-page``<br/>``--author``<br/>``--typo3-version``                                | Fetch a list of extensions from TER.            |
-| ``ter:publish``       | ``version``<br/>``extensionkey``  | ``--path``<br/>``--artefact``<br/>``--comment``                                                       | Publishes a new version of an extension to TER. |
-| ``ter:register``      | ``extensionkey``                  |                                                                                                       | Register a new extension key in TER.            |
-| ``ter:token:create``  |                                   | ``--name``<br/>``--expires``<br/>``--scope``<br/>``--extensions``                                     | Request an access token for the TER.            |
-| ``ter:token:refresh`` | ``token``                         |                                                                                                       | Refresh an access token for the TER.            |
-| ``ter:token:revoke``  | ``token``                         |                                                                                                       | Revoke an access token for the TER.             |
-| ``ter:transfer``      | ``username``<br/>``extensionkey`` |                                                                                                       | Transfer ownership of an extension key.         |
-| ``ter:update``        | ``extensionkey``                  | ``--composer``<br/>``--issues``<br/>``--repository``<br/>``--manual``<br/>``--paypal``<br/>``--tags`` | Update extension meta information.              |
-| ``ter:version``       | ``version``<br/>``extensionkey``  |                                                                                                       | Fetch details about an extension version.       |
-| ``ter:versions``      | ``extensionkey``                  |                                                                                                       | Fetch details for all versions of an extension. |
-
-**General options for all commands**
-
-- ``-r, --raw`` Return result as raw object (e.g. json) - Only for 
-commands, requesting the TER API
-- ``-h, --help`` Display help message
-- ``-q, --quiet`` Do not output any message
-- ``-v, --version`` Display the CLI applications' version
-- ``-n, --no-interaction`` Do not ask any interactive question
-- ``-v|vv|vvv, --verbose`` Increase the verbosity of messages:
-1 for normal output, 2 for more verbose output and 3 for debug
-- ``--ansi`` Force ANSI output
-- ``--no-ansi`` Disable ANSI output
-
 ## Publish a new version using tailor locally
 
 **Step 1: Update the version in your extension files**
@@ -361,20 +354,19 @@ Please have a look at the following examples describing how
 such integration could look like for GitHub workflows and
 GitLab pipelines. 
 
-### Github workflow
+### Github actions workflow
 
 The workflow will only be executed when pushing a new tag.
 This can either be done using **Step 3** from above example
 or by creating a new GitHub release which will also add a
 new tag.
 
-The workflow furthermore requires the GitHub secrets
-`TYPO3_EXTENSION_KEY` and `TYPO3_API_TOKEN` to be set.
+The workflow furthermore requires the GitHub secrets `TYPO3_EXTENSION_KEY` and `TYPO3_API_TOKEN`
+to be set. Add them at "Settings -> Secrets -> New repository secret".
 
-**Note**: If your `composer.json` file contains your extension
-key, you can remove the `TYPO3_EXTENSION_KEY` secret and the
-assignment in the GitHub action, since Tailor automatically
-fetches this key then.
+**Note**: If your `composer.json` file contains the extension key at
+`[extra][typo3/cms][extension-key] = 'my_key'` (this is good practice anyway), the `TYPO3_EXTENSION_KEY`
+secret and assignment in the below GitHub action example is not needed, tailor will pick it up.
 
 The version is automatically fetched from the tag and
 validated to match the required pattern.
@@ -494,9 +486,42 @@ The variable `CI_COMMIT_TAG` is set by GitLab automatically.
       fi;
 ```
 
+
+## Overview of all available commands
+
+| Commands              | Arguments                         | Options                                                                                               | Description                                     |
+| --------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| ``set-version``       | ``version``                       | ``--path``<br/>``--no-docs``                                                                          | Update the version in extension files           |
+| ``ter:delete``        | ``extensionkey``                  |                                                                                                       | Delete an extension.                            |
+| ``ter:details``       | ``extensionkey``                  |                                                                                                       | Fetch details about an extension.               |
+| ``ter:find``          |                                   | ``--page``<br/>``--per-page``<br/>``--author``<br/>``--typo3-version``                                | Fetch a list of extensions from TER.            |
+| ``ter:publish``       | ``version``<br/>``extensionkey``  | ``--path``<br/>``--artefact``<br/>``--comment``                                                       | Publishes a new version of an extension to TER. |
+| ``ter:register``      | ``extensionkey``                  |                                                                                                       | Register a new extension key in TER.            |
+| ``ter:token:create``  |                                   | ``--name``<br/>``--expires``<br/>``--scope``<br/>``--extensions``                                     | Request an access token for the TER.            |
+| ``ter:token:refresh`` | ``token``                         |                                                                                                       | Refresh an access token for the TER.            |
+| ``ter:token:revoke``  | ``token``                         |                                                                                                       | Revoke an access token for the TER.             |
+| ``ter:transfer``      | ``username``<br/>``extensionkey`` |                                                                                                       | Transfer ownership of an extension key.         |
+| ``ter:update``        | ``extensionkey``                  | ``--composer``<br/>``--issues``<br/>``--repository``<br/>``--manual``<br/>``--paypal``<br/>``--tags`` | Update extension meta information.              |
+| ``ter:version``       | ``version``<br/>``extensionkey``  |                                                                                                       | Fetch details about an extension version.       |
+| ``ter:versions``      | ``extensionkey``                  |                                                                                                       | Fetch details for all versions of an extension. |
+
+### General options for all commands
+
+- ``-r, --raw`` Return result as raw object (e.g. json) - Only for commands, requesting the TER API
+- ``-h, --help`` Display help message
+- ``-q, --quiet`` Do not output any message
+- ``-v, --version`` Display the CLI applications' version
+- ``-n, --no-interaction`` Do not ask any interactive question
+- ``-v|vv|vvv, --verbose`` Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+- ``--ansi`` Force ANSI output
+- ``--no-ansi`` Disable ANSI output
+
+
 ## Author & License
 
 Created by Benni Mack and Oliver Bartsch in 2020.
+
+MIT License, see LICENSE
 
 [rest-api]: https://extensions.typo3.org/faq/rest-api/
 [ter]: https://extensions.typo3.org
