@@ -82,7 +82,7 @@ class SetExtensionVersionCommand extends Command
 
         $documentationSettingsFile = rtrim($path, '/') . '/Documentation/Settings.cfg';
         if (!file_exists($documentationSettingsFile)) {
-            $io->info(
+            $io->note(
                 'Documentation version update is enabled but was not performed because the file '
                 . $documentationSettingsFile . ' does not exist. To disable this operation use the \'--no-docs\' '
                 . 'option or set the \'TYPO3_DISABLE_DOCS_VERSION_UPDATE\' environment variable.'
