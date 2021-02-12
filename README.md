@@ -361,12 +361,14 @@ This can either be done using **Step 3** from above example
 or by creating a new GitHub release which will also add a
 new tag.
 
-The workflow furthermore requires the GitHub secrets `TYPO3_EXTENSION_KEY` and `TYPO3_API_TOKEN`
-to be set. Add them at "Settings -> Secrets -> New repository secret".
+The workflow furthermore requires the GitHub secrets `TYPO3_EXTENSION_KEY`
+and `TYPO3_API_TOKEN` to be set. Add them at "Settings -> Secrets -> New
+repository secret".
 
 **Note**: If your `composer.json` file contains the extension key at
-`[extra][typo3/cms][extension-key] = 'my_key'` (this is good practice anyway), the `TYPO3_EXTENSION_KEY`
-secret and assignment in the below GitHub action example is not needed, tailor will pick it up.
+`[extra][typo3/cms][extension-key] = 'my_key'` (this is good practice anyway),
+the `TYPO3_EXTENSION_KEY` secret and assignment in the below GitHub action
+example is not needed, tailor will pick it up.
 
 The version is automatically fetched from the tag and
 validated to match the required pattern.
@@ -507,12 +509,14 @@ The variable `CI_COMMIT_TAG` is set by GitLab automatically.
 
 ### General options for all commands
 
-- ``-r, --raw`` Return result as raw object (e.g. json) - Only for commands, requesting the TER API
+- ``-r, --raw`` Return result as raw object (e.g. json) - Only for commands,
+  requesting the TER API
 - ``-h, --help`` Display help message
 - ``-q, --quiet`` Do not output any message
 - ``-v, --version`` Display the CLI applications' version
 - ``-n, --no-interaction`` Do not ask any interactive question
-- ``-v|vv|vvv, --verbose`` Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+- ``-v|vv|vvv, --verbose`` Increase the verbosity of messages: 1 for normal output, 2
+  for more verbose output and 3 for debug
 - ``--ansi`` Force ANSI output
 - ``--no-ansi`` Disable ANSI output
 
