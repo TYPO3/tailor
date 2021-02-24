@@ -22,6 +22,7 @@ return [
         'public',
         'tailor-version-upload',
         'tests',
+        'tools',
         'vendor',
     ],
     'files' => [
@@ -47,6 +48,7 @@ return [
         'gitreview',
         'package-lock.json',
         'package.json',
+        'phive.xml',
         'php_cs',
         'php_cs.php',
         'phpcs.xml',
