@@ -18,7 +18,7 @@
         "sort-packages": true
     },
     "require": {
-        "php": "^7.2",
+        "php": "^7.2 || ^8.0",
         "ext-json": "*",
         "ext-zip": "*",
         "symfony/console": "^4.4 || ^5.0",
