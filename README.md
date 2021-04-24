@@ -384,7 +384,8 @@ look at the [tailor_ext][tailor-ext] example extension.
 name: publish
 on:
   push:
-    tag:
+    tags:
+      - *
 jobs:
   publish:
     name: Publish new version to TER
