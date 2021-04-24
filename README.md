@@ -385,7 +385,7 @@ name: publish
 on:
   push:
     tags:
-      - *
+      - '*'
 jobs:
   publish:
     name: Publish new version to TER
