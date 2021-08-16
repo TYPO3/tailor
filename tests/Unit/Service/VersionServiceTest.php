@@ -22,11 +22,11 @@ class VersionServiceTest extends TestCase
     /**
      * @test
      */
-    public function defaultExcludeFromPackagingConfiurationIsUsedOnNonExistingEnvVar(): void
+    public function defaultExcludeFromPackagingConfigurationIsUsedOnNonExistingEnvVar(): void
     {
         unset($_ENV);
 
-        $this::assertContains(
+        self::assertContains(
             'vendor',
             $this->invokeMethod('getExcludeConfiguration', [])['directories']
         );
@@ -35,13 +35,13 @@ class VersionServiceTest extends TestCase
     /**
      * @test
      */
-    public function defaultExcludeFromPackagingConfiurationIsUsedOnEmptyPath(): void
+    public function defaultExcludeFromPackagingConfigurationIsUsedOnEmptyPath(): void
     {
         unset($_ENV);
         putenv('TYPO3_EXCLUDE_FROM_PACKAGING=');
         $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] = '';
 
-        $this::assertContains(
+        self::assertContains(
             'vendor',
             $this->invokeMethod('getExcludeConfiguration', [])['directories']
         );
@@ -50,13 +50,13 @@ class VersionServiceTest extends TestCase
     /**
      * @test
      */
-    public function customExcludeFromPackagingConfiurationIsUsed(): void
+    public function customExcludeFromPackagingConfigurationIsUsed(): void
     {
         unset($_ENV);
         putenv('TYPO3_EXCLUDE_FROM_PACKAGING=');
         $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] = __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_valid.php';
 
-        $this::assertSame(
+        self::assertSame(
             ['directories' => ['dummy'], 'files' => ['dummy']],
             $this->invokeMethod('getExcludeConfiguration', [])
         );
@@ -98,7 +98,7 @@ class VersionServiceTest extends TestCase
         unset($_ENV);
         putenv('TYPO3_EXCLUDE_FROM_PACKAGING=' . __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_valid.php');
 
-        $this::assertSame(
+        self::assertSame(
             '/dummyPath/my_ext_1.0.0.zip',
             $this->invokeMethod('getVersionFilename', [])
         );
@@ -113,7 +113,7 @@ class VersionServiceTest extends TestCase
         putenv('TYPO3_EXCLUDE_FROM_PACKAGING=');
         $_ENV['TYPO3_EXCLUDE_FROM_PACKAGING'] = __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_valid.php';
 
-        $this::assertSame(
+        self::assertSame(
             'cf2d6e211e53d983056761055c95791b',
             $this->invokeMethod('getVersionFilename', [true])
         );
