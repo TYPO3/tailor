@@ -5,7 +5,7 @@
 // and make sure the file returns an array with the keys `directories` and `files`
 // on root level.
 
-// Note: The filter is case insensitive. There is furthermore no need to define the
+// Note: The filter is case-insensitive. There is furthermore no need to define the
 // filenames with / without a leading dot. This is taken into account automatically.
 
 return [
@@ -17,6 +17,7 @@ return [
         '.gitlab',
         '.gitlab-ci',
         '.idea',
+        '.phive',
         'bin',
         'build',
         'public',
@@ -49,12 +50,16 @@ return [
         'package-lock.json',
         'package.json',
         'phive.xml',
+        'php-cs-fixer.dist.php',
+        'php-cs-fixer.php',
         'php_cs',
         'php_cs.php',
         'phpcs.xml',
         'phpcs.xml.dist',
         'phplint.yml',
+        'phpstan-baseline.neon',
         'phpstan.neon',
+        'phpstan.neon.dist',
         'phpunit.xml',
         'phpunit.xml.dist',
         'prettierrc.json',
