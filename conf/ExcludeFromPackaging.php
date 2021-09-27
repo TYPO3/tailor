@@ -63,6 +63,7 @@ return [
         'phpunit.xml',
         'phpunit.xml.dist',
         'prettierrc.json',
+        'rector.php',
         'scrutinizer.yml',
         'styleci.yml',
         'stylelint.config.js',
