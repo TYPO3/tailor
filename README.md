@@ -38,11 +38,11 @@ access token. You can create such token either on
 [https://extensions.typo3.org/][ter] after you've logged in, or
 directly using Tailor.
 
-**Note:** To create an access token with Tailor, you have to add your
-TYPO3.org credentials (see below). Even if it is possible to execute
-all commands using the TYPO3.org credentials for authentication, it
-is highly discouraged. That's why we have built token based
-authentication for the [TER][ter].
+**Note:** To create, refresh or revoke an access token with Tailor,
+you have to add your TYPO3.org credentials (see below). Even if it
+is possible to execute all commands using the TYPO3.org credentials
+for authentication, it is highly discouraged. That's why we have
+built token based authentication for the [TER][ter].
 
 Provide your credentials by either creating a `.env` file in the
 project root folder or setting environment variables through your
