@@ -2,6 +2,6 @@
 
 return [
     'folders' => [
-        'dummy'
-    ]
+        'dummy',
+    ],
 ];

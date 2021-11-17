@@ -48,7 +48,7 @@
             "@php vendor/bin/phpunit --testsuite Unit"
         ],
         "cs": [
-            "@php vendor/bin/php-cs-fixer fix --dry-run --diff --diff-format=udiff --config=vendor/typo3/coding-standards/templates/extension_php_cs.dist src/ tests/"
+            "@php vendor/bin/php-cs-fixer fix --dry-run --diff --config=vendor/typo3/coding-standards/templates/extension_php-cs-fixer.dist.php src/ tests/"
         ]
     }
 }
