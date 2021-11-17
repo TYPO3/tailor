@@ -38,35 +38,35 @@ class VersionValidatorTest extends TestCase
     {
         yield 'Wrong format' => [
             'v1',
-            false
+            false,
         ];
         yield 'Wrong delimiter' => [
             '1-0-0',
-            false
+            false,
         ];
         yield 'Missing patch version' => [
             '1.0',
-            false
+            false,
         ];
         yield 'Patch version to high' => [
             '1.0.1000',
-            false
+            false,
         ];
         yield 'Patch version to low' => [
             '1.0.-12',
-            false
+            false,
         ];
         yield 'Not numeric' => [
             '0.2.0-alpha',
-            false
+            false,
         ];
         yield 'Valid version' => [
             '1.0.0',
-            true
+            true,
         ];
         yield 'Valid version 2' => [
             '10.4.999',
-            true
+            true,
         ];
     }
 }

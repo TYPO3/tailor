@@ -53,19 +53,19 @@ class ConsoleFormatterTest extends TestCase
         yield 'No output' => [
             [
                 'some' => [
-                    'dummy' => 'data'
-                ]
+                    'dummy' => 'data',
+                ],
             ],
             [],
             [],
-            ConsoleFormatter::FORMAT_NONE
+            ConsoleFormatter::FORMAT_NONE,
         ];
         yield 'Simple key/values array' => [
             [
                 'dummy' => 'data',
                 'noKey',
                 'notKeyValue' => [
-                    'foo' => 'bar'
+                    'foo' => 'bar',
                 ],
                 'some_Key' => 'otherData',
             ],
@@ -75,7 +75,7 @@ class ConsoleFormatterTest extends TestCase
                 ['<info>Some Key</info>: otherData'],
             ],
             [],
-            ConsoleFormatter::FORMAT_KEY_VALUE
+            ConsoleFormatter::FORMAT_KEY_VALUE,
         ];
         yield 'Extension details list' => [
             [
@@ -87,12 +87,12 @@ class ConsoleFormatterTest extends TestCase
                     'paypal_url' => '',
                     'tags' => [
                         [
-                            'title' => 'sometag'
+                            'title' => 'sometag',
                         ],
                         [
-                            'title' => 'anothertag'
-                        ]
-                    ]
+                            'title' => 'anothertag',
+                        ],
+                    ],
                 ],
                 'current_version' => [
                     'title' => 'foobar',
@@ -101,13 +101,13 @@ class ConsoleFormatterTest extends TestCase
                     'state' => 'stable',
                     'category' => 'be',
                     'typo3_versions' => [
-                        9, 10
+                        9, 10,
                     ],
                     'dependencies' => [
                         'typo3' => '10.0.0 - 10.99.99',
                     ],
                     'conflicts' => [
-                        'templavoila' => '*'
+                        'templavoila' => '*',
                     ],
                     'downloads' => 1234,
                     'upload_date' => 1606400890,
@@ -115,14 +115,14 @@ class ConsoleFormatterTest extends TestCase
                     'download' => [
                         'composer' => 'composer req vendor/some_ext',
                         'zip' => 'https://extensions.typo3.org/extension/download/some_ext/1.0.0/zip',
-                        't3x' => 'https://extensions.typo3.org/extension/download/some_ext/1.0.0/t3x'
+                        't3x' => 'https://extensions.typo3.org/extension/download/some_ext/1.0.0/t3x',
                     ],
                     'author' => [
                         'name' => 'John Doe',
                         'email' => 'some-mail@example.com',
-                        'company' => 'ACME Inc'
-                    ]
-                ]
+                        'company' => 'ACME Inc',
+                    ],
+                ],
             ],
             [
                 ['<info>Key</info>: some_ext'],
@@ -156,10 +156,10 @@ class ConsoleFormatterTest extends TestCase
                 [PHP_EOL . 'Author'],
                 ['<info>Name</info>: John Doe'],
                 ['<info>Email</info>: some-mail@example.com'],
-                ['<info>Company</info>: ACME Inc']
+                ['<info>Company</info>: ACME Inc'],
             ],
             [],
-            ConsoleFormatter::FORMAT_DETAIL
+            ConsoleFormatter::FORMAT_DETAIL,
         ];
         yield 'Details with empty array' => [
             [
@@ -168,19 +168,19 @@ class ConsoleFormatterTest extends TestCase
                 'version_count' => 2,
                 'meta' => [
                     'composer_name' => 'vendor/some_ext',
-                    'tags' => []
+                    'tags' => [],
                 ],
-                'current_version' => []
+                'current_version' => [],
             ],
             [
                 ['<info>Key</info>: some_ext'],
                 ['<info>Downloads</info>: 60'],
                 ['<info>Version count</info>: 2'],
                 [PHP_EOL . 'Meta'],
-                ['<info>Composer name</info>: vendor/some_ext']
+                ['<info>Composer name</info>: vendor/some_ext'],
             ],
             [],
-            ConsoleFormatter::FORMAT_DETAIL
+            ConsoleFormatter::FORMAT_DETAIL,
         ];
         yield 'Find extensions result' => [
             [
@@ -188,40 +188,40 @@ class ConsoleFormatterTest extends TestCase
                 'page' => 1,
                 'per_page' => 2,
                 'filter' => [
-                    'username' => 'some_user'
+                    'username' => 'some_user',
                 ],
                 'extensions' => [
                     [
                         'key' => 'some_ext',
                         'meta' => [
-                            'composer_name' => 'vendor/some_ext'
+                            'composer_name' => 'vendor/some_ext',
                         ],
                         'current_version' => [
                             'title' => 'foobar',
                             'number' => '1.0.0',
-                            'upload_date' => 1605785659
-                        ]
+                            'upload_date' => 1605785659,
+                        ],
                     ],
                     [
-                        'key' => 'another_ext'
-                    ]
-                ]
+                        'key' => 'another_ext',
+                    ],
+                ],
             ],
             [
                 [
                     ['Extension Key', 'Title', 'Latest Version', 'Last Updated on', 'Composer Name'],
                     [
                         'another_ext' => ['another_ext', '-', '-', '-', '-'],
-                        'some_ext' => ['some_ext', 'foobar', '1.0.0', '19.11.2020', 'vendor/some_ext']
-                    ]
+                        'some_ext' => ['some_ext', 'foobar', '1.0.0', '19.11.2020', 'vendor/some_ext'],
+                    ],
                 ],
-                ['Page: 1, Per page: 2, Filter: some_user (Author)']
+                ['Page: 1, Per page: 2, Filter: some_user (Author)'],
             ],
             [
                 OutputPart::OUTPUT_TABLE,
-                OutputPart::OUTPUT_WRITE_LINE
+                OutputPart::OUTPUT_WRITE_LINE,
             ],
-            ConsoleFormatter::FORMAT_TABLE
+            ConsoleFormatter::FORMAT_TABLE,
         ];
     }
 }

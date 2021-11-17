@@ -14,6 +14,6 @@ $EM_CONF['my_extension'] = [
     'constraints' => [
         'depends' => [
             'typo3' => '10.0.0-11.99.99',
-        ]
-    ]
+        ],
+    ],
 ];
