@@ -41,7 +41,7 @@ final class HttpClientFactory
                 'User-Agent' => 'Tailor - Your TYPO3 Extension Helper',
             ], $requestConfiguration->getHeaders()),
             // REST API does not perform redirects
-            'max_redirects' => 0
+            'max_redirects' => 0,
         ];
         if ($requestConfiguration->getQuery() !== []) {
             $options['query'] = $requestConfiguration->getQuery();

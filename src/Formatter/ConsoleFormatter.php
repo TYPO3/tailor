@@ -117,7 +117,7 @@ class ConsoleFormatter
             new OutputPart(
                 [
                     ['Extension Key', 'Title', 'Latest Version', 'Last Updated on', 'Composer Name'],
-                    $extensions
+                    $extensions,
                 ],
                 OutputPart::OUTPUT_TABLE
             )

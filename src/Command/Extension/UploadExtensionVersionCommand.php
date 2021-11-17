@@ -121,7 +121,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
         return new FormDataPart([
             'description' => (string)$options['comment'],
             'gplCompliant' => '1',
-            'file' => DataPart::fromPath($versionService->getVersionFilePath())
+            'file' => DataPart::fromPath($versionService->getVersionFilePath()),
         ]);
     }
 
