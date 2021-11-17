@@ -47,8 +47,10 @@ abstract class AbstractClientRequestCommand extends Command
 
     protected function configure(): void
     {
-        // General option to get a raw result. Can be used for further processing.
-        $this->addOption('raw', 'r', InputOption::VALUE_OPTIONAL, 'Return result as raw object (e.g. json)', false);
+        $this
+            // General option to get a raw result. Can be used for further processing.
+            ->addOption('raw', 'r', InputOption::VALUE_OPTIONAL, 'Return result as raw object (e.g. json)', false)
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Outputs the operations but will not execute anything');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -67,6 +69,12 @@ abstract class AbstractClientRequestCommand extends Command
         $requestConfiguration
             ->setRaw($input->getOption('raw') !== false)
             ->setDefaultAuthMethod($this->defaultAuthMethod);
+
+        // In case of a dry-run the request to TER is skipped.
+        if ($input->getOption('dry-run') === true) {
+            $io->note(sprintf('Would have sent the command "%s %s", skipping', $requestConfiguration->getMethod(), $requestConfiguration->getEndpoint()));
+            return 0;
+        }
 
         // RequestService returns a boolean for whether the request was successful or not.
         // Since we have to return an exit code, this must be negated and casted to return
