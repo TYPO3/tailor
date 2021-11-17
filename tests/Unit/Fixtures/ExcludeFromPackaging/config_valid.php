@@ -2,9 +2,9 @@
 
 return [
     'directories' => [
-        'dummy'
+        'dummy',
     ],
     'files' => [
         'dummy',
-    ]
+    ],
 ];
