@@ -453,9 +453,12 @@ ${GITHUB_REF#refs/tags/v}
 $(git tag -n10 -l v${{ steps.get-version.outputs.version }} | sed "s/^v[0-9.]*[ ]*//g")
 ```
 
-#### Github actions from TYPO3 community
+#### GitHub actions from TYPO3 community
 
-Additionally, to further simplify your workflow, you can also use the [typo3-uploader-ter][typo3-uploader-ter] Github action from TYPO3 community member Tomas Norre. For more information about the usage, please refer to the corresponding [README][typo3-uploader-ter-readme].
+Additionally, to further simplify your workflow, you can also use the
+[typo3-uploader-ter][typo3-uploader-ter] GitHub action from TYPO3 community
+member Tomas Norre. For more information about the usage, please refer to the
+corresponding [README][typo3-uploader-ter-readme].
 
 ### GitLab pipeline
 
