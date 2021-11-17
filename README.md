@@ -453,6 +453,13 @@ ${GITHUB_REF#refs/tags/v}
 $(git tag -n10 -l v${{ steps.get-version.outputs.version }} | sed "s/^v[0-9.]*[ ]*//g")
 ```
 
+#### GitHub actions from TYPO3 community
+
+Additionally, to further simplify your workflow, you can also use the
+[typo3-uploader-ter][typo3-uploader-ter] GitHub action from TYPO3 community
+member Tomas Norre. For more information about the usage, please refer to the
+corresponding [README][typo3-uploader-ter-readme].
+
 ### GitLab pipeline
 
 The job will only be executed when pushing a new tag.
@@ -531,3 +538,5 @@ MIT License, see LICENSE
 [rest-api]: https://extensions.typo3.org/faq/rest-api/
 [ter]: https://extensions.typo3.org
 [tailor-ext]: https://github.com/o-ba/tailor_ext
+[typo3-uploader-ter]: https://github.com/tomasnorre/typo3-upload-ter
+[typo3-uploader-ter-readme]: https://github.com/tomasnorre/typo3-upload-ter/blob/main/README.md
