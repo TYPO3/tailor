@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        php: [7.2, 7.3, 7.4, 8.0]
+        php: ["7.2", "7.3", "7.4", "8.0", "8.1"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -32,8 +32,9 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
 
-      - name: Run Tests
-        run: |
-          composer tests:unit
-          composer cs
+      - name: Run cgl
+        if: ${{ matrix.php != '8.1' }}
+        run: composer cs
 
+      - name: Run unit tests
+        run: composer tests:unit
