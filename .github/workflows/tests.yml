@@ -32,8 +32,9 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
 
-      - name: Run Tests
-        run: |
-          composer tests:unit
-          composer cs
+      - name: Run cgl
+        if: ${{ matrix.php != '8.1' }}
+        run: composer cs
 
+      - name: Run unit tests
+        run: composer tests:unit
