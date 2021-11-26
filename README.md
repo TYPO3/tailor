@@ -48,21 +48,25 @@ Provide your credentials by either creating a `.env` file in the
 project root folder or setting environment variables through your
 system to this PHP script:
 
-    TYPO3_API_TOKEN=<your-token>
-    TYPO3_API_USERNAME=<your-t3o-username>
-    TYPO3_API_PASSWORD=<your-t3o-password>
-    
+```bash
+TYPO3_API_TOKEN=<your-token>
+TYPO3_API_USERNAME=<your-t3o-username>
+TYPO3_API_PASSWORD=<your-t3o-password>
+```
+
 **Note**: For an overview of all available environment variables,
 have a look at the `.env.dist` file.
-    
+
 **Note**: You can also add environment variables directly on
 executing a command. This overrides any variable, defined in
 the `.env` file.
 
 Example:
 
-    TYPO3_API_TOKEN="someToken" TYPO3_EXTENSION_KEY="ext_key" bin/tailor ter:details
-    
+```bash
+TYPO3_API_TOKEN="someToken" TYPO3_EXTENSION_KEY="ext_key" bin/tailor ter:details
+```
+
 This will display the extension details for extension `ext_key` if
 `someToken` is valid (not expired/revoked and having at least the
 `extension:read` scope assigned).
@@ -71,7 +75,9 @@ This will display the extension details for extension `ext_key` if
 
 Use Tailor as a dev dependency via composer of your extensions:
 
-    composer req --dev typo3/tailor
+```bash
+composer req --dev typo3/tailor
+```
 
 ## Usage
 
@@ -83,9 +89,9 @@ Most of the commands require an extension key to work with.
 There are multiple possibilities to provide an extension key.
 These are - in the order in which they are checked:
 
-* As argument, e.g. `./vendor/bin/tailor ter:details my_key`
-* As environment variable, `TYPO3_EXTENSION_KEY=my_key`
-* In your `composer.json`, `[extra][typo3/cms][extension-key] = 'my_key'`
+- As argument, e.g. `./vendor/bin/tailor ter:details my_key`
+- As environment variable, `TYPO3_EXTENSION_KEY=my_key`
+- In your `composer.json`, `[extra][typo3/cms][extension-key] = 'my_key'`
 
 This means, even if you have an extension key defined globally,
 either as environment variable or in your `composer.json`, you
@@ -100,17 +106,21 @@ which require an extension key to be set, will throw an exception.
 
 Use the `ter:token:create` command to create a new token:
 
-    ./vendor/bin/tailor ter:token:create --name="token for my_extension" --extensions=my_extension
+```bash
+./vendor/bin/tailor ter:token:create --name="token for my_extension" --extensions=my_extension
+```
 
 The result will look like this:
 
-    Token type: bearer
-    Access token: eyJ0eXAOiEJKV1QiLCJhb
-    Refresh token: eyJ0eXMRxHRaF4hIVrEtu
-    Expires in: 604800
-    Scope: extension:read,extension:write
-    Extensions: my_extension
-    
+```http
+Token type: bearer
+Access token: eyJ0eXAOiEJKV1QiLCJhb
+Refresh token: eyJ0eXMRxHRaF4hIVrEtu
+Expires in: 604800
+Scope: extension:read,extension:write
+Extensions: my_extension
+```
+
 As you can see, this will create an access token which is only
 valid for the extension `my_extension`. The scopes are set to
 `extension:read,extension:write` since this is the default if
@@ -119,35 +129,45 @@ expiration date which can be set with the option `--expires`.
 
 If the token threatens to expire, refresh it with `ter:token:refresh`:
 
-    ./vendor/bin/tailor ter:token:refresh eyJ0eXMRxHRaF4hIVrEtu
-    
+```bash
+./vendor/bin/tailor ter:token:refresh eyJ0eXMRxHRaF4hIVrEtu
+```
+
 This will generate new access and refresh tokens with the same
 options, initially set on creation.
 
 To revoke an access token irretrievably, use `ter:token:revoke`:
 
-    ./vendor/bin/tailor ter:token:revoke eyJ0eXAOiEJKV1QiLCJhb
+```bash
+./vendor/bin/tailor ter:token:revoke eyJ0eXAOiEJKV1QiLCJhb
+```
 
 ### Register a new extension key
 
 To register a new extension, use `ter:register` by providing
 your desired extension key as argument:
 
-    ./vendor/bin/tailor ter:register my_extension
+```bash
+./vendor/bin/tailor ter:register my_extension
+```
 
 This registers the key `my_extension` and returns following
 confirmation:
 
-    Key: my_extension
-    Owner: your_username
-    
+```http
+Key: my_extension
+Owner: your_username
+```
+
 ### Update the version in your extension files
 
 Prior to publishing a new version, you have to update the
 version in your extensions `ext_emconf.php` file. This can
 be done using the `set-version` command.
 
-    ./vendor/bin/tailor set-version 1.2.0
+```bash
+./vendor/bin/tailor set-version 1.2.0
+```
 
 If your extension also contains a `Documentation/Settings.cfg`
 file, the command will also update the `release` and `version`
@@ -173,26 +193,36 @@ extension). The latter can be either local or a remote file.
 
 Using `--path`:
 
-    ./vendor/bin/tailor ter:publish 1.2.0 my_extension --path=/path/to/my_extension
-    
+```bash
+./vendor/bin/tailor ter:publish 1.2.0 my_extension --path=/path/to/my_extension
+```
+
 Using a local `--artefact`:
-    
-    ./vendor/bin/tailor ter:publish 1.2.0 my_extension --artefact=/path/to/any-zip-file/my_extension.zip
-    
+
+```bash
+./vendor/bin/tailor ter:publish 1.2.0 my_extension --artefact=/path/to/any-zip-file/my_extension.zip
+```
+
 Using a remote `--artefact`:
 
-    ./vendor/bin/tailor ter:publish 1.2.0 my_extension --artefact=https://github.com/my-name/my_extension/archive/1.2.0.zip
-    
+```bash
+./vendor/bin/tailor ter:publish 1.2.0 my_extension --artefact=https://github.com/my-name/my_extension/archive/1.2.0.zip
+```
+
 Using the root direcotry:
 
-    ./vendor/bin/tailor ter:publish 1.2.0 my_extension
-    
+```bash
+./vendor/bin/tailor ter:publish 1.2.0 my_extension
+```
+
 If the extension key is defined as environment variable or
 in your `composer.json`, it can also be skipped. So using the
 current root directory the whole command simplifies to:
 
-    ./vendor/bin/tailor ter:publish 1.2.0
-    
+```bash
+./vendor/bin/tailor ter:publish 1.2.0
+```
+
 **Important**: A couple of directories and files are excluded
 from packaging by default. You can find the configuration in
 `conf/ExcludeFromPackaging.php`. If you like, you can also
@@ -200,7 +230,7 @@ use a custom configuration. Just add the path to your custom
 configuration file to the environment variable
 `TYPO3_EXCLUDE_FROM_PACKAGING`. This file must return an
 `array` with the keys `directories` and `files` on root level.
-    
+
 **Note**: The REST API, just like the the [TER][ter], requires
 an upload comment to be set. This can be achieved using the
 `--comment` option. If not set, Tailor will automatically use
@@ -214,12 +244,16 @@ command.
 
 To update the composer name:
 
-    ./vendor/bin/tailor ter:update my_extension --composer=vender/my_extension
-    
+```bash
+./vendor/bin/tailor ter:update my_extension --composer=vender/my_extension
+```
+
 To update the tags:
 
-    ./vendor/bin/tailor ter:update my_extension --tags=some-tag,another-tag
-    
+```bash
+./vendor/bin/tailor ter:update my_extension --tags=some-tag,another-tag
+```
+
 Please use `./vendor/bin/tailor ter:update -h` to see the full
 list of available options.
 
@@ -238,13 +272,17 @@ Since you won't have any access to the extension afterwards, the
 command asks for your confirmation before sending the order to
 the REST API.
 
-    ./vendor/bin/tailor ter:transfer some_user my_extension
-    
+```bash
+./vendor/bin/tailor ter:transfer some_user my_extension
+```
+
 This transfers the extension `my_extension`  to the user
 `some_user` and returns following confirmation:
 
-    Key: my_extension
-    Owner: some_user    
+```http
+Key: my_extension
+Owner: some_user
+```
 
 **Note**: For automated workflows the confirmation can be
 skipped with the ``-n, --no-interaction`` option.
@@ -260,8 +298,10 @@ Since you won't have any access to the extension afterwards,
 the command asks for your confirmation before sending the order
 to the REST API.
 
-    ./vendor/bin/tailor ter:delete my_extension
-    
+```bash
+./vendor/bin/tailor ter:delete my_extension
+```
+
 This will delete / abandon the extension `my_extension`.
 
 **Note**: For automated workflows the confirmation can be
@@ -271,11 +311,13 @@ skipped with the ``-n, --no-interaction`` option.
 
 Tailor can't only be used for managing your extensions but
 also to find others. Therefore, use `ter:find` by adding some
-filters: 
+filters:
 
-    ./vendor/bin/tailor ter:find
-    ./vendor/bin/tailor ter:find --typo3-version=9
-    ./vendor/bin/tailor ter:find --typo3-author=some_user
+```bash
+./vendor/bin/tailor ter:find
+./vendor/bin/tailor ter:find --typo3-version=9
+./vendor/bin/tailor ter:find --typo3-author=some_user
+```
 
 First command will find all public extensions. The second
 and third one will only return extensions which match the
@@ -285,15 +327,19 @@ filter. In this case being compatible with TYPO3 version
 To limit / paginate the result, you can use the options
 `--page` and `--per_page`:
 
-    ./vendor/bin/tailor ter:find --page=3 --per_page=20
+```bash
+./vendor/bin/tailor ter:find --page=3 --per_page=20
+```
 
 #### Specific extension details
 
 You can also request more details about a specific extension
 using the `ter:details` command:
 
-    ./vendor/bin/tailor ter:details my_extension
-    
+```bash
+./vendor/bin/tailor ter:details my_extension
+```
+
 This will return details about the extension `my_extension`
 like the current version, the author, some meta information
 and more. Similar to the extension detail page on
@@ -304,8 +350,10 @@ and more. Similar to the extension detail page on
 If you like to get details about a specific version of an
 extension, `ter:version` can be used:
 
-    ./vendor/bin/tailor ter:version 1.0.0 my_extension
-    
+```bash
+./vendor/bin/tailor ter:version 1.0.0 my_extension
+```
+
 This will return details about version `1.0.0` of extension
 `my_extension`.
 
@@ -314,8 +362,10 @@ This will return details about version `1.0.0` of extension
 You can also get the details for all versions of an extension
 with `ter:versions`:
 
-    ./vendor/bin/tailor ter:versions my_extension
-    
+```bash
+./vendor/bin/tailor ter:versions my_extension
+```
+
 This will return the details for all version of the extension
 `my_extension`.
 
@@ -323,21 +373,29 @@ This will return the details for all version of the extension
 
 **Step 1: Update the version in your extension files**
 
-    ./vendor/bin/tailor set-version 1.5.0
+```bash
+./vendor/bin/tailor set-version 1.5.0
+```
 
 **Step 2: Commit the changes and add a tag**
- 
-    git commit -am "[RELEASE] A new version was published"
-    git tag -a 1.5.0
+
+```bash
+git commit -am "[RELEASE] A new version was published"
+git tag -a 1.5.0
+```
 
 **Step 3: Push this to your remote repository**
 
-    git push origin --tags
+```bash
+git push origin --tags
+```
 
 **Step 4: Push this version to TER**
 
-    ./vendor/bin/tailor ter:publish 1.5.0
-    
+```bash
+./vendor/bin/tailor ter:publish 1.5.0
+```
+
 **Note:** Both `set-version` and `ter:publish` provide options
 to specify the location of your extension. If, like in the example
 above, non is set, Tailor automatically uses your current working
@@ -352,7 +410,7 @@ done by your integration.
 
 Please have a look at the following examples describing how
 such integration could look like for GitHub workflows and
-GitLab pipelines. 
+GitLab pipelines.
 
 ### Github actions workflow
 
@@ -378,7 +436,6 @@ comment. If it's empty, a static text will be used.
 
 To see the following workflow in action, please have a
 look at the [tailor_ext][tailor-ext] example extension.
-
 
 ```yaml
 name: publish
@@ -437,7 +494,7 @@ jobs:
 
 1. The regular expression in step **Check tag** should be:
 
-```
+```regexp
 ^refs/tags/v[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$
 ```
 
@@ -489,7 +546,6 @@ The variable `CI_COMMIT_TAG` is set by GitLab automatically.
       fi;
 ```
 
-
 ## Overview of all available commands
 
 | Commands              | Arguments                         | Options                                                                                               | Description                                     |
@@ -520,7 +576,6 @@ The variable `CI_COMMIT_TAG` is set by GitLab automatically.
   for more verbose output and 3 for debug
 - ``--ansi`` Force ANSI output
 - ``--no-ansi`` Disable ANSI output
-
 
 ## Author & License
 
