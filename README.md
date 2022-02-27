@@ -112,7 +112,7 @@ Use the `ter:token:create` command to create a new token:
 
 The result will look like this:
 
-```http
+```
 Token type: bearer
 Access token: eyJ0eXAOiEJKV1QiLCJhb
 Refresh token: eyJ0eXMRxHRaF4hIVrEtu
