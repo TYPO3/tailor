@@ -60,6 +60,7 @@ return [
         'phpstan-baseline.neon',
         'phpstan.neon',
         'phpstan.neon.dist',
+        'phpstorm.meta.php',
         'phpunit.xml',
         'phpunit.xml.dist',
         'prettierrc.json',
