@@ -52,17 +52,18 @@ class HttpClientFactoryTest extends TestCase
         $_ENV['TYPO3_API_TOKEN'] = 'token123';
 
         $httpClient = HttpClientFactory::create($this->requestConfiguration);
+        $defaultOptions =  $this->getDefaultOptions($httpClient);
 
         self::assertSame(
             'https://extensions.typo3.org/api/v1/',
-            $this->getDefaultOptions($httpClient)['base_uri']
+            $defaultOptions['base_uri']
         );
-        self::assertSame(
-            ['accept: application/xml', 'User-Agent: Tailor - Your TYPO3 Extension Helper'],
-            $this->getDefaultOptions($httpClient)['headers']
-        );
-        self::assertSame(['parameter' => 'value'], $this->getDefaultOptions($httpClient)['query']);
-        self::assertSame('data=some+value', $this->getDefaultOptions($httpClient)['body']);
+
+        self::assertContains('accept: application/xml', $defaultOptions['headers']);
+        self::assertContains('User-Agent: Tailor - Your TYPO3 Extension Helper', $defaultOptions['headers']);
+
+        self::assertSame(['parameter' => 'value'], $defaultOptions['query']);
+        self::assertSame('data=some+value', $defaultOptions['body']);
     }
 
     /**
