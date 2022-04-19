@@ -81,16 +81,21 @@ class VersionService
                     return false;
                 }
 
-                // check directories
-                foreach ($this->excludeConfiguration['directories'] as $excludeDirectory) {
-                    if (preg_match('/^' . $excludeDirectory . '/i', $path)) {
-                        return false;
+                if ($current->isDir()) {
+                    // if $current is a directory, check for excluded directories
+                    foreach ($this->excludeConfiguration['directories'] as $excludeDirectory) {
+                        if (preg_match('/^' . $excludeDirectory . '/i', $path)) {
+                            return false;
+                        }
                     }
                 }
-                // check files
-                foreach ($this->excludeConfiguration['files'] as $excludeFile) {
-                    if (preg_match('/' . $excludeFile . '$/i', $filename)) {
-                        return false;
+
+                if ($current->isFile()) {
+                    // if $current is a file, check for excluded files
+                    foreach ($this->excludeConfiguration['files'] as $excludeFile) {
+                        if (preg_match('/' . $excludeFile . '$/i', $filename)) {
+                            return false;
+                        }
                     }
                 }
 
