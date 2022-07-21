@@ -266,7 +266,7 @@ one. You can use `ter:details` to get the current state.
 
 It's possible to transfer one of your extensions to another user.
 Therefore, use the `ter:transfer` command providing the extension
-key to be transfered and the TYPO3.org username of the recipient.
+key to be transferred and the TYPO3.org username of the recipient.
 
 Since you won't have any access to the extension afterwards, the
 command asks for your confirmation before sending the order to
@@ -404,7 +404,7 @@ directory.
 ## Publish a new version using your CI
 
 You can also integrate tailor into you GitHub workflow respectively
-your GitLab pipline. Therefore, **Step 1**, **Step 2** and **Step 3**
+your GitLab pipeline. Therefore, **Step 1**, **Step 2** and **Step 3**
 from the above example are the same. **Step 4** could then be
 done by your integration.
 
