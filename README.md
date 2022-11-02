@@ -453,7 +453,7 @@ jobs:
       TYPO3_API_TOKEN: ${{ secrets.TYPO3_API_TOKEN }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Check tag
         run: |
@@ -463,17 +463,17 @@ jobs:
 
       - name: Get version
         id: get-version
-        run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\//}
+        run: echo "version=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
 
       - name: Get comment
         id: get-comment
         run: |
-          readonly local comment=$(git tag -n10 -l ${{ steps.get-version.outputs.version }} | sed "s/^[0-9.]*[ ]*//g")
+          readonly local comment=$(git tag -n10 -l ${{ env.version }} | sed "s/^[0-9.]*[ ]*//g")
 
           if [[ -z "${comment// }" ]]; then
-            echo ::set-output name=comment::Released version ${{ steps.get-version.outputs.version }} of ${{ env.TYPO3_EXTENSION_KEY }}
+            echo "comment=Released version ${{ env.version }} of ${{ env.TYPO3_EXTENSION_KEY }}" >> $GITHUB_ENV
           else
-            echo ::set-output name=comment::$comment
+            echo "comment=$comment" >> $GITHUB_ENV
           fi
 
       - name: Setup PHP
@@ -487,7 +487,7 @@ jobs:
         run: composer global require typo3/tailor --prefer-dist --no-progress --no-suggest
 
       - name: Publish to TER
-        run: php ~/.composer/vendor/bin/tailor ter:publish --comment "${{ steps.get-comment.outputs.comment }}" ${{ steps.get-version.outputs.version }}
+        run: php ~/.composer/vendor/bin/tailor ter:publish --comment "${{ env.comment }}" ${{ env.version }}
 ```
 
 **Note**: If you're using tags with a leading `v` the above example needs to be adjusted.
@@ -507,7 +507,7 @@ ${GITHUB_REF#refs/tags/v}
 3. The variable declaration in step **Get comment** should be:
 
 ```bash
-$(git tag -n10 -l v${{ steps.get-version.outputs.version }} | sed "s/^v[0-9.]*[ ]*//g")
+$(git tag -n10 -l v${{ env.version }} | sed "s/^v[0-9.]*[ ]*//g")
 ```
 
 #### GitHub actions from TYPO3 community
