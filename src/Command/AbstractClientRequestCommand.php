@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,9 +19,6 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
-use TYPO3\Tailor\Environment\Variables;
-use TYPO3\Tailor\Exception\ExtensionKeyMissingException;
-use TYPO3\Tailor\Filesystem\ComposerReader;
 use TYPO3\Tailor\Formatter\ConsoleFormatter;
 use TYPO3\Tailor\HttpClientFactory;
 use TYPO3\Tailor\Service\RequestService;
@@ -31,7 +27,7 @@ use TYPO3\Tailor\Writer\ConsoleWriter;
 /**
  * Abstract class to be used by commands, requesting an TER API endpoint
  */
-abstract class AbstractClientRequestCommand extends Command
+abstract class AbstractClientRequestCommand extends AbstractCommand
 {
     /** @var int */
     private $defaultAuthMethod = HttpClientFactory::ALL_AUTH;
@@ -93,26 +89,6 @@ abstract class AbstractClientRequestCommand extends Command
     {
         $this->confirmationRequired = $confirmationRequired;
         return $this;
-    }
-
-    protected function getExtensionKey(InputInterface $input): string
-    {
-        if ($input->hasArgument('extensionkey')
-            && ($key = ($input->getArgument('extensionkey') ?? '')) !== ''
-        ) {
-            $extensionKey = $key;
-        } elseif (Variables::has('TYPO3_EXTENSION_KEY')) {
-            $extensionKey = Variables::get('TYPO3_EXTENSION_KEY');
-        } elseif (($extensionKeyFromComposer = (new ComposerReader())->getExtensionKey()) !== '') {
-            $extensionKey = $extensionKeyFromComposer;
-        } else {
-            throw new ExtensionKeyMissingException(
-                'The extension key must either be set as argument, as environment variable or in the composer.json.',
-                1605706548
-            );
-        }
-
-        return $extensionKey;
     }
 
     abstract protected function getRequestConfiguration(): RequestConfiguration;

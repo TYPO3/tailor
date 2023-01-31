@@ -16,6 +16,7 @@ versions to the [extension repository][ter].
   - [Register a new extension key](#register-a-new-extension-key)
   - [Update the version in your extension files](#update-the-version-in-your-extension-files)
   - [Publish a new version of an extension to TER](#publish-a-new-version-of-an-extension-to-ter)
+  - [Create a local artefact of an extension](#create-a-local-artefact-of-an-extension)
   - [Update extension meta information](#update-extension-meta-information)
   - [Transfer ownership of an extension to another user](#transfer-ownership-of-an-extension-to-another-user)
   - [Delete / abandon an extension](#delete--abandon-an-extension)
@@ -235,6 +236,59 @@ configuration file to the environment variable
 an upload comment to be set. This can be achieved using the
 `--comment` option. If not set, Tailor will automatically use
 `Updated extension to <version>` as comment.
+
+### Create a local artefact of an extension
+
+You can generate a local artefact of your extension using the
+`create-artefact` command. This will generate a zip archive
+ready to be uploaded to TER (which is not covered by this
+command, have a look at the [`ter:publish`](#publish-a-new-version-of-an-extension-to-ter)
+command instead).
+
+Provide the version number and extension key as arguments
+followed by the path to the extension directory or an artefact
+(a zipped version of your extension). The latter can be either
+local or a remote file.
+
+Using `--path`:
+
+```bash
+./vendor/bin/tailor create-artefact 1.2.0 my_extension --path=/path/to/my_extension
+```
+
+Using a local `--artefact`:
+
+```bash
+./vendor/bin/tailor create-artefact 1.2.0 my_extension --artefact=/path/to/any-zip-file/my_extension.zip
+```
+
+Using a remote `--artefact`:
+
+```bash
+./vendor/bin/tailor create-artefact 1.2.0 my_extension --artefact=https://github.com/my-name/my_extension/archive/1.2.0.zip
+```
+
+Using the root directory:
+
+```bash
+./vendor/bin/tailor create-artefact 1.2.0 my_extension
+```
+
+If the extension key is defined as environment variable or
+in your `composer.json`, it can also be skipped. So using the
+current root directory the whole command simplifies to:
+
+```bash
+./vendor/bin/tailor create-artefact 1.2.0
+```
+
+**Important**: A couple of directories and files are excluded
+from packaging by default. You can find the configuration in
+`conf/ExcludeFromPackaging.php`. If you like, you can also
+use a custom configuration. Just add the path to your custom
+configuration file to the environment variable
+`TYPO3_EXCLUDE_FROM_PACKAGING`. This file must return an
+`array` with the keys `directories` and `files` on root level.
 
 ### Update extension meta information
 
@@ -559,21 +613,22 @@ The variable `CI_COMMIT_TAG` is set by GitLab automatically.
 
 ## Overview of all available commands
 
-| Commands              | Arguments                         | Options                                                                                               | Description                                     |
-| --------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| ``set-version``       | ``version``                       | ``--path``<br/>``--no-docs``                                                                          | Update the version in extension files           |
-| ``ter:delete``        | ``extensionkey``                  |                                                                                                       | Delete an extension.                            |
-| ``ter:details``       | ``extensionkey``                  |                                                                                                       | Fetch details about an extension.               |
-| ``ter:find``          |                                   | ``--page``<br/>``--per-page``<br/>``--author``<br/>``--typo3-version``                                | Fetch a list of extensions from TER.            |
-| ``ter:publish``       | ``version``<br/>``extensionkey``  | ``--path``<br/>``--artefact``<br/>``--comment``                                                       | Publishes a new version of an extension to TER. |
-| ``ter:register``      | ``extensionkey``                  |                                                                                                       | Register a new extension key in TER.            |
-| ``ter:token:create``  |                                   | ``--name``<br/>``--expires``<br/>``--scope``<br/>``--extensions``                                     | Request an access token for the TER.            |
-| ``ter:token:refresh`` | ``token``                         |                                                                                                       | Refresh an access token for the TER.            |
-| ``ter:token:revoke``  | ``token``                         |                                                                                                       | Revoke an access token for the TER.             |
-| ``ter:transfer``      | ``username``<br/>``extensionkey`` |                                                                                                       | Transfer ownership of an extension key.         |
-| ``ter:update``        | ``extensionkey``                  | ``--composer``<br/>``--issues``<br/>``--repository``<br/>``--manual``<br/>``--paypal``<br/>``--tags`` | Update extension meta information.              |
-| ``ter:version``       | ``version``<br/>``extensionkey``  |                                                                                                       | Fetch details about an extension version.       |
-| ``ter:versions``      | ``extensionkey``                  |                                                                                                       | Fetch details for all versions of an extension. |
+| Commands              | Arguments                         | Options                                                                                               | Description                                            |
+|-----------------------|-----------------------------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------|
+| ``set-version``       | ``version``                       | ``--path``<br/>``--no-docs``                                                                          | Update the version in extension files                  |
+| ``ter:delete``        | ``extensionkey``                  |                                                                                                       | Delete an extension.                                   |
+| ``ter:details``       | ``extensionkey``                  |                                                                                                       | Fetch details about an extension.                      |
+| ``ter:find``          |                                   | ``--page``<br/>``--per-page``<br/>``--author``<br/>``--typo3-version``                                | Fetch a list of extensions from TER.                   |
+| ``ter:publish``       | ``version``<br/>``extensionkey``  | ``--path``<br/>``--artefact``<br/>``--comment``                                                       | Publishes a new version of an extension to TER.        |
+| ``create-artefact``   | ``version``<br/>``extensionkey``  | ``--path``<br/>``--artefact``                                                                         | Create an artefact file (zip archive) of an extension. |
+| ``ter:register``      | ``extensionkey``                  |                                                                                                       | Register a new extension key in TER.                   |
+| ``ter:token:create``  |                                   | ``--name``<br/>``--expires``<br/>``--scope``<br/>``--extensions``                                     | Request an access token for the TER.                   |
+| ``ter:token:refresh`` | ``token``                         |                                                                                                       | Refresh an access token for the TER.                   |
+| ``ter:token:revoke``  | ``token``                         |                                                                                                       | Revoke an access token for the TER.                    |
+| ``ter:transfer``      | ``username``<br/>``extensionkey`` |                                                                                                       | Transfer ownership of an extension key.                |
+| ``ter:update``        | ``extensionkey``                  | ``--composer``<br/>``--issues``<br/>``--repository``<br/>``--manual``<br/>``--paypal``<br/>``--tags`` | Update extension meta information.                     |
+| ``ter:version``       | ``version``<br/>``extensionkey``  |                                                                                                       | Fetch details about an extension version.              |
+| ``ter:versions``      | ``extensionkey``                  |                                                                                                       | Fetch details for all versions of an extension.        |
 
 ### General options for all commands
 
