@@ -28,6 +28,7 @@ versions to the [extension repository][ter].
 - [Publish a new version using your CI](#publish-a-new-version-using-your-ci)
   - [Github actions workflow](#github-actions-workflow)
   - [GitLab pipeline](#gitlab-pipeline)
+- [Exclude paths from packaging](#exclude-paths-from-packaging)
 - [Overview of all available commands](#overview-of-all-available-commands)
   - [General options for all commands](#general-options-for-all-commands)
 - [Author & License](#author--license)
@@ -39,11 +40,12 @@ access token. You can create such token either on
 [https://extensions.typo3.org/][ter] after you've logged in, or
 directly using Tailor.
 
-**Note:** To create, refresh or revoke an access token with Tailor,
-you have to add your TYPO3.org credentials (see below). Even if it
-is possible to execute all commands using the TYPO3.org credentials
-for authentication, it is highly discouraged. That's why we have
-built token based authentication for the [TER][ter].
+> [!IMPORTANT]
+> To create, refresh or revoke an access token with Tailor,
+> you have to add your TYPO3.org credentials (see below). Even if it
+> is possible to execute all commands using the TYPO3.org credentials
+> for authentication, it is highly discouraged. That's why we have
+> built token based authentication for the [TER][ter].
 
 Provide your credentials by either creating a `.env` file in the
 project root folder or setting environment variables through your
@@ -55,12 +57,14 @@ TYPO3_API_USERNAME=<your-t3o-username>
 TYPO3_API_PASSWORD=<your-t3o-password>
 ```
 
-**Note**: For an overview of all available environment variables,
-have a look at the `.env.dist` file.
+> [!NOTE]
+> For an overview of all available environment variables,
+> have a look at the `.env.dist` file.
 
-**Note**: You can also add environment variables directly on
-executing a command. This overrides any variable, defined in
-the `.env` file.
+> [!TIP]
+> You can also add environment variables directly on
+> executing a command. This overrides any variable, defined in
+> the `.env` file.
 
 Example:
 
@@ -99,9 +103,10 @@ either as environment variable or in your `composer.json`, you
 can still run all commands for different extensions by adding
 the desired extension key as argument to the command.
 
-**Note:** If no extension key is defined, neither as an argument,
-as environment variable, nor in your `composer.json`, commands
-which require an extension key to be set, will throw an exception.
+> [!NOTE]
+> If no extension key is defined, neither as an argument,
+> as environment variable, nor in your `composer.json`, commands
+> which require an extension key to be set, will throw an exception.
 
 ### Manage your personal access token
 
@@ -176,13 +181,15 @@ information in it. You can disable this feature by either
 using `--no-docs` or by setting the environment variable
 `TYPO3_DISABLE_DOCS_VERSION_UPDATE=1`.
 
-**Note**: It's also possible to use the `--path` option to
-specify the location of your extension. If not given, your
-current working directory is search for the `ext_emconf.php`
-file.
+> [!TIP]
+> It's also possible to use the `--path` option to
+> specify the location of your extension. If not given, your
+> current working directory is search for the `ext_emconf.php`
+> file.
 
-**Note**: The version will only be updated if already present
-in your `ext_emconf.php`. It won't be added by this command.
+> [!NOTE]
+> The version will only be updated if already present
+> in your `ext_emconf.php`. It won't be added by this command.
 
 ### Publish a new version of an extension to TER
 
@@ -224,18 +231,17 @@ current root directory the whole command simplifies to:
 ./vendor/bin/tailor ter:publish 1.2.0
 ```
 
-**Important**: A couple of directories and files are excluded
-from packaging by default. You can find the configuration in
-`conf/ExcludeFromPackaging.php`. If you like, you can also
-use a custom configuration. Just add the path to your custom
-configuration file to the environment variable
-`TYPO3_EXCLUDE_FROM_PACKAGING`. This file must return an
-`array` with the keys `directories` and `files` on root level.
+> [!IMPORTANT]
+> A couple of directories and files are excluded from packaging
+> by default. Read more about
+> [excluding paths from packaging](#exclude-paths-from-packaging)
+> below.
 
-**Note**: The REST API, just like the the [TER][ter], requires
-an upload comment to be set. This can be achieved using the
-`--comment` option. If not set, Tailor will automatically use
-`Updated extension to <version>` as comment.
+> [!NOTE]
+> The REST API, just like the the [TER][ter], requires
+> an upload comment to be set. This can be achieved using the
+> `--comment` option. If not set, Tailor will automatically use
+> `Updated extension to <version>` as comment.
 
 ### Create a local artefact of an extension
 
@@ -282,13 +288,11 @@ current root directory the whole command simplifies to:
 ./vendor/bin/tailor create-artefact 1.2.0
 ```
 
-**Important**: A couple of directories and files are excluded
-from packaging by default. You can find the configuration in
-`conf/ExcludeFromPackaging.php`. If you like, you can also
-use a custom configuration. Just add the path to your custom
-configuration file to the environment variable
-`TYPO3_EXCLUDE_FROM_PACKAGING`. This file must return an
-`array` with the keys `directories` and `files` on root level.
+> [!IMPORTANT]
+> A couple of directories and files are excluded from packaging
+> by default. Read more about
+> [excluding paths from packaging](#exclude-paths-from-packaging)
+> below.
 
 ### Update extension meta information
 
@@ -311,10 +315,11 @@ To update the tags:
 Please use `./vendor/bin/tailor ter:update -h` to see the full
 list of available options.
 
-**Note:** All options set with this command will overwrite the
-existing data. Therefore, if you, for example, just want to add
-another tag, you have to add the current ones along with the new
-one. You can use `ter:details` to get the current state.
+> [!IMPORTANT]
+> All options set with this command will overwrite the
+> existing data. Therefore, if you, for example, just want to add
+> another tag, you have to add the current ones along with the new
+> one. You can use `ter:details` to get the current state.
 
 ### Transfer ownership of an extension to another user
 
@@ -338,8 +343,9 @@ Key: my_extension
 Owner: some_user
 ```
 
-**Note**: For automated workflows the confirmation can be
-skipped with the ``-n, --no-interaction`` option.
+> [!TIP]
+> For automated workflows the confirmation can be
+> skipped with the ``-n, --no-interaction`` option.
 
 ### Delete / abandon an extension
 
@@ -358,8 +364,9 @@ to the REST API.
 
 This will delete / abandon the extension `my_extension`.
 
-**Note**: For automated workflows the confirmation can be
-skipped with the ``-n, --no-interaction`` option.
+> [!TIP]
+> For automated workflows the confirmation can be
+> skipped with the ``-n, --no-interaction`` option.
 
 ### Find and filter extensions on TER
 
@@ -450,10 +457,11 @@ git push origin --tags
 ./vendor/bin/tailor ter:publish 1.5.0
 ```
 
-**Note:** Both `set-version` and `ter:publish` provide options
-to specify the location of your extension. If, like in the example
-above, non is set, Tailor automatically uses your current working
-directory.
+> [!NOTE]
+> Both `set-version` and `ter:publish` provide options
+> to specify the location of your extension. If, like in the example
+> above, non is set, Tailor automatically uses your current working
+> directory.
 
 ## Publish a new version using your CI
 
@@ -477,10 +485,11 @@ The workflow furthermore requires the GitHub secrets `TYPO3_EXTENSION_KEY`
 and `TYPO3_API_TOKEN` to be set. Add them at "Settings -> Secrets -> New
 repository secret".
 
-**Note**: If your `composer.json` file contains the extension key at
-`[extra][typo3/cms][extension-key] = 'my_key'` (this is good practice anyway),
-the `TYPO3_EXTENSION_KEY` secret and assignment in the below GitHub action
-example is not needed, tailor will pick it up.
+> [!NOTE]
+> If your `composer.json` file contains the extension key at
+> `[extra][typo3/cms][extension-key] = 'my_key'` (this is good practice anyway),
+> the `TYPO3_EXTENSION_KEY` secret and assignment in the below GitHub action
+> example is not needed, tailor will pick it up.
 
 The version is automatically fetched from the tag and
 validated to match the required pattern.
@@ -548,7 +557,8 @@ jobs:
         run: php ~/.composer/vendor/bin/tailor ter:publish --comment "${{ env.comment }}" ${{ env.version }}
 ```
 
-**Note**: If you're using tags with a leading `v` the above example needs to be adjusted.
+> [!IMPORTANT]
+> If you're using tags with a leading `v` the above example needs to be adjusted.
 
 1. The regular expression in step **Check tag** should be:
 
@@ -583,10 +593,11 @@ The upload comment is taken from the message in the tag.
 The job furthermore requires the GitLab variables
 `TYPO3_EXTENSION_KEY` and `TYPO3_API_TOKEN` to be set.
 
-**Note**: If your `composer.json` file contains your extension
-key, you can remove the `TYPO3_EXTENSION_KEY` variable, the
-check and the assignment in the GitLab pipeline, since Tailor
-automatically fetches this key then.
+> [!NOTE]
+> If your `composer.json` file contains your extension
+> key, you can remove the `TYPO3_EXTENSION_KEY` variable, the
+> check and the assignment in the GitLab pipeline, since Tailor
+> automatically fetches this key then.
 
 The variable `CI_COMMIT_TAG` is set by GitLab automatically.
 
@@ -610,6 +621,17 @@ The variable `CI_COMMIT_TAG` is set by GitLab automatically.
         /tmp/vendor/bin/tailor ter:publish --comment "$TAG_MESSAGE" "$CI_COMMIT_TAG" "$TYPO3_EXTENSION_KEY"
       fi;
 ```
+
+## Exclude paths from packaging
+
+A couple of directories and files are excluded
+from packaging by default. You can find the configuration in
+[`conf/ExcludeFromPackaging.php`](conf/ExcludeFromPackaging.php).
+
+If you like, you can also use a custom configuration. Just add the
+path to your custom configuration file to the environment variable
+`TYPO3_EXCLUDE_FROM_PACKAGING`. This file must return an
+`array` with the keys `directories` and `files` on root level.
 
 ## Overview of all available commands
 
