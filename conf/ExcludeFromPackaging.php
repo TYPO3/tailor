@@ -21,6 +21,7 @@ return [
         'bin',
         'build',
         'public',
+        'tailor-version-artefact',
         'tailor-version-upload',
         'tests',
         'tools',

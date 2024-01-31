@@ -62,7 +62,7 @@ class CreateExtensionArtefactCommand extends AbstractCommand
         $extensionKey = $this->getExtensionKey($input);
         $path = $input->getOption('path');
         $artefact = $input->getOption('artefact');
-        $transactionPath = rtrim(realpath(getcwd() ?: './'), '/') . '/tailor-version-upload';
+        $transactionPath = rtrim(realpath(getcwd() ?: './'), '/') . '/tailor-version-artefact';
 
         if (!(new Filesystem\Directory())->create($transactionPath)) {
             throw new \RuntimeException(sprintf('Directory could not be created.'));
