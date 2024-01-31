@@ -65,7 +65,7 @@ class CreateExtensionArtefactCommand extends AbstractCommand
         $transactionPath = rtrim(realpath(getcwd() ?: './'), '/') . '/tailor-version-artefact';
 
         if (!(new Filesystem\Directory())->create($transactionPath)) {
-            throw new \RuntimeException(sprintf('Directory could not be created.'));
+            throw new \RuntimeException(sprintf('Directory could not be created: %s', $transactionPath));
         }
 
         $versionService = new VersionService($version, $extensionKey, $transactionPath);
