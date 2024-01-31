@@ -12,19 +12,20 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Command\Extension;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use TYPO3\Tailor\Command\AbstractCommand;
 use TYPO3\Tailor\Filesystem;
+use TYPO3\Tailor\Helper\CommandHelper;
 use TYPO3\Tailor\Service\VersionService;
 
 /**
  * Command to create a local extension artefact (zip archive).
  */
-class CreateExtensionArtefactCommand extends AbstractCommand
+class CreateExtensionArtefactCommand extends Command
 {
     protected function configure(): void
     {
@@ -59,7 +60,7 @@ class CreateExtensionArtefactCommand extends AbstractCommand
         $io = new SymfonyStyle($input, $output);
 
         $version = $input->getArgument('version');
-        $extensionKey = $this->getExtensionKey($input);
+        $extensionKey = CommandHelper::getExtensionKeyFromInput($input);
         $path = $input->getOption('path');
         $artefact = $input->getOption('artefact');
         $transactionPath = rtrim(realpath(getcwd() ?: './'), '/') . '/tailor-version-artefact';

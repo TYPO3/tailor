@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
+use TYPO3\Tailor\Helper\CommandHelper;
 
 /**
  * Command for TER REST endpoint `POST /extension/{key}`
@@ -37,7 +38,7 @@ class RegisterExtensionCommand extends AbstractClientRequestCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->extensionKey = $this->getExtensionKey($input);
+        $this->extensionKey = CommandHelper::getExtensionKeyFromInput($input);
         return parent::execute($input, $output);
     }
 

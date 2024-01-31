@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,7 +28,7 @@ use TYPO3\Tailor\Writer\ConsoleWriter;
 /**
  * Abstract class to be used by commands, requesting an TER API endpoint
  */
-abstract class AbstractClientRequestCommand extends AbstractCommand
+abstract class AbstractClientRequestCommand extends Command
 {
     /** @var int */
     private $defaultAuthMethod = HttpClientFactory::ALL_AUTH;
