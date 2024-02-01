@@ -30,13 +30,7 @@ jobs:
           restore-keys: ${{ runner.os }}-php-${{ matrix.php }}-composer-
 
       - name: Install dependencies
-        if: ${{ matrix.php <= '8.1' }}
         run: composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
-
-      - name: Install dependencies PHP 8.2
-        # @todo: Needed until prophecy (req by phpunit) allows PHP 8.2, https://github.com/phpspec/prophecy/issues/556
-        if: ${{ matrix.php > '8.1' }}
-        run: composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader --ignore-platform-req=php+
 
       - name: Run cgl
         if: ${{ matrix.php < '8.1' }}
