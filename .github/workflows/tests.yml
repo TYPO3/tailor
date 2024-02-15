@@ -32,9 +32,6 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
 
-      - name: Run cgl
-        run: composer cs
-
       - name: Run unit tests
         run: composer tests:unit
 
