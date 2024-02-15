@@ -19,6 +19,7 @@ use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
 use TYPO3\Tailor\Formatter\ConsoleFormatter;
+use TYPO3\Tailor\Helper\CommandHelper;
 
 /**
  * Command for TER REST endpoint `GET /extension/{key}/versions`
@@ -39,7 +40,7 @@ class ExtensionVersionsCommand extends AbstractClientRequestCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->extensionKey = $this->getExtensionKey($input);
+        $this->extensionKey = CommandHelper::getExtensionKeyFromInput($input);
         // @todo the response format needs to be adjusted!
         return parent::execute($input, $output);
     }
