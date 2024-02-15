@@ -23,11 +23,7 @@ foreach ([__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php
 \call_user_func(static function() {
     foreach ([ __DIR__ . '/../.env', __DIR__ . '/../../../../.env', __DIR__ . '/../../../../../.env'] as $file) {
         if (file_exists($file)) {
-            if (method_exists(Dotenv::class, 'usePutenv')) {
-                $dotEnv = (new Dotenv())->usePutenv(true);
-            } else {
-                $dotEnv = new Dotenv(true);
-            }
+            $dotEnv = (new Dotenv())->usePutenv();
             $dotEnv->loadEnv($file);
             break;
         }
