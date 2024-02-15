@@ -36,6 +36,7 @@ foreach ([__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php
     $application->add(new Command\Auth\CreateTokenCommand('ter:token:create'));
     $application->add(new Command\Auth\RefreshTokenCommand('ter:token:refresh'));
     $application->add(new Command\Auth\RevokeTokenCommand('ter:token:revoke'));
+    $application->add(new Command\Extension\CreateExtensionArtefactCommand('create-artefact'));
     $application->add(new Command\Extension\DeleteExtensionCommand('ter:delete'));
     $application->add(new Command\Extension\ExtensionDetailsCommand('ter:details'));
     $application->add(new Command\Extension\ExtensionVersionsCommand('ter:versions'));

@@ -23,6 +23,7 @@ use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
 use TYPO3\Tailor\Filesystem;
 use TYPO3\Tailor\Formatter\ConsoleFormatter;
+use TYPO3\Tailor\Helper\CommandHelper;
 use TYPO3\Tailor\Service\VersionService;
 
 /**
@@ -56,7 +57,7 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->version = $input->getArgument('version');
-        $this->extensionKey = $this->getExtensionKey($input);
+        $this->extensionKey = CommandHelper::getExtensionKeyFromInput($input);
         $this->transactionPath = rtrim(realpath(getcwd() ?: './'), '/') . '/tailor-version-upload';
 
         if (!(new Filesystem\Directory())->create($this->transactionPath)) {
