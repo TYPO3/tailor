@@ -2,7 +2,7 @@ name: tests
 on: [push, pull_request]
 jobs:
   tests:
-    name: Tests with PHP${{ matrix.php }}
+    name: Tests with PHP ${{ matrix.php }}
     runs-on: ubuntu-22.04
     strategy:
       matrix:
