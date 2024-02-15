@@ -12,6 +12,4 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Exception;
 
-class ExtensionKeyMissingException extends \InvalidArgumentException
-{
-}
+class ExtensionKeyMissingException extends \InvalidArgumentException {}

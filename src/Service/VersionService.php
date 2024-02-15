@@ -71,7 +71,7 @@ class VersionService
 
         $iterator = new RecursiveDirectoryIterator($fullPath, FilesystemIterator::SKIP_DOTS);
         $files = new RecursiveIteratorIterator(
-            new RecursiveCallbackFilterIterator($iterator, function ($current) use ($fullPath) {
+            new RecursiveCallbackFilterIterator($iterator, function($current) use ($fullPath) {
                 // @todo Find a more performant way for filtering
 
                 $filepath = $current->getRealPath();
@@ -204,7 +204,7 @@ class VersionService
     {
         $filename = sprintf('%s/%s_%s.zip', $this->transactionPath, $this->extension, $this->version);
 
-        return $hash ? md5($filename): $filename;
+        return $hash ? md5($filename) : $filename;
     }
 
     /**
