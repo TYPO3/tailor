@@ -39,7 +39,8 @@ class SetExtensionVersionCommand extends Command
             ->setDescription('Update the extensions ext_emconf.php version to a specific version. Useful in CI environments')
             ->addArgument('version', InputArgument::REQUIRED, 'The version to publish, e.g. 1.2.3. Must have three digits.')
             ->addOption('path', '', InputOption::VALUE_OPTIONAL, 'Path to the extension folder', getcwd() ?: './')
-            ->addOption('no-docs', '', InputOption::VALUE_OPTIONAL, 'Disable version update in documentation settings', false);
+            ->addOption('no-docs', '', InputOption::VALUE_OPTIONAL, 'Disable version update in documentation settings', false)
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Outputs the operations but will not execute anything');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -58,6 +59,8 @@ class SetExtensionVersionCommand extends Command
             return 1;
         }
 
+        $dryRun = ($input->getOption('dry-run') === true);
+
         $emConfFile = rtrim($path, '/') . '/ext_emconf.php';
         if (!file_exists($emConfFile)) {
             $io->error(sprintf('No \'ext_emconf.php\' found in the given path %s.', $path));
@@ -66,11 +69,15 @@ class SetExtensionVersionCommand extends Command
 
         $versionReplacer = new VersionReplacer($version);
 
-        try {
-            $versionReplacer->setVersion($emConfFile, self::EMCONF_PATTERN);
-        } catch (\InvalidArgumentException $e) {
-            $io->error(sprintf('An error occurred while setting the ext_emconf.php version to %s.', $version));
-            return 1;
+        if (!$dryRun) {
+            try {
+                $versionReplacer->setVersion($emConfFile, self::EMCONF_PATTERN);
+            } catch (\InvalidArgumentException $e) {
+                $io->error(sprintf('An error occurred while setting the ext_emconf.php version to %s.', $version));
+                return 1;
+            }
+        } else {
+            $io->note(sprintf('Would have set version in ext_emconf.php to %s, skipping', $version));
         }
 
         if ($input->getOption('no-docs') === null
@@ -90,18 +97,22 @@ class SetExtensionVersionCommand extends Command
             return 0;
         }
 
-        try {
-            $versionReplacer->setVersion($documentationSettingsFile, self::DOCUMENTATION_RELEASE_PATTERN);
-        } catch (\InvalidArgumentException $e) {
-            $io->error(sprintf('An error occurred while updating the release number in %s', $documentationSettingsFile));
-            return 1;
-        }
+        if (!$dryRun) {
+            try {
+                $versionReplacer->setVersion($documentationSettingsFile, self::DOCUMENTATION_RELEASE_PATTERN);
+            } catch (\InvalidArgumentException $e) {
+                $io->error(sprintf('An error occurred while updating the release number in %s', $documentationSettingsFile));
+                return 1;
+            }
 
-        try {
-            $versionReplacer->setVersion($documentationSettingsFile, self::DOCUMENTATION_VERSION_PATTERN, 2);
-        } catch (\InvalidArgumentException $e) {
-            $io->error(sprintf('An error occurred while updating the version number in %s', $documentationSettingsFile));
-            return 1;
+            try {
+                $versionReplacer->setVersion($documentationSettingsFile, self::DOCUMENTATION_VERSION_PATTERN, 2);
+            } catch (\InvalidArgumentException $e) {
+                $io->error(sprintf('An error occurred while updating the version number in %s', $documentationSettingsFile));
+                return 1;
+            }
+        } else {
+            $io->note(sprintf('Would have set version in Documentation/Settings.cfg to %s, skipping', $version));
         }
 
         return 0;
