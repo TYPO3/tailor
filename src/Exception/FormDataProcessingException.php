@@ -12,6 +12,4 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Exception;
 
-class FormDataProcessingException extends \RuntimeException
-{
-}
+class FormDataProcessingException extends \RuntimeException {}

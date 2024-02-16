@@ -43,7 +43,7 @@ class VersionReplacer
         if ($fileContents === false) {
             throw new \InvalidArgumentException('The file ' . $filePath . ' could not be opened', 1605741968);
         }
-        $updatedFileContents = preg_replace_callback('/' . $pattern . '/u', static function ($matches) use ($newVersion) {
+        $updatedFileContents = preg_replace_callback('/' . $pattern . '/u', static function($matches) use ($newVersion) {
             return str_replace($matches[1], $newVersion, $matches[0]);
         }, $fileContents);
         file_put_contents($filePath, $updatedFileContents);
