@@ -667,7 +667,7 @@ path to your custom configuration file to the environment variable
 
 ## Author & License
 
-Created by Benni Mack and Oliver Bartsch in 2020.
+Created by Benni Mack and Oliver Bartsch.
 
 MIT License, see LICENSE
 
