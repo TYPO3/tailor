@@ -32,26 +32,47 @@ class EmConfVersionValidator
     }
 
     /**
+     * @return list<EmConfValidationError::*> List of validation errors. If list is empty, ext_emconf.php file is valid.
+     */
+    public function collectErrors(string $givenVersion): array
+    {
+        if (!file_exists($this->emConfFilePath)) {
+            return [EmConfValidationError::NOT_FOUND];
+        }
+
+        $_EXTKEY = 'dummy';
+        @include $this->emConfFilePath;
+
+        if (!isset($EM_CONF)) {
+            return [EmConfValidationError::MISSING_CONFIGURATION];
+        }
+
+        $emConfDetails = reset($EM_CONF);
+
+        if (!is_array($emConfDetails)) {
+            return [EmConfValidationError::UNSUPPORTED_TYPE];
+        }
+
+        $errors = [];
+
+        if (!isset($emConfDetails['version'])) {
+            $errors[] = EmConfValidationError::MISSING_EXTENSION_VERSION;
+        } elseif ((string)$emConfDetails['version'] !== $givenVersion) {
+            $errors[] = EmConfValidationError::EXTENSION_VERSION_MISMATCH;
+        }
+        if (!isset($emConfDetails['constraints']['depends']['typo3'])) {
+            $errors[] = EmConfValidationError::MISSING_TYPO3_VERSION_CONSTRAINT;
+        }
+
+        return $errors;
+    }
+
+    /**
      * @param string $givenVersion
      * @return bool TRUE if the ext_emconf is valid, FALSE otherwise
      */
     public function isValid(string $givenVersion): bool
     {
-        $_EXTKEY = 'dummy';
-        @include $this->emConfFilePath;
-        if (!isset($EM_CONF)) {
-            return false;
-        }
-        $emConfDetails = reset($EM_CONF);
-        if (!is_array($emConfDetails)) {
-            return false;
-        }
-        if (!isset($emConfDetails['version'], $emConfDetails['constraints']['depends']['typo3'])) {
-            return false;
-        }
-        if ((string)$emConfDetails['version'] !== $givenVersion) {
-            return false;
-        }
-        return true;
+        return $this->collectErrors($givenVersion) === [];
     }
 }
