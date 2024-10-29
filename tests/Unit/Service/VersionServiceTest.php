@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace TYPO3\Tailor\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
 use TYPO3\Tailor\Exception\RequiredConfigurationMissing;
 use TYPO3\Tailor\Service\VersionService;
 
@@ -135,7 +134,7 @@ class VersionServiceTest extends TestCase
             ->setConstructorArgs(['1.0.0', 'my_ext', '/dummyPath'])
             ->getMock();
 
-        $method = new ReflectionMethod(VersionService::class, $methodName);
+        $method = new \ReflectionMethod(VersionService::class, $methodName);
         $method->setAccessible(true);
 
         return $method->invokeArgs($mock, $arguments);

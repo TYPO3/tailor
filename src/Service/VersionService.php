@@ -12,10 +12,6 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Service;
 
-use FilesystemIterator;
-use RecursiveCallbackFilterIterator;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use TYPO3\Tailor\Environment\Variables;
 use TYPO3\Tailor\Exception\FormDataProcessingException;
 use TYPO3\Tailor\Exception\RequiredConfigurationMissing;
@@ -64,14 +60,14 @@ class VersionService
             throw new FormDataProcessingException('Path is not valid.', 1605562741);
         }
 
-        $zipArchive = new ZipArchive();
-        $zipArchive->open($this->getVersionFilename(), ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        $zipArchive = new \ZipArchive();
+        $zipArchive->open($this->getVersionFilename(), \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 
         $emConfValid = false;
 
-        $iterator = new RecursiveDirectoryIterator($fullPath, FilesystemIterator::SKIP_DOTS);
-        $files = new RecursiveIteratorIterator(
-            new RecursiveCallbackFilterIterator($iterator, function($current) use ($fullPath) {
+        $iterator = new \RecursiveDirectoryIterator($fullPath, \FilesystemIterator::SKIP_DOTS);
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveCallbackFilterIterator($iterator, function ($current) use ($fullPath) {
                 // @todo Find a more performant way for filtering
 
                 $filepath = $current->getRealPath();
@@ -101,7 +97,7 @@ class VersionService
 
                 return true;
             }),
-            RecursiveIteratorIterator::LEAVES_ONLY
+            \RecursiveIteratorIterator::LEAVES_ONLY
         );
 
         foreach ($files as $file) {
@@ -157,7 +153,7 @@ class VersionService
         if (!is_file($filename)) {
             throw new FormDataProcessingException('No such file.', 1605562482);
         }
-        $zipArchive = new ZipArchive();
+        $zipArchive = new \ZipArchive();
         $zipFile = $zipArchive->open($filename);
         if (!$zipFile || $zipArchive->numFiles <= 0) {
             throw new FormDataProcessingException('No files in given directory.', 1605562663);

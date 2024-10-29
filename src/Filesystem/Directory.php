@@ -12,10 +12,6 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Filesystem;
 
-use FilesystemIterator;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-
 /**
  * Provide functionality for handling directories on the filesystem
  */
@@ -42,9 +38,9 @@ class Directory
     public function remove(string $directory): bool
     {
         $directory = realpath($directory);
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
         );
 
         foreach ($iterator as $file) {
