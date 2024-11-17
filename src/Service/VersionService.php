@@ -15,6 +15,7 @@ namespace TYPO3\Tailor\Service;
 use TYPO3\Tailor\Environment\Variables;
 use TYPO3\Tailor\Exception\FormDataProcessingException;
 use TYPO3\Tailor\Exception\RequiredConfigurationMissing;
+use TYPO3\Tailor\Validation\EmConfValidationError;
 use TYPO3\Tailor\Validation\EmConfVersionValidator;
 use ZipArchive;
 
@@ -63,7 +64,7 @@ class VersionService
         $zipArchive = new \ZipArchive();
         $zipArchive->open($this->getVersionFilename(), \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 
-        $emConfValid = false;
+        $emConfValidationErrors = [EmConfValidationError::NOT_FOUND];
 
         $iterator = new \RecursiveDirectoryIterator($fullPath, \FilesystemIterator::SKIP_DOTS);
         $files = new \RecursiveIteratorIterator(
@@ -110,15 +111,15 @@ class VersionService
             }
 
             if ($filename === 'ext_emconf.php') {
-                $emConfValid = (new EmConfVersionValidator($fileRealPath))->isValid($this->version);
+                $emConfValidationErrors = (new EmConfVersionValidator($fileRealPath))->collectErrors($this->version);
             }
 
             // Add the files including their directories
             $zipArchive->addFile($fileRealPath, substr($fileRealPath, strlen($fullPath) + 1));
         }
 
-        if (!$emConfValid) {
-            throw new FormDataProcessingException('No or invalid ext_emconf.php found in the folder.', 1605563410);
+        if ($emConfValidationErrors !== []) {
+            throw new FormDataProcessingException($this->formatEmConfValidationErrors($emConfValidationErrors), 1605563410);
         }
 
         $zipArchive->close();
@@ -232,5 +233,19 @@ class VersionService
         }
 
         return $configuration;
+    }
+
+    /**
+     * @param list<EmConfValidationError::*> $errors
+     */
+    private function formatEmConfValidationErrors(array $errors): string
+    {
+        $messageParts = ['Validation of `ext_emconf.php` file failed due to the following errors:'];
+
+        foreach ($errors as $error) {
+            $messageParts[] = '  * ' . EmConfValidationError::getErrorMessage($error);
+        }
+
+        return implode(PHP_EOL, $messageParts);
     }
 }

@@ -1,5 +1,5 @@
 <?php
 
-$EM_CONF = [
+$EM_CONF[$_EXTKEY] = [
     'nothing' => 'YES',
 ];
