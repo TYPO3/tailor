@@ -24,13 +24,19 @@ use TYPO3\Tailor\Validation\VersionValidator;
 
 /**
  * Command for updating the extension version in ext_emconf.php and
- * the extension documentation configuration file Settings.cfg.
+ * the extension documentation configuration files guides.xml and Settings.cfg.
  */
 class SetExtensionVersionCommand extends Command
 {
     private const EMCONF_PATTERN = '["\']version["\']\s=>\s["\']((?:[0-9]+)\.[0-9]+\.[0-9]+\s*)["\']';
-    private const DOCUMENTATION_VERSION_PATTERN = 'version\s*=\s*([0-9]+\.[0-9]+)';
-    private const DOCUMENTATION_RELEASE_PATTERN = 'release\s*=\s*([0-9]+\.[0-9]+\.[0-9]+)';
+
+    // Documentation/guides.xml
+    private const DOCUMENTATION_RELEASE_PATTERN = 'release="([0-9]+\.[0-9]+\.[0-9]+)"';
+    private const DOCUMENTATION_VERSION_PATTERN = 'version="([0-9]+\.[0-9]+)"';
+
+    // Documentation/Settings.cfg
+    private const DOCUMENTATION_RELEASE_LEGACY_PATTERN = 'release\s*=\s*([0-9]+\.[0-9]+\.[0-9]+)';
+    private const DOCUMENTATION_VERSION_LEGACY_PATTERN = 'version\s*=\s*([0-9]+\.[0-9]+)';
 
     protected function configure(): void
     {
@@ -80,28 +86,47 @@ class SetExtensionVersionCommand extends Command
             return 0;
         }
 
-        $documentationSettingsFile = rtrim($path, '/') . '/Documentation/Settings.cfg';
-        if (!file_exists($documentationSettingsFile)) {
+        $documentationVersionReplaced = false;
+        $documentationSettingsFiles = [
+            rtrim($path, '/') . '/Documentation/guides.xml' => [
+                self::DOCUMENTATION_RELEASE_PATTERN,
+                self::DOCUMENTATION_VERSION_PATTERN,
+            ],
+            rtrim($path, '/') . '/Documentation/Settings.cfg' => [
+                self::DOCUMENTATION_RELEASE_LEGACY_PATTERN,
+                self::DOCUMENTATION_VERSION_LEGACY_PATTERN,
+            ],
+        ];
+
+        foreach ($documentationSettingsFiles as $documentationSettingsFile => [$documentationReleasePattern, $documentationVersionPattern]) {
+            if (!file_exists($documentationSettingsFile)) {
+                continue;
+            }
+
+            try {
+                $versionReplacer->setVersion($documentationSettingsFile, $documentationReleasePattern);
+            } catch (\InvalidArgumentException $e) {
+                $io->error(sprintf('An error occurred while updating the release number in %s', $documentationSettingsFile));
+                return 1;
+            }
+
+            try {
+                $versionReplacer->setVersion($documentationSettingsFile, $documentationVersionPattern, 2);
+            } catch (\InvalidArgumentException $e) {
+                $io->error(sprintf('An error occurred while updating the version number in %s', $documentationSettingsFile));
+                return 1;
+            }
+
+            $documentationVersionReplaced = true;
+        }
+
+        if (!$documentationVersionReplaced) {
             $io->note(
-                'Documentation version update is enabled but was not performed because the file '
-                . $documentationSettingsFile . ' does not exist. To disable this operation use the \'--no-docs\' '
-                . 'option or set the \'TYPO3_DISABLE_DOCS_VERSION_UPDATE\' environment variable.'
+                'Documentation version update is enabled but was not performed because the files '
+                . implode(' and ', array_keys($documentationSettingsFiles)) . ' do not exist. '
+                . 'To disable this operation use the \'--no-docs\' option or set the '
+                . '\'TYPO3_DISABLE_DOCS_VERSION_UPDATE\' environment variable.'
             );
-            return 0;
-        }
-
-        try {
-            $versionReplacer->setVersion($documentationSettingsFile, self::DOCUMENTATION_RELEASE_PATTERN);
-        } catch (\InvalidArgumentException $e) {
-            $io->error(sprintf('An error occurred while updating the release number in %s', $documentationSettingsFile));
-            return 1;
-        }
-
-        try {
-            $versionReplacer->setVersion($documentationSettingsFile, self::DOCUMENTATION_VERSION_PATTERN, 2);
-        } catch (\InvalidArgumentException $e) {
-            $io->error(sprintf('An error occurred while updating the version number in %s', $documentationSettingsFile));
-            return 1;
         }
 
         return 0;
