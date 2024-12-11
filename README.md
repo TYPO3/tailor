@@ -175,11 +175,11 @@ be done using the `set-version` command.
 ./vendor/bin/tailor set-version 1.2.0
 ```
 
-If your extension also contains a `Documentation/Settings.cfg`
-file, the command will also update the `release` and `version`
-information in it. You can disable this feature by either
-using `--no-docs` or by setting the environment variable
-`TYPO3_DISABLE_DOCS_VERSION_UPDATE=1`.
+If your extension also contains a `Documentation/guides.xml`
+or `Documentation/Settings.cfg` file, the command will also
+update the `release` and `version` information in it. You
+can disable this feature by either using `--no-docs` or by
+setting the environment variable `TYPO3_DISABLE_DOCS_VERSION_UPDATE=1`.
 
 > [!TIP]
 > It's also possible to use the `--path` option to

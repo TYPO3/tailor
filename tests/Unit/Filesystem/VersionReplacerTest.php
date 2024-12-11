@@ -33,32 +33,58 @@ class VersionReplacerTest extends TestCase
     }
 
     /**
-     * @test
+     * @return \Generator<string, array{string, string, string}>
      */
-    public function replaceVersionReplacesProperReleaseOfDocumentationConfiguration(): void
+    public static function replaceVersionReplacesProperReleaseOfDocumentationConfigurationDataProvider(): \Generator
     {
-        $docSettings = file_get_contents(__DIR__ . '/../Fixtures/Documentation/Settings.cfg');
-        $tempFile = tempnam('/tmp/', 'tailor_settings.cfg');
-        file_put_contents($tempFile, $docSettings);
-        $subject = new VersionReplacer('6.9.0');
-        $subject->setVersion($tempFile, 'release\s*=\s*([0-9]+\.[0-9]+\.[0-9]+)');
-        $contents = file_get_contents($tempFile);
-        self::assertStringContainsString('release=6.9.0', preg_replace('/\s+/', '', $contents));
-        unlink($tempFile);
+        yield 'guides.xml' => ['guides.xml', 'release="([0-9]+\.[0-9]+\.[0-9]+)"', 'release="6.9.0"'];
+        yield 'Settings.cfg' => ['Settings.cfg', 'release\s*=\s*([0-9]+\.[0-9]+\.[0-9]+)', 'release=6.9.0'];
     }
 
     /**
      * @test
+     * @dataProvider replaceVersionReplacesProperReleaseOfDocumentationConfigurationDataProvider
      */
-    public function replaceVersionReplacesProperVersionOfDocumentationConfiguration(): void
-    {
-        $docSettings = file_get_contents(__DIR__ . '/../Fixtures/Documentation/Settings.cfg');
-        $tempFile = tempnam('/tmp/', 'tailor_settings.cfg');
+    public function replaceVersionReplacesProperReleaseOfDocumentationConfiguration(
+        string $docSettingsFile,
+        string $docReleasePattern,
+        string $expected
+    ): void {
+        $docSettings = file_get_contents(__DIR__ . '/../Fixtures/Documentation/' . $docSettingsFile);
+        $tempFile = tempnam(sys_get_temp_dir(), 'tailor_' . $docSettingsFile);
         file_put_contents($tempFile, $docSettings);
         $subject = new VersionReplacer('6.9.0');
-        $subject->setVersion($tempFile, 'version\s*=\s*([0-9]+\.[0-9]+)', 2);
+        $subject->setVersion($tempFile, $docReleasePattern);
         $contents = file_get_contents($tempFile);
-        self::assertStringContainsString('version=6.9', preg_replace('/\s+/', '', $contents));
+        self::assertStringContainsString($expected, preg_replace('/\s+/', '', $contents));
+        unlink($tempFile);
+    }
+
+    /**
+     * @return \Generator<string, array{string, string, string}>
+     */
+    public static function replaceVersionReplacesProperVersionOfDocumentationConfigurationDataProvider(): \Generator
+    {
+        yield 'guides.xml' => ['guides.xml', 'version="([0-9]+\.[0-9]+)"', 'version="6.9"'];
+        yield 'Settings.cfg' => ['Settings.cfg', 'version\s*=\s*([0-9]+\.[0-9]+)', 'version=6.9'];
+    }
+
+    /**
+     * @test
+     * @dataProvider replaceVersionReplacesProperVersionOfDocumentationConfigurationDataProvider
+     */
+    public function replaceVersionReplacesProperVersionOfDocumentationConfiguration(
+        string $docSettingsFile,
+        string $docVersionPattern,
+        string $expected
+    ): void {
+        $docSettings = file_get_contents(__DIR__ . '/../Fixtures/Documentation/' . $docSettingsFile);
+        $tempFile = tempnam(sys_get_temp_dir(), 'tailor_' . $docSettingsFile);
+        file_put_contents($tempFile, $docSettings);
+        $subject = new VersionReplacer('6.9.0');
+        $subject->setVersion($tempFile, $docVersionPattern, 2);
+        $contents = file_get_contents($tempFile);
+        self::assertStringContainsString($expected, preg_replace('/\s+/', '', $contents));
         unlink($tempFile);
     }
 
