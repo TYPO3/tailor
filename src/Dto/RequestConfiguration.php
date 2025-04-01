@@ -59,7 +59,7 @@ class RequestConfiguration
         iterable $headers = [],
         bool $raw = false,
         int $defaultAuthMethod = HttpClientFactory::ALL_AUTH,
-        FormDataPart $formData = null
+        ?FormDataPart $formData = null
     ) {
         $this->method = $method;
         $this->endpoint = $endpoint;
