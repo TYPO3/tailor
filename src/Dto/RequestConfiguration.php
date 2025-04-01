@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Dto;
 
+use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use TYPO3\Tailor\HttpClientFactory;
 
 /**
@@ -35,6 +36,9 @@ class RequestConfiguration
     /** @var iterable */
     protected $body;
 
+    /** @var FormDataPart|null */
+    protected $formData;
+
     /** @var iterable */
     protected $headers;
 
@@ -54,7 +58,8 @@ class RequestConfiguration
         iterable $body = [],
         iterable $headers = [],
         bool $raw = false,
-        int $defaultAuthMethod = HttpClientFactory::ALL_AUTH
+        int $defaultAuthMethod = HttpClientFactory::ALL_AUTH,
+        FormDataPart $formData = null
     ) {
         $this->method = $method;
         $this->endpoint = $endpoint;
@@ -63,6 +68,7 @@ class RequestConfiguration
         $this->headers = $headers;
         $this->raw = $raw;
         $this->defaultAuthMethod = $defaultAuthMethod;
+        $this->formData = $formData;
     }
 
     public function getMethod(): string
@@ -85,9 +91,20 @@ class RequestConfiguration
         return $this->body;
     }
 
+    public function getFormData(): ?FormDataPart
+    {
+        return $this->formData;
+    }
+
     public function getHeaders(): iterable
     {
-        return $this->headers;
+        $headers = $this->headers;
+        if ($this->formData) {
+            foreach ($this->formData->getPreparedHeaders()->all() as $key => $value) {
+                $headers[$key] = $value->getBodyAsString();
+            }
+        }
+        return $headers;
     }
 
     public function setRaw(bool $raw): self
