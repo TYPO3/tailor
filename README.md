@@ -509,6 +509,8 @@ on:
 jobs:
   publish:
     name: Publish new version to TER
+    # use folliwing if tags begins with `v`
+    # if: startsWith(github.ref, 'refs/tags/v')
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-20.04
     env:
@@ -520,6 +522,7 @@ jobs:
 
       - name: Check tag
         run: |
+          # use ^refs/tags/v[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$ when tag is prefixed with v
           if ! [[ ${{ github.ref }} =~ ^refs/tags/[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$ ]]; then
             exit 1
           fi
@@ -531,7 +534,9 @@ jobs:
       - name: Get comment
         id: get-comment
         run: |
-          readonly local comment=$(git tag -n10 -l ${{ env.version }} | sed "s/^[0-9.]*[ ]*//g")
+          # If tag begins with `v` use:
+          # readonly local comment=$(git tag -l v${{ env.version }} --format '%(contents))
+          readonly local comment=$(git tag -l ${{ env.version }} --format '%(contents))
 
           if [[ -z "${comment// }" ]]; then
             echo "comment=Released version ${{ env.version }} of ${{ env.TYPO3_EXTENSION_KEY }}" >> $GITHUB_ENV
@@ -575,7 +580,7 @@ ${GITHUB_REF#refs/tags/v}
 3. The variable declaration in step **Get comment** should be:
 
 ```bash
-$(git tag -n10 -l v${{ env.version }} | sed "s/^v[0-9.]*[ ]*//g")
+$(git tag -l v${{ env.version }} --format '%(contents))
 ```
 
 #### GitHub actions from TYPO3 community
