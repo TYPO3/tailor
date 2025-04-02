@@ -48,6 +48,8 @@ final class HttpClientFactory
         }
         if ($requestConfiguration->getBody() !== []) {
             $options['body'] = $requestConfiguration->getBody();
+        } elseif ($requestConfiguration->getFormData()) {
+            $options['body'] = $requestConfiguration->getFormData()->bodyToString();
         }
         if (($defaultAuthMethod === self::BEARER_AUTH || $defaultAuthMethod === self::ALL_AUTH)
             && Variables::has('TYPO3_API_TOKEN')

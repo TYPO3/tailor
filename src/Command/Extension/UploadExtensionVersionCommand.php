@@ -24,6 +24,7 @@ use TYPO3\Tailor\Dto\RequestConfiguration;
 use TYPO3\Tailor\Filesystem;
 use TYPO3\Tailor\Formatter\ConsoleFormatter;
 use TYPO3\Tailor\Helper\CommandHelper;
+use TYPO3\Tailor\HttpClientFactory;
 use TYPO3\Tailor\Service\VersionService;
 
 /**
@@ -75,8 +76,11 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
             'POST',
             'extension/' . $this->extensionKey . '/' . $this->version,
             [],
-            $formDataPart->bodyToIterable(),
-            $formDataPart->getPreparedHeaders()->toArray()
+            [],
+            [],
+            false,
+            HttpClientFactory::ALL_AUTH,
+            $formDataPart
         );
     }
 
