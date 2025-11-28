@@ -69,12 +69,13 @@ TYPO3_API_PASSWORD=<your-t3o-password>
 Example:
 
 ```bash
-TYPO3_API_TOKEN="someToken" TYPO3_EXTENSION_KEY="ext_key" bin/tailor ter:details
+TYPO3_API_TOKEN="someToken" bin/tailor ter:details ext_key
 ```
 
 This will display the extension details for extension `ext_key` if
 `someToken` is valid (not expired/revoked and having at least the
-`extension:read` scope assigned).
+`extension:read` scope assigned). The extension key can also be read
+automatically from your `composer.json` if defined there.
 
 ## Installation
 
@@ -91,22 +92,23 @@ option. If set, the raw result will be returned. This can be
 used for further processing e.g. by using some JSON processor.
 
 Most of the commands require an extension key to work with.
-There are multiple possibilities to provide an extension key.
-These are - in the order in which they are checked:
+The extension key is determined in the following order:
 
-- As argument, e.g. `./vendor/bin/tailor ter:details my_key`
-- As environment variable, `TYPO3_EXTENSION_KEY=my_key`
-- In your `composer.json`, `[extra][typo3/cms][extension-key] = 'my_key'`
+1. **CLI argument** (highest priority): e.g. `./vendor/bin/tailor ter:details my_key`
+2. **composer.json** (recommended): `[extra][typo3/cms][extension-key] = 'my_key'`
+3. **Environment variable** (deprecated, for backwards compatibility only): `TYPO3_EXTENSION_KEY=my_key`
 
-This means, even if you have an extension key defined globally,
-either as environment variable or in your `composer.json`, you
-can still run all commands for different extensions by adding
+> [!WARNING]
+> Using the `TYPO3_EXTENSION_KEY` environment variable is deprecated and will
+> trigger a deprecation warning. Please migrate to using `composer.json` instead.
+
+This means, even if you have an extension key defined in your `composer.json`,
+you can still run commands for different extensions by providing
 the desired extension key as argument to the command.
 
 > [!NOTE]
-> If no extension key is defined, neither as an argument,
-> as environment variable, nor in your `composer.json`, commands
-> which require an extension key to be set, will throw an exception.
+> If no extension key is defined, neither as an argument nor in your
+> `composer.json`, commands which require an extension key will throw an exception.
 
 ### Manage your personal access token
 
@@ -481,15 +483,17 @@ This can either be done using **Step 3** from above example
 or by creating a new GitHub release which will also add a
 new tag.
 
-The workflow furthermore requires the GitHub secrets `TYPO3_EXTENSION_KEY`
-and `TYPO3_API_TOKEN` to be set. Add them at "Settings -> Secrets -> New
-repository secret".
+The workflow requires the GitHub secret `TYPO3_API_TOKEN` to be set.
+Add it at "Settings -> Secrets -> New repository secret".
 
-> [!NOTE]
-> If your `composer.json` file contains the extension key at
-> `[extra][typo3/cms][extension-key] = 'my_key'` (this is good practice anyway),
-> the `TYPO3_EXTENSION_KEY` secret and assignment in the below GitHub action
-> example is not needed, tailor will pick it up.
+> [!IMPORTANT]
+> The extension key has to be defined in your `composer.json` at
+> `[extra][typo3/cms][extension-key]`.
+>
+> For backwards compatibility, `TYPO3_EXTENSION_KEY` is still supported but
+> deprecated. It should not be used as it prevents a single source of truth
+> and causes error messages to be masked in CI logs (e.g.
+> `"Could not publish extension ***"`), hiding valuable information.
 
 The version is automatically fetched from the tag and
 validated to match the required pattern.
@@ -514,7 +518,6 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-20.04
     env:
-      TYPO3_EXTENSION_KEY: ${{ secrets.TYPO3_EXTENSION_KEY }}
       TYPO3_API_TOKEN: ${{ secrets.TYPO3_API_TOKEN }}
     steps:
       - name: Checkout repository
@@ -539,7 +542,7 @@ jobs:
           readonly local comment=$(git tag -l ${{ env.version }} --format '%(contents))
 
           if [[ -z "${comment// }" ]]; then
-            echo "comment=Released version ${{ env.version }} of ${{ env.TYPO3_EXTENSION_KEY }}" >> $GITHUB_ENV
+            echo "comment=Released version ${{ env.version }}" >> $GITHUB_ENV
           else
             {
               echo 'comment<<EOF'
@@ -595,14 +598,16 @@ corresponding [README][typo3-uploader-ter-readme].
 The job will only be executed when pushing a new tag.
 The upload comment is taken from the message in the tag.
 
-The job furthermore requires the GitLab variables
-`TYPO3_EXTENSION_KEY` and `TYPO3_API_TOKEN` to be set.
+The job requires the GitLab variable `TYPO3_API_TOKEN` to be set.
 
-> [!NOTE]
-> If your `composer.json` file contains your extension
-> key, you can remove the `TYPO3_EXTENSION_KEY` variable, the
-> check and the assignment in the GitLab pipeline, since Tailor
-> automatically fetches this key then.
+> [!IMPORTANT]
+> The extension key has to be defined in your `composer.json` at
+> `[extra][typo3/cms][extension-key]`.
+>
+> For backwards compatibility, `TYPO3_EXTENSION_KEY` is still supported but
+> deprecated. It should not be used as it prevents a single source of truth
+> and causes error messages to be masked in CI logs (e.g.
+> `"Could not publish extension ***"`), hiding valuable information.
 
 The variable `CI_COMMIT_TAG` is set by GitLab automatically.
 
@@ -616,14 +621,14 @@ The variable `CI_COMMIT_TAG` is set by GitLab automatically.
     - composer global require typo3/tailor
   script:
     - >
-      if [ -n "$CI_COMMIT_TAG" ] && [ -n "$TYPO3_API_TOKEN" ] && [ -n "$TYPO3_EXTENSION_KEY" ]; then
+      if [ -n "$CI_COMMIT_TAG" ] && [ -n "$TYPO3_API_TOKEN" ]; then
         echo -e "Preparing upload of release ${CI_COMMIT_TAG} to TER\n"
         # Cleanup before we upload
         git reset --hard HEAD && git clean -fx
-        # Upload
+        # Upload (extension key is read from composer.json)
         TAG_MESSAGE=`git tag -n10 -l $CI_COMMIT_TAG | sed 's/^[0-9.]*[ ]*//g'`
         echo "Uploading release ${CI_COMMIT_TAG} to TER"
-        /tmp/vendor/bin/tailor ter:publish --comment "$TAG_MESSAGE" "$CI_COMMIT_TAG" "$TYPO3_EXTENSION_KEY"
+        /tmp/vendor/bin/tailor ter:publish --comment "$TAG_MESSAGE" "$CI_COMMIT_TAG"
       fi;
 ```
 

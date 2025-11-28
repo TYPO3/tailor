@@ -24,21 +24,32 @@ final class CommandHelper
 {
     public static function getExtensionKeyFromInput(InputInterface $input): string
     {
+        // 1. CLI argument has highest priority
         if ($input->hasArgument('extensionkey')
             && ($key = ($input->getArgument('extensionkey') ?? '')) !== ''
         ) {
-            $extensionKey = $key;
-        } elseif (Variables::has('TYPO3_EXTENSION_KEY')) {
-            $extensionKey = Variables::get('TYPO3_EXTENSION_KEY');
-        } elseif (($extensionKeyFromComposer = (new ComposerReader())->getExtensionKey()) !== '') {
-            $extensionKey = $extensionKeyFromComposer;
-        } else {
-            throw new ExtensionKeyMissingException(
-                'The extension key must either be set as argument, as environment variable or in the composer.json.',
-                1605706548
-            );
+            return $key;
         }
 
-        return $extensionKey;
+        // 2. composer.json is the recommended source
+        $extensionKeyFromComposer = (new ComposerReader())->getExtensionKey();
+        if ($extensionKeyFromComposer !== '') {
+            return $extensionKeyFromComposer;
+        }
+
+        // 3. Environment variable only for backwards compatibility
+        if (Variables::has('TYPO3_EXTENSION_KEY')) {
+            trigger_error(
+                'Using TYPO3_EXTENSION_KEY environment variable is deprecated. '
+                . 'Please set the extension key in composer.json at [extra][typo3/cms][extension-key] instead.',
+                E_USER_DEPRECATED
+            );
+            return Variables::get('TYPO3_EXTENSION_KEY');
+        }
+
+        throw new ExtensionKeyMissingException(
+            'The extension key must either be set as argument or in composer.json at [extra][typo3/cms][extension-key].',
+            1605706548
+        );
     }
 }
