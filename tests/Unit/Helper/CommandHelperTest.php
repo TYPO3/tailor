@@ -38,11 +38,17 @@ final class CommandHelperTest extends TestCase
         $this->input = new ArrayInput([], $this->definition);
     }
 
+    protected function tearDown(): void
+    {
+        // Clean up environment variable after each test
+        putenv('TYPO3_EXTENSION_KEY');
+    }
+
     #[Test]
     public function getExtensionKeyFromInputThrowsExceptionIfInputHasNoArgumentDefined(): void
     {
         $this->expectException(ExtensionKeyMissingException::class);
-        $this->expectExceptionMessage('The extension key must either be set as argument, as environment variable or in the composer.json.');
+        $this->expectExceptionMessage('The extension key must either be set as argument or in composer.json at [extra][typo3/cms][extension-key].');
         $this->expectExceptionCode(1605706548);
 
         CommandHelper::getExtensionKeyFromInput($this->input);
@@ -61,7 +67,7 @@ final class CommandHelperTest extends TestCase
     public function getExtensionKeyFromInputIgnoresEmptyInputArgumentValue(): void
     {
         $this->expectException(ExtensionKeyMissingException::class);
-        $this->expectExceptionMessage('The extension key must either be set as argument, as environment variable or in the composer.json.');
+        $this->expectExceptionMessage('The extension key must either be set as argument or in composer.json at [extra][typo3/cms][extension-key].');
         $this->expectExceptionCode(1605706548);
 
         $this->definition->addArgument(new InputArgument('extensionkey', InputArgument::OPTIONAL));
@@ -71,12 +77,25 @@ final class CommandHelperTest extends TestCase
     }
 
     #[Test]
-    public function getExtensionKeyFromInputReturnsExtensionKeyFromEnvironmentVariables(): void
+    public function getExtensionKeyFromInputReturnsExtensionKeyFromEnvironmentVariablesWithDeprecation(): void
     {
         putenv('TYPO3_EXTENSION_KEY=foo');
 
-        self::assertSame('foo', CommandHelper::getExtensionKeyFromInput($this->input));
+        $deprecationTriggered = false;
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecationTriggered): bool {
+            if ($errno === E_USER_DEPRECATED) {
+                $deprecationTriggered = true;
+                self::assertStringContainsString('TYPO3_EXTENSION_KEY environment variable is deprecated', $errstr);
+                return true;
+            }
+            return false;
+        });
 
-        putenv('TYPO3_EXTENSION_KEY');
+        try {
+            self::assertSame('foo', CommandHelper::getExtensionKeyFromInput($this->input));
+            self::assertTrue($deprecationTriggered, 'Expected deprecation warning was not triggered');
+        } finally {
+            restore_error_handler();
+        }
     }
 }
