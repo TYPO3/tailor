@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace TYPO3\Tailor\Command\Extension;
 
 use FAIR\DID\Keys\EdDsaKey;
-use TYPO3\Tailor\Service\FairConfigurationService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -27,6 +26,7 @@ use TYPO3\Tailor\Filesystem;
 use TYPO3\Tailor\Formatter\ConsoleFormatter;
 use TYPO3\Tailor\Helper\CommandHelper;
 use TYPO3\Tailor\HttpClientFactory;
+use TYPO3\Tailor\Service\FairConfigurationService;
 use TYPO3\Tailor\Service\VersionService;
 
 /**

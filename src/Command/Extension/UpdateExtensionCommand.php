@@ -17,11 +17,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\Tailor\Command\AbstractClientRequestCommand;
-use TYPO3\Tailor\Service\FairConfigurationService;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
 use TYPO3\Tailor\Formatter\ConsoleFormatter;
 use TYPO3\Tailor\Helper\CommandHelper;
+use TYPO3\Tailor\Service\FairConfigurationService;
 
 /**
  * Command for TER REST endpoint `PUT /extension/{key}`
