@@ -670,6 +670,77 @@ path to your custom configuration file to the environment variable
 - ``--ansi`` Force ANSI output
 - ``--no-ansi`` Disable ANSI output
 
+### Commands specific to the FAIR Project
+
+FAIR integration gives each extension a cryptographic identity (`did:plc`) anchored at
+[plc.directory](https://plc.directory). Published versions are signed with an Ed25519 key so
+that consumers can verify artefact integrity without trusting the registry alone.
+
+Local state is stored in `~/.config/fairpm/<extensionkey>/` (mode `0700`):
+
+| File | Contents |
+|------|----------|
+| `keys.json` | Rotation key pair, Ed25519 verification key pair, recovery salt (mode `0600`) |
+| `did.json` | The `did:plc:…` identifier and the signed genesis operation |
+
+#### Initial setup (one-time per extension)
+
+**1. `fair:did:create`** — Generate and publish a `did:plc` identity for the extension.
+
+Generates a fresh Ed25519 verification key pair and a secp256k1 rotation key pair, derives a static
+recovery key from `TYPO3_API_USERNAME` + `TYPO3_API_PASSWORD` via HKDF-SHA256, builds the genesis
+PLC operation, submits it to `plc.directory`, and writes `keys.json` + `did.json` locally.
+Fails safely if a DID already exists.
+
+```bash
+bin/tailor fair:did:create <extensionkey>
+```
+
+**2. `ter:update`** — Register the DID with the TYPO3 Extension Repository.
+
+When a local DID is found in `~/.config/fairpm/`, `ter:update` automatically appends the
+`did` field to the form payload. Run this once after `fair:did:create` to associate the DID
+with the extension record in TER.
+
+```bash
+bin/tailor ter:update <extensionkey>
+```
+
+#### Publishing a new version (regular workflow)
+
+**3. `ter:publish`** — Publish a new version, optionally with FAIR signatures.
+
+If a local DID and verification key exist for the extension, `ter:publish` automatically computes
+SHA-256/384/512 hashes of the ZIP artefact, signs the SHA-384 with the Ed25519 key, and includes
+the hashes and signature in the upload payload — no extra step needed.
+
+```bash
+bin/tailor ter:publish <version> [extensionkey]
+```
+
+#### Signing an already-published version
+
+**4. `fair:extension:sign`** — Retroactively add FAIR signatures to an existing TER version.
+
+Downloads the published ZIP from `extensions.typo3.org`, verifies its MD5 checksum against the TER
+API, computes SHA hashes, creates an Ed25519 signature, and submits the metadata via `PATCH` —
+without re-uploading the binary.
+
+```bash
+bin/tailor fair:extension:sign <extensionkey> <version>
+```
+
+#### Rare maintenance
+
+**5. `fair:did:update`** — Update a field in the published `did:plc` document.
+
+Currently supports updating `alsoKnownAs` (the list of `did:web` aliases). Fetches the previous
+CID from `plc.directory`, builds a signed update operation, submits it, and refreshes `did.json`.
+
+```bash
+bin/tailor fair:did:update <extensionkey> alsoKnownAs '["did:web:extensions.typo3.org:my_ext"]'
+```
+
 ## Author & License
 
 Created by Benni Mack and Oliver Bartsch.

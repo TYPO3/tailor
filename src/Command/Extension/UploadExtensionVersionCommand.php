@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Command\Extension;
 
+use FAIR\DID\Keys\EdDsaKey;
+use TYPO3\Tailor\Service\FairConfigurationService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -70,7 +72,9 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
 
     protected function getRequestConfiguration(): RequestConfiguration
     {
-        $formDataPart = $this->getFormDataPart($this->input->getOptions());
+        $versionService = $this->prepareVersionService($this->input->getOptions());
+        $fairFields = $this->getFairpmFields($versionService->getVersionFilePath());
+        $formDataPart = $this->getFormDataPart($this->input->getOptions(), $versionService, $fairFields);
 
         return new RequestConfiguration(
             'POST',
@@ -82,6 +86,50 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
             HttpClientFactory::ALL_AUTH,
             $formDataPart
         );
+    }
+
+    private function prepareVersionService(array $options): VersionService
+    {
+        $versionService = new VersionService($this->version, $this->extensionKey, $this->transactionPath);
+
+        if ($options['path'] !== null) {
+            $versionService->createZipArchiveFromPath((string)$options['path']);
+        } elseif ($options['artefact'] !== null) {
+            $versionService->createZipArchiveFromArtefact(trim((string)$options['artefact']));
+        } else {
+            $versionService->createZipArchiveFromPath(getcwd() ?: './');
+        }
+
+        return $versionService;
+    }
+
+    private function getFairpmFields(string $zipFilePath): array
+    {
+        $config = new FairConfigurationService();
+
+        if (!$config->didExists($this->extensionKey)) {
+            return [];
+        }
+
+        $keysData = $config->loadKeysData($this->extensionKey);
+        $privateMultibase = $keysData['verificationKey']['private'] ?? null;
+
+        if ($privateMultibase === null) {
+            return [];
+        }
+
+        $zipFileContents = file_get_contents($zipFilePath);
+        $sha256 = hash('sha256', $zipFileContents);
+        $sha384 = hash('sha384', $zipFileContents);
+        $sha512 = hash('sha512', $zipFileContents);
+        $signature = EdDsaKey::from_private($privateMultibase)->sign($sha384);
+
+        return [
+            'sha256' => $sha256,
+            'sha384' => $sha384,
+            'sha512' => $sha512,
+            'didSignature' => $signature,
+        ];
     }
 
     protected function getMessages(): Messages
@@ -96,14 +144,13 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
     }
 
     /**
-     * Create FormDataPart from given options.
-     * This also creates a proper DataPart (containing the version as ZipArchive)
-     * from either a given path or an existing ZipArchive (local or remote).
+     * Create FormDataPart from given options and a prepared VersionService.
      *
      * @param array $options
+     * @param VersionService $versionService
      * @return FormDataPart
      */
-    protected function getFormDataPart(array $options): FormDataPart
+    protected function getFormDataPart(array $options, VersionService $versionService, array $fairFields = []): FormDataPart
     {
         if ($options['comment'] === null) {
             // The REST API requires a description to be set (just like the GUI does).
@@ -111,22 +158,11 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
             $options['comment'] = 'Updated extension to ' . $this->version;
         }
 
-        $versionService = new VersionService($this->version, $this->extensionKey, $this->transactionPath);
-
-        if ($options['path'] !== null) {
-            $versionService->createZipArchiveFromPath((string)$options['path']);
-        } elseif ($options['artefact'] !== null) {
-            $versionService->createZipArchiveFromArtefact(trim((string)$options['artefact']));
-        } else {
-            // If neither `path` nor `artefact` is defined, we just
-            // create the ZipArchive from the current directory.
-            $versionService->createZipArchiveFromPath(getcwd() ?: './');
-        }
-
         return new FormDataPart([
             'description' => (string)$options['comment'],
             'gplCompliant' => '1',
             'file' => DataPart::fromPath($versionService->getVersionFilePath()),
+            ...$fairFields,
         ]);
     }
 

@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\Tailor\Command\AbstractClientRequestCommand;
+use TYPO3\Tailor\Service\FairConfigurationService;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
 use TYPO3\Tailor\Formatter\ConsoleFormatter;
@@ -88,6 +89,14 @@ class UpdateExtensionCommand extends AbstractClientRequestCommand
         foreach (self::OPTION_TO_FORM_DATA_MAPPING as $optionName => $formName) {
             if ($options[$optionName] !== null) {
                 $formData[$formName] = $options[$optionName];
+            }
+        }
+
+        $config = new FairConfigurationService();
+        if ($config->didExists($this->extensionKey)) {
+            $did = $config->getDid($this->extensionKey);
+            if ($did !== null) {
+                $formData['did'] = $did;
             }
         }
 
