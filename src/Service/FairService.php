@@ -17,9 +17,13 @@ use FAIR\DID\Keys\Key;
 
 class FairService
 {
-    public function resolveDidWeb(string $extensionKey): string
+    public function resolveDidWeb(?string $extensionKey): string
     {
-        return sprintf('did:web:extensions.typo3.org:%s', $extensionKey);
+        $did = 'did:web:extensions.typo3.org';
+        if ($extensionKey === null) {
+            return $did;
+        }
+        return $did . ':' . $extensionKey;
     }
 
     /**

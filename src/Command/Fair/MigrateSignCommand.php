@@ -12,6 +12,11 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Command\Fair;
 
+use CBOR\MapItem;
+use CBOR\TextStringObject;
+use FAIR\DID\Crypto\CanonicalMapObject;
+use FAIR\DID\Keys\EdDsaKey;
+use FAIR\DID\Keys\Key;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,6 +26,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpClient\HttpClient;
 use TYPO3\Tailor\Environment\Variables;
 use TYPO3\Tailor\Service\FairService;
+use YOCLIB\Multiformats\Multibase\Multibase;
 
 /**
  * Command for signing an arbitrary extension version with a local Ed25519 PEM key
@@ -52,7 +58,13 @@ class MigrateSignCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Path to the Ed25519 private key in PEM format'
             )
-            ->setHelp('bin/tailor fair:migrate:sign news 14.0.0 --key ~/.config/private.pem --out news.releases.json');
+            ->addOption(
+                'did',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Path to write the DID document JSON (e.g. did.json). If omitted, no DID document is written.'
+            )
+            ->setHelp('bin/tailor fair:migrate:sign news 14.0.0 --key ~/.config/private.pem --out news.releases.json --did did.json');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -74,19 +86,18 @@ class MigrateSignCommand extends Command
             return Command::FAILURE;
         }
 
-        if (!function_exists('sodium_crypto_sign_detached')) {
-            $io->error('Ed25519 signing requires the PHP sodium extension (ext-sodium).');
-            return Command::FAILURE;
-        }
-
-        $secretKey = $this->loadEd25519SecretKeyFromPem((string)file_get_contents($keyFile));
-        if ($secretKey === null) {
+        $privateMultibase = $this->loadEd25519SecretKeyFromPem((string)file_get_contents($keyFile));
+        if ($privateMultibase === null) {
             $io->error(sprintf('Failed to load Ed25519 private key from "%s". Expected a PKCS#8 PEM file (BEGIN PRIVATE KEY).', $keyFile));
             return Command::FAILURE;
         }
 
+        $edDsaKey = EdDsaKey::from_private($privateMultibase);
+        $didFile = (string)$input->getOption('did');
+
         // 2. Resolve did:web: identifier (deterministic, no local config needed)
-        $did = (new FairService())->resolveDidWeb($extensionKey);
+        $fairService = new FairService();
+        $did = $fairService->resolveDidWeb($extensionKey);
 
         // 3. Build ZIP URL using the fileadmin path convention
         $baseUri = rtrim(Variables::get('TYPO3_REMOTE_BASE_URI') ?: self::DEFAULT_BASE_URI, '/');
@@ -108,27 +119,61 @@ class MigrateSignCommand extends Command
             return Command::FAILURE;
         }
 
-        // 7. Compute SHA hashes
+        // 5. Compute SHA hashes
         $sha256 = hash('sha256', $zipContents);
         $sha384 = hash('sha384', $zipContents);
         $sha512 = hash('sha512', $zipContents);
 
-        // 8. Sign the hex-encoded SHA-384 with the Ed25519 secret key
-        $didSignature = bin2hex(sodium_crypto_sign_detached($sha384, $secretKey));
-
-        // 9. Build the artifact record
-        $artifactRecord = [
-            'url' => $zipUrl,
+        // 6. Build the artifact operation (all fields to be signed — no signature field)
+        $operation = [
             'content-type' => 'application/zip',
-            'signer' => $did,
-            'sha256' => $sha256,
-            'sha384' => $sha384,
-            'sha512' => $sha512,
-            'didSignature' => $didSignature,
+            'sha256'       => $sha256,
+            'signer'       => $did,
+            'url'          => $zipUrl,
         ];
 
-        // 10. Merge into the output JSON file
+        // 7. DAG-CBOR encode and sign: SHA-256 of CBOR bytes → Ed25519 → base64url
+        $cbor = $this->encodeOperationCbor($operation);
+        $signature = rtrim(strtr(base64_encode(hex2bin(
+            $edDsaKey->sign(hash('sha256', $cbor, false))
+        )), '+/', '-_'), '=');
+
+        // 8. Build the artifact record
+        $artifactRecord = [
+            'url'          => $zipUrl,
+            'content-type' => 'application/zip',
+            'signer'       => $did,
+            'sha256'       => $sha256,
+            'signature'    => $signature,
+        ];
+
+        // 9. Merge into the output JSON file
         $this->mergeReleaseRecord($outFile, $version, $zipUrl, $artifactRecord);
+
+        // 10. Optionally write DID document
+        if ($didFile !== '') {
+            $siteDid = $fairService->resolveDidWeb(null);
+            $didDocument = [
+                '@context' => [
+                    'https://www.w3.org/ns/did/v1',
+                    'https://w3id.org/security/multikey/v1',
+                ],
+                'id' => $siteDid,
+                'verificationMethod' => [
+                    [
+                        'id'                 => $siteDid . '#fair_signing',
+                        'type'               => 'Multikey',
+                        'controller'         => $siteDid,
+                        'publicKeyMultibase' => $edDsaKey->encode_public(),
+                    ],
+                ],
+            ];
+            file_put_contents(
+                $didFile,
+                json_encode($didDocument, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n"
+            );
+            $io->writeln(sprintf('DID document written to <info>%s</info>.', $didFile));
+        }
 
         $io->success(sprintf(
             'Version %s of extension %s signed and written to %s.',
@@ -142,7 +187,7 @@ class MigrateSignCommand extends Command
             ['SHA-256', $sha256],
             ['SHA-384', $sha384],
             ['SHA-512', $sha512],
-            ['didSignature', $didSignature],
+            ['Signature', $signature],
             ['Output file', $outFile],
         ]);
 
@@ -150,8 +195,23 @@ class MigrateSignCommand extends Command
     }
 
     /**
-     * Parse a PKCS#8 Ed25519 PEM private key and return the 64-byte libsodium secret key
-     * (seed || public key), or null if the PEM cannot be decoded.
+     * DAG-CBOR encode a flat string→string map using RFC 8949 §4.2 canonical ordering.
+     */
+    private function encodeOperationCbor(array $operation): string
+    {
+        $items = [];
+        foreach ($operation as $key => $value) {
+            $items[] = MapItem::create(
+                TextStringObject::create($key),
+                TextStringObject::create($value),
+            );
+        }
+        return (string) CanonicalMapObject::create($items);
+    }
+
+    /**
+     * Parse a PKCS#8 Ed25519 PEM private key and return a multibase-encoded private key
+     * string suitable for use with EdDsaKey::from_private(), or null on failure.
      *
      * A PKCS#8 Ed25519 DER blob is always 48 bytes:
      *   30 2e 30 05 06 03 2b 65 70 04 22 04 20 [32-byte seed]
@@ -172,8 +232,7 @@ class MigrateSignCommand extends Command
         // The 32-byte Ed25519 seed is always the last 32 bytes of the PKCS#8 blob
         $seed = substr($der, -32);
 
-        $keypair = sodium_crypto_sign_seed_keypair($seed);
-        return sodium_crypto_sign_secretkey($keypair);
+        return Multibase::encode(Multibase::BASE58BTC, Key::PREFIX_ED25519_PRIV . $seed);
     }
 
     private function mergeReleaseRecord(
