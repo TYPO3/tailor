@@ -21,6 +21,7 @@
         "php": "^7.2 || ^8.0",
         "ext-json": "*",
         "ext-zip": "*",
+        "fairpm/did-manager": "^0.0.3",
         "symfony/console": "^5.4 || ^6.4 || ^7.0",
         "symfony/dotenv": "^5.4 || ^6.4 || ^7.0",
         "symfony/http-client": "^5.4 || ^6.4 || ^7.0",

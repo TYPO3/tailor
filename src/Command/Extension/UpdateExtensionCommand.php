@@ -21,6 +21,7 @@ use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
 use TYPO3\Tailor\Formatter\ConsoleFormatter;
 use TYPO3\Tailor\Helper\CommandHelper;
+use TYPO3\Tailor\Service\FairConfigurationService;
 
 /**
  * Command for TER REST endpoint `PUT /extension/{key}`
@@ -88,6 +89,14 @@ class UpdateExtensionCommand extends AbstractClientRequestCommand
         foreach (self::OPTION_TO_FORM_DATA_MAPPING as $optionName => $formName) {
             if ($options[$optionName] !== null) {
                 $formData[$formName] = $options[$optionName];
+            }
+        }
+
+        $config = new FairConfigurationService();
+        if ($config->didExists($this->extensionKey)) {
+            $did = $config->getDid($this->extensionKey);
+            if ($did !== null) {
+                $formData['did'] = $did;
             }
         }
 
