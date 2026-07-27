@@ -32,7 +32,7 @@ class SetExtensionVersionCommand extends Command
 
     // Documentation/guides.xml
     private const DOCUMENTATION_RELEASE_PATTERN = 'release="([0-9]+\.[0-9]+\.[0-9]+)"';
-    private const DOCUMENTATION_VERSION_PATTERN = 'version="([0-9]+\.[0-9]+)"';
+    private const DOCUMENTATION_VERSION_PATTERN = '(?<!xml )version="([0-9]+\.[0-9]+)"';
 
     // Documentation/Settings.cfg
     private const DOCUMENTATION_RELEASE_LEGACY_PATTERN = 'release\s*=\s*([0-9]+\.[0-9]+\.[0-9]+)';
