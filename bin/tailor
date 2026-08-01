@@ -29,19 +29,27 @@ foreach ([__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php
         }
     }
     $application = new Application('Tailor - Your TYPO3 Extension Helper', '1.6.0');
-    $application->add(new Command\Auth\CreateTokenCommand('ter:token:create'));
-    $application->add(new Command\Auth\RefreshTokenCommand('ter:token:refresh'));
-    $application->add(new Command\Auth\RevokeTokenCommand('ter:token:revoke'));
-    $application->add(new Command\Extension\CreateExtensionArtefactCommand('create-artefact'));
-    $application->add(new Command\Extension\DeleteExtensionCommand('ter:delete'));
-    $application->add(new Command\Extension\ExtensionDetailsCommand('ter:details'));
-    $application->add(new Command\Extension\ExtensionVersionsCommand('ter:versions'));
-    $application->add(new Command\Extension\FindExtensionsCommand('ter:find'));
-    $application->add(new Command\Extension\RegisterExtensionCommand('ter:register'));
-    $application->add(new Command\Extension\SetExtensionVersionCommand('set-version'));
-    $application->add(new Command\Extension\TransferExtensionCommand('ter:transfer'));
-    $application->add(new Command\Extension\UpdateExtensionCommand('ter:update'));
-    $application->add(new Command\Extension\UploadExtensionVersionCommand('ter:publish'));
-    $application->add(new Command\Extension\VersionDetailsCommand('ter:version'));
+    $commands = [
+        new Command\Auth\CreateTokenCommand('ter:token:create'),
+        new Command\Auth\RefreshTokenCommand('ter:token:refresh'),
+        new Command\Auth\RevokeTokenCommand('ter:token:revoke'),
+        new Command\Extension\CreateExtensionArtefactCommand('create-artefact'),
+        new Command\Extension\DeleteExtensionCommand('ter:delete'),
+        new Command\Extension\ExtensionDetailsCommand('ter:details'),
+        new Command\Extension\ExtensionVersionsCommand('ter:versions'),
+        new Command\Extension\FindExtensionsCommand('ter:find'),
+        new Command\Extension\RegisterExtensionCommand('ter:register'),
+        new Command\Extension\SetExtensionVersionCommand('set-version'),
+        new Command\Extension\TransferExtensionCommand('ter:transfer'),
+        new Command\Extension\UpdateExtensionCommand('ter:update'),
+        new Command\Extension\UploadExtensionVersionCommand('ter:publish'),
+        new Command\Extension\VersionDetailsCommand('ter:version'),
+    ];
+    // Application::add() was replaced by addCommand() in symfony/console 7.4
+    // and removed in 8.0, while 6.4 only knows add()
+    $addMethod = method_exists($application, 'addCommand') ? 'addCommand' : 'add';
+    foreach ($commands as $command) {
+        $application->{$addMethod}($command);
+    }
     $application->run();
 });
