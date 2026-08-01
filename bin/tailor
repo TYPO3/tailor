@@ -45,11 +45,6 @@ call_user_func(static function () {
         new Command\Extension\UploadExtensionVersionCommand('ter:publish'),
         new Command\Extension\VersionDetailsCommand('ter:version'),
     ];
-    // Application::add() was replaced by addCommand() in symfony/console 7.4
-    // and removed in 8.0, while 6.4 only knows add()
-    $addMethod = method_exists($application, 'addCommand') ? 'addCommand' : 'add';
-    foreach ($commands as $command) {
-        $application->{$addMethod}($command);
-    }
+    $application->addCommands($commands);
     $application->run();
 });
