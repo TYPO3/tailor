@@ -12,14 +12,14 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Tests\Unit\Filesystem;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TYPO3\Tailor\Filesystem\VersionReplacer;
 
 class VersionReplacerTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function replaceVersionReplacesProperVersionOfEmConf(): void
     {
         $emConfContents = file_get_contents(__DIR__ . '/../Fixtures/EmConf/emconf_valid.php');
@@ -41,10 +41,8 @@ class VersionReplacerTest extends TestCase
         yield 'Settings.cfg' => ['Settings.cfg', 'release\s*=\s*([0-9]+\.[0-9]+\.[0-9]+)', 'release=6.9.0'];
     }
 
-    /**
-     * @test
-     * @dataProvider replaceVersionReplacesProperReleaseOfDocumentationConfigurationDataProvider
-     */
+    #[Test]
+    #[DataProvider('replaceVersionReplacesProperReleaseOfDocumentationConfigurationDataProvider')]
     public function replaceVersionReplacesProperReleaseOfDocumentationConfiguration(
         string $docSettingsFile,
         string $docReleasePattern,
@@ -69,10 +67,8 @@ class VersionReplacerTest extends TestCase
         yield 'Settings.cfg' => ['Settings.cfg', 'version\s*=\s*([0-9]+\.[0-9]+)', 'version=6.9'];
     }
 
-    /**
-     * @test
-     * @dataProvider replaceVersionReplacesProperVersionOfDocumentationConfigurationDataProvider
-     */
+    #[Test]
+    #[DataProvider('replaceVersionReplacesProperVersionOfDocumentationConfigurationDataProvider')]
     public function replaceVersionReplacesProperVersionOfDocumentationConfiguration(
         string $docSettingsFile,
         string $docVersionPattern,
@@ -88,9 +84,7 @@ class VersionReplacerTest extends TestCase
         unlink($tempFile);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function replaceVersionThrowsExceptionOnInvalidFile(): void
     {
         $this->expectExceptionCode(1605741968);

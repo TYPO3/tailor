@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Tests\Unit\Helper;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -37,9 +38,7 @@ final class CommandHelperTest extends TestCase
         $this->input = new ArrayInput([], $this->definition);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getExtensionKeyFromInputThrowsExceptionIfInputHasNoArgumentDefined(): void
     {
         $this->expectException(ExtensionKeyMissingException::class);
@@ -49,9 +48,7 @@ final class CommandHelperTest extends TestCase
         CommandHelper::getExtensionKeyFromInput($this->input);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getExtensionKeyFromInputReturnsExtensionKeyFromInputArgument(): void
     {
         $this->definition->addArgument(new InputArgument('extensionkey', InputArgument::REQUIRED));
@@ -60,9 +57,7 @@ final class CommandHelperTest extends TestCase
         self::assertSame('foo', CommandHelper::getExtensionKeyFromInput($this->input));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getExtensionKeyFromInputIgnoresEmptyInputArgumentValue(): void
     {
         $this->expectException(ExtensionKeyMissingException::class);
@@ -75,9 +70,7 @@ final class CommandHelperTest extends TestCase
         CommandHelper::getExtensionKeyFromInput($this->input);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getExtensionKeyFromInputReturnsExtensionKeyFromEnvironmentVariables(): void
     {
         putenv('TYPO3_EXTENSION_KEY=foo');

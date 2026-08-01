@@ -12,18 +12,15 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Tests\Unit\Validation;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TYPO3\Tailor\Validation\VersionValidator;
 
 class VersionValidatorTest extends TestCase
 {
-    /**
-     * @test
-     * @dataProvider isValidTestDataProvider
-     *
-     * @param string $input
-     * @param bool $expected
-     */
+    #[Test]
+    #[DataProvider('isValidTestDataProvider')]
     public function isValidTest(string $input, bool $expected): void
     {
         self::assertEquals($expected, (new VersionValidator())->isValid($input));
@@ -34,7 +31,7 @@ class VersionValidatorTest extends TestCase
      *
      * @return \Generator
      */
-    public function isValidTestDataProvider(): \Generator
+    public static function isValidTestDataProvider(): \Generator
     {
         yield 'Wrong format' => [
             'v1',

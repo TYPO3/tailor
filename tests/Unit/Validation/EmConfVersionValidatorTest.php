@@ -12,15 +12,14 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Tests\Unit\Validation;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TYPO3\Tailor\Validation\EmConfValidationError;
 use TYPO3\Tailor\Validation\EmConfVersionValidator;
 
 class EmConfVersionValidatorTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function collectErrorsReturnsErrorIfFileDoesNotExist(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/no-file');
@@ -28,9 +27,7 @@ class EmConfVersionValidatorTest extends TestCase
         self::assertSame($expected, $subject->collectErrors('1.2.0'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function collectErrorsReturnsErrorIfConfigurationIsMissing(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_invalid.php');
@@ -38,9 +35,7 @@ class EmConfVersionValidatorTest extends TestCase
         self::assertSame($expected, $subject->collectErrors('1.0.0'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function collectErrorsReturnsErrorIfFileDoesNotMatchEmConfStructure(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_no_structure.php');
@@ -48,9 +43,7 @@ class EmConfVersionValidatorTest extends TestCase
         self::assertSame($expected, $subject->collectErrors('1.0.0'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function collectErrorsReturnsErrorsIfNoVersionGiven(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_no_version.php');
@@ -61,9 +54,7 @@ class EmConfVersionValidatorTest extends TestCase
         self::assertSame($expected, $subject->collectErrors('1.0.0'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function collectErrorsReturnsErrorIfVersionsDoNotMatch(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_valid.php');
@@ -71,45 +62,35 @@ class EmConfVersionValidatorTest extends TestCase
         self::assertSame($expected, $subject->collectErrors('2.0.0'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function collectErrorsReturnsEmptyArrayIfFileIsValid(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_valid.php');
         self::assertSame([], $subject->collectErrors('1.0.0'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isInvalidIfNoFileFound(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/no-file');
         self::assertFalse($subject->isValid('1.2.0'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isInvalidIfFileDoesNotMatchEmConfStructure(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_invalid.php');
         self::assertFalse($subject->isValid('1.0.0'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isInvalidIfNoVersionGiven(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_no_version.php');
         self::assertFalse($subject->isValid('1.0.0'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isValidMatchesVersion(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_valid.php');
@@ -117,9 +98,7 @@ class EmConfVersionValidatorTest extends TestCase
         self::assertTrue($subject->isValid('1.0.0'));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function isValidWithStringArrayKey(): void
     {
         $subject = new EmConfVersionValidator(__DIR__ . '/../Fixtures/EmConf/emconf_valid_string_array_key.php');

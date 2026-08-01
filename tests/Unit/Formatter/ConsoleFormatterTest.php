@@ -12,21 +12,16 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Tests\Unit\Formatter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TYPO3\Tailor\Formatter\ConsoleFormatter;
 use TYPO3\Tailor\Output\OutputPart;
 
 class ConsoleFormatterTest extends TestCase
 {
-    /**
-     * @test
-     * @dataProvider formatReturnsFormattedPartsDataProvider
-     *
-     * @param array $content
-     * @param array $expectedValues
-     * @param array $expectedOutputStyle
-     * @param int $formatType
-     */
+    #[Test]
+    #[DataProvider('formatReturnsFormattedPartsDataProvider')]
     public function formatReturnsFormattedParts(
         array $content,
         array $expectedValues,
@@ -48,7 +43,7 @@ class ConsoleFormatterTest extends TestCase
      *
      * @return \Generator
      */
-    public function formatReturnsFormattedPartsDataProvider(): \Generator
+    public static function formatReturnsFormattedPartsDataProvider(): \Generator
     {
         yield 'No output' => [
             [

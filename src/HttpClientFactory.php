@@ -67,7 +67,7 @@ final class HttpClientFactory
         return HttpClient::create($options);
     }
 
-    protected static function getBaseUri(): string
+    private static function getBaseUri(): string
     {
         $remoteBaseUri = Variables::get('TYPO3_REMOTE_BASE_URI') ?: self::DEFAULT_BASE_URI;
         $apiVersion =  Variables::get('TYPO3_API_VERSION') ?: self::DEFAULT_API_VERSION;

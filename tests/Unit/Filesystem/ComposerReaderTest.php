@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Tests\Unit\Filesystem;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TYPO3\Tailor\Exception\InvalidComposerJsonException;
 use TYPO3\Tailor\Filesystem\ComposerReader;
@@ -33,9 +34,7 @@ class ComposerReaderTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function throwsExceptionOnEmptyComposerJsonFile(): void
     {
         $this->expectExceptionCode(1610442954);
@@ -44,9 +43,7 @@ class ComposerReaderTest extends TestCase
         new ComposerReader('tmp');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function throwsExceptionOnInvalidComposerJsonFile(): void
     {
         $this->expectExceptionCode(1610442954);
@@ -56,9 +53,7 @@ class ComposerReaderTest extends TestCase
         new ComposerReader('tmp');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function returnEmptyStringIfExtensionKeyNotGiven(): void
     {
         $composerContent = file_get_contents(__DIR__ . '/../Fixtures/Composer/composer_no_extension_key.json');
@@ -67,9 +62,7 @@ class ComposerReaderTest extends TestCase
         self::assertEmpty($subject->getExtensionKey());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function readCorrectExtensionKeyFromGivenComposerJsonFile(): void
     {
         $composerContent = file_get_contents(__DIR__ . '/../Fixtures/Composer/composer_with_extension_key.json');
