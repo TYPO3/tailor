@@ -12,14 +12,13 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Tests\Unit\Environment;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TYPO3\Tailor\Environment\Variables;
 
 class VariablesTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function hasVariableTest(): void
     {
         unset($_ENV);
@@ -43,9 +42,7 @@ class VariablesTest extends TestCase
         self::assertTrue(Variables::has('NOT_EMPTY_PUTENV', true));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getVariableTest(): void
     {
         unset($_ENV);

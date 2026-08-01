@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use TYPO3\Tailor\Dto\RequestConfiguration;
@@ -32,18 +33,14 @@ class HttpClientFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function createHttpClientThrowsExceptionOnMissingCredentials(): void
     {
         $this->expectExceptionCode(1606995339);
         HttpClientFactory::create($this->requestConfiguration);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function createHttpClientWithDefaultsTest(): void
     {
         unset($_ENV);
@@ -66,9 +63,7 @@ class HttpClientFactoryTest extends TestCase
         self::assertSame('data=some+value', $defaultOptions['body']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function createHttpClientWithFallbackTest(): void
     {
         unset($_ENV);
@@ -82,9 +77,7 @@ class HttpClientFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function createHttpClientWithOverrideTest(): void
     {
         unset($_ENV);
@@ -100,9 +93,7 @@ class HttpClientFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function createHttpClientWithOverridePutenvTest(): void
     {
         unset($_ENV);
@@ -119,9 +110,7 @@ class HttpClientFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function createHttpClientWithBearerAuthTest(): void
     {
         unset($_ENV);
@@ -134,9 +123,7 @@ class HttpClientFactoryTest extends TestCase
         self::assertSame('token123', $this->getDefaultOptions($httpClient)['auth_bearer']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function createHttpClientWithBearerAuthOverrideTest(): void
     {
         unset($_ENV);
@@ -150,9 +137,7 @@ class HttpClientFactoryTest extends TestCase
         self::assertSame('token321', $this->getDefaultOptions($httpClient)['auth_bearer']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function createHttpClientWithBasicAuthTest(): void
     {
         unset($_ENV);
@@ -166,9 +151,7 @@ class HttpClientFactoryTest extends TestCase
         self::assertSame('overridenUser:pass', $this->getDefaultOptions($httpClient)['auth_basic']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function createHttpClientWithBasicAuthEnforcedTest(): void
     {
         unset($_ENV);
@@ -188,7 +171,6 @@ class HttpClientFactoryTest extends TestCase
     protected function getDefaultOptions(HttpClientInterface $httpClient): array
     {
         $defaultOptions = (new \ReflectionClass($httpClient))->getProperty('defaultOptions');
-        $defaultOptions->setAccessible(true);
 
         return $defaultOptions->getValue($httpClient);
     }

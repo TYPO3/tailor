@@ -12,15 +12,14 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Tests\Unit\Service;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TYPO3\Tailor\Exception\RequiredConfigurationMissing;
 use TYPO3\Tailor\Service\VersionService;
 
 class VersionServiceTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function defaultExcludeFromPackagingConfigurationIsUsedOnNonExistingEnvVar(): void
     {
         unset($_ENV);
@@ -31,9 +30,7 @@ class VersionServiceTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function defaultExcludeFromPackagingConfigurationIsUsedOnEmptyPath(): void
     {
         unset($_ENV);
@@ -46,9 +43,7 @@ class VersionServiceTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function customExcludeFromPackagingConfigurationIsUsed(): void
     {
         unset($_ENV);
@@ -61,9 +56,7 @@ class VersionServiceTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function throwsExceptionOnMissingCustomConfiguration(): void
     {
         unset($_ENV);
@@ -75,9 +68,7 @@ class VersionServiceTest extends TestCase
         new VersionService('1.0.0', 'my_ext', '/dummyPath');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function throwsExceptionOnInvalidCustomConfiguration(): void
     {
         unset($_ENV);
@@ -89,9 +80,7 @@ class VersionServiceTest extends TestCase
         new VersionService('1.0.0', 'my_ext', '/dummyPath');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getVersionFilenameTest(): void
     {
         unset($_ENV);
@@ -103,9 +92,7 @@ class VersionServiceTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function getVersionFilenameAsMd5Test(): void
     {
         unset($_ENV);
@@ -135,7 +122,6 @@ class VersionServiceTest extends TestCase
             ->getMock();
 
         $method = new \ReflectionMethod(VersionService::class, $methodName);
-        $method->setAccessible(true);
 
         return $method->invokeArgs($mock, $arguments);
     }
