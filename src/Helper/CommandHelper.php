@@ -22,6 +22,25 @@ use TYPO3\Tailor\Filesystem\ComposerReader;
  */
 final class CommandHelper
 {
+    /**
+     * Tags that every TER listing already implies. TER only lists TYPO3
+     * extensions, so these narrow nothing down there — unlike on GitHub or
+     * Packagist, where the same terms are what make a package findable at all.
+     *
+     * @var string[]
+     */
+    private const TAGS_IMPLIED_BY_TER = [
+        'cms',
+        'extension',
+        'extensions',
+        'php',
+        'ter',
+        'typo3',
+        'typo3-cms',
+        'typo3-extension',
+        'typo3cms',
+        'typo3ext',
+    ];
     public static function getExtensionKeyFromInput(InputInterface $input): string
     {
         // 1. CLI argument has highest priority
@@ -51,5 +70,25 @@ final class CommandHelper
             'The extension key must either be set as argument or in composer.json at [extra][typo3/cms][extension-key].',
             1605706548
         );
+    }
+
+    /**
+     * Returns those of the given tags that TER already implies, so the caller
+     * can point them out. Comparison is case-insensitive.
+     *
+     * @return string[]
+     */
+    public static function getTagsImpliedByTer(string $tags): array
+    {
+        $implied = [];
+
+        foreach (explode(',', $tags) as $tag) {
+            $tag = trim($tag);
+            if ($tag !== '' && in_array(strtolower($tag), self::TAGS_IMPLIED_BY_TER, true)) {
+                $implied[] = $tag;
+            }
+        }
+
+        return $implied;
     }
 }

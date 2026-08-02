@@ -314,6 +314,19 @@ To update the tags:
 ./vendor/bin/tailor ter:update my_extension --tags=some-tag,another-tag
 ```
 
+Tags are what people search the extension listing by, so they are worth
+choosing for TER specifically. Every extension in TER is a TYPO3 extension,
+which means terms such as `typo3`, `typo3-extension`, `extension`, `cms` or
+`php` narrow nothing down there — even though the very same terms are what
+make a package findable on GitHub or Packagist. Prefer tags describing what
+the extension does. Tailor warns when it recognises such a term, but still
+sends whatever you pass.
+
+This matters most for automated publishing: because the whole list is
+replaced on every call (see below), a pipeline that reuses one vocabulary
+across registries will keep overwriting curated TER tags with terms that add
+nothing.
+
 Please use `./vendor/bin/tailor ter:update -h` to see the full
 list of available options.
 

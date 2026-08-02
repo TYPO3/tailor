@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace TYPO3\Tailor\Tests\Unit\Helper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -97,5 +98,32 @@ final class CommandHelperTest extends TestCase
         } finally {
             restore_error_handler();
         }
+    }
+
+    /**
+     * @param string[] $expected
+     */
+    #[Test]
+    #[DataProvider('tagsImpliedByTerDataProvider')]
+    public function getTagsImpliedByTerReturnsOnlyTermsTerAlreadyImplies(string $tags, array $expected): void
+    {
+        self::assertSame($expected, CommandHelper::getTagsImpliedByTer($tags));
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: string[]}>
+     */
+    public static function tagsImpliedByTerDataProvider(): array
+    {
+        return [
+            'empty input' => ['', []],
+            'only domain tags' => ['search,indexing,facets', []],
+            'single implied tag' => ['typo3,search', ['typo3']],
+            'several implied tags' => ['typo3,php,search,extension', ['typo3', 'php', 'extension']],
+            'case is ignored' => ['TYPO3,Extension', ['TYPO3', 'Extension']],
+            'surrounding whitespace' => [' typo3 , search ', ['typo3']],
+            'empty segments' => ['typo3,,search,', ['typo3']],
+            'substring is not a match' => ['typo3-solr,phpunit', []],
+        ];
     }
 }

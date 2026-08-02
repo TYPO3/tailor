@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\Tailor\Command\AbstractClientRequestCommand;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
@@ -57,7 +58,34 @@ class UpdateExtensionCommand extends AbstractClientRequestCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->extensionKey = CommandHelper::getExtensionKeyFromInput($input);
+        $this->warnAboutTagsImpliedByTer($input, $output);
+
         return parent::execute($input, $output);
+    }
+
+    /**
+     * TER replaces the whole tag list with what is sent, so a pipeline reusing
+     * one vocabulary across registries silently publishes terms that say
+     * nothing here. Point them out without changing what gets sent.
+     */
+    private function warnAboutTagsImpliedByTer(InputInterface $input, OutputInterface $output): void
+    {
+        $tags = $input->getOption('tags');
+        if (!is_string($tags) || $tags === '') {
+            return;
+        }
+
+        $implied = CommandHelper::getTagsImpliedByTer($tags);
+        if ($implied === []) {
+            return;
+        }
+
+        (new SymfonyStyle($input, $output))->warning(sprintf(
+            'Every extension in TER is a TYPO3 extension, so %s %s no discoverability there. '
+            . 'Consider tags describing what the extension does instead.',
+            implode(', ', $implied),
+            count($implied) === 1 ? 'adds' : 'add'
+        ));
     }
 
     protected function getRequestConfiguration(): RequestConfiguration
