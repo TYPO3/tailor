@@ -74,9 +74,7 @@ class RequestService
                 $this->consoleWriter->writeSuccess();
                 $this->consoleWriter->writeFormattedResult($content);
             } else {
-                $this->consoleWriter->writeFailure(
-                    (string)($content['error_description'] ?? $content['message'] ?? 'Unknown (Status ' . $status . ')')
-                );
+                $this->consoleWriter->writeFailure(self::createFailureReason($content, $status));
                 return false;
             }
         } catch (ExceptionInterface|\InvalidArgumentException $e) {
@@ -85,5 +83,29 @@ class RequestService
         }
 
         return true;
+    }
+
+    /**
+     * Describe a failed request for the console.
+     *
+     * Next to the API's message, this reports the HTTP status and the API's own
+     * error code. The code is what identifies the failing branch on the server:
+     * TER answers `{"status": 500, "code": 1603956982, "message": "An error
+     * occured on handling the request."}` for every masked exception, so the
+     * message alone cannot tell two unrelated defects apart.
+     *
+     * @param array<string, mixed> $content Decoded response body
+     */
+    public static function createFailureReason(array $content, int $status): string
+    {
+        $reason = (string)($content['error_description'] ?? $content['message'] ?? '');
+        $details = ['HTTP ' . $status];
+        $code = $content['code'] ?? null;
+
+        if ((is_int($code) || is_string($code)) && !in_array((string)$code, ['', '0'], true)) {
+            $details[] = 'code ' . $code;
+        }
+
+        return ($reason !== '' ? $reason : 'Unknown') . ' (' . implode(', ', $details) . ')';
     }
 }
