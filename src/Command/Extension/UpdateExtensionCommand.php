@@ -52,7 +52,14 @@ class UpdateExtensionCommand extends AbstractClientRequestCommand
             ->addOption('repository', '', InputOption::VALUE_OPTIONAL, 'Link to the repository')
             ->addOption('manual', '', InputOption::VALUE_OPTIONAL, 'Link to the external manual')
             ->addOption('paypal', '', InputOption::VALUE_OPTIONAL, 'Link to sponsoring page (paypal)')
-            ->addOption('tags', '', InputOption::VALUE_OPTIONAL, 'Comma-separated list of tags');
+            ->addOption(
+                'tags',
+                '',
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of tags. Replaces the existing list. Every extension in TER is a '
+                . 'TYPO3 extension, so terms like typo3, typo3-extension, extension or php add no '
+                . 'discoverability there - prefer tags describing what the extension does.'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

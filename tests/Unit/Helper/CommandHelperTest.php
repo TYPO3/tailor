@@ -124,6 +124,17 @@ final class CommandHelperTest extends TestCase
             'surrounding whitespace' => [' typo3 , search ', ['typo3']],
             'empty segments' => ['typo3,,search,', ['typo3']],
             'substring is not a match' => ['typo3-solr,phpunit', []],
+            // Spelling variants observed in the wild: composer.json keywords
+            // favour "typo3 cms", GitHub topics "typo3-cms-extension".
+            'separator variants' => [
+                'typo3 cms,typo3-cms,typo3cms',
+                ['typo3 cms', 'typo3-cms', 'typo3cms'],
+            ],
+            'extension variants' => [
+                'typo3-cms-extension,typo3-extension,cms-extension',
+                ['typo3-cms-extension', 'typo3-extension', 'cms-extension'],
+            ],
+            'domain tag with separator survives' => ['e-commerce,tt_news', []],
         ];
     }
 }
