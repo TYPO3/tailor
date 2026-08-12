@@ -35,7 +35,7 @@ return [
         'codeception.yaml',
         'codeception.yml',
         'composer.lock',
-        'crowdin.yaml'
+        'crowdin.yaml',
         'crowdin.yml',
         'deploy.yaml',
         'deploy.yml',
