@@ -26,7 +26,7 @@ versions to the [extension repository][ter].
     - [Details for all versions of an extension](#details-for-all-versions-of-an-extension)
 - [Publish a new version using tailor locally](#publish-a-new-version-using-tailor-locally)
 - [Publish a new version using your CI](#publish-a-new-version-using-your-ci)
-  - [Github actions workflow](#github-actions-workflow)
+  - [GitHub actions workflow](#github-actions-workflow)
   - [GitLab pipeline](#gitlab-pipeline)
 - [Exclude paths from packaging](#exclude-paths-from-packaging)
 - [Overview of all available commands](#overview-of-all-available-commands)
@@ -89,7 +89,7 @@ composer req --dev typo3/tailor
 
 All commands, requesting the TER API, provide the `-r, --raw`
 option. If set, the raw result will be returned. This can be
-used for further processing e.g. by using some JSON processor.
+used for further processing, e.g. by using some JSON processor.
 
 Most of the commands require an extension key to work with.
 The extension key is determined in the following order:
@@ -219,7 +219,7 @@ Using a remote `--artefact`:
 ./vendor/bin/tailor ter:publish 1.2.0 my_extension --artefact=https://github.com/my-name/my_extension/archive/1.2.0.zip
 ```
 
-Using the root direcotry:
+Using the root directory:
 
 ```bash
 ./vendor/bin/tailor ter:publish 1.2.0 my_extension
@@ -240,7 +240,7 @@ current root directory the whole command simplifies to:
 > below.
 
 > [!NOTE]
-> The REST API, just like the the [TER][ter], requires
+> The REST API, just like the [TER][ter], requires
 > an upload comment to be set. This can be achieved using the
 > `--comment` option. If not set, Tailor will automatically use
 > `Updated extension to <version>` as comment.
@@ -284,7 +284,7 @@ Using the root directory:
 
 If the extension key is defined as environment variable or
 in your `composer.json`, it can also be skipped. So using the
-current root directory the whole command simplifies to:
+current root directory, the whole command simplifies to:
 
 ```bash
 ./vendor/bin/tailor create-artefact 1.2.0
@@ -364,7 +364,7 @@ Owner: some_user
 
 ### Delete / abandon an extension
 
-You can easily delete / abandon extensions with Tailor using
+You can delete / abandon extensions with Tailor using
 the `ter:delete` command. This either removes the extension
 entirely or just abandons it if the extension still has public
 versions.
@@ -442,7 +442,7 @@ with `ter:versions`:
 ./vendor/bin/tailor ter:versions my_extension
 ```
 
-This will return the details for all version of the extension
+This will return the details for all versions of the extension
 `my_extension`.
 
 ## Publish a new version using tailor locally
@@ -492,7 +492,7 @@ GitLab pipelines.
 ### Github actions workflow
 
 The workflow will only be executed when pushing a new tag.
-This can either be done using **Step 3** from above example
+This can either be done using **Step 3** from the above example
 or by creating a new GitHub release which will also add a
 new tag.
 
@@ -526,15 +526,15 @@ on:
 jobs:
   publish:
     name: Publish new version to TER
-    # use folliwing if tags begins with `v`
+    # use the following if tags begins with `v`
     # if: startsWith(github.ref, 'refs/tags/v')
     if: startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       TYPO3_API_TOKEN: ${{ secrets.TYPO3_API_TOKEN }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Check tag
         run: |
@@ -651,7 +651,7 @@ A couple of directories and files are excluded
 from packaging by default. You can find the configuration in
 [`conf/ExcludeFromPackaging.php`](conf/ExcludeFromPackaging.php).
 
-If you like, you can also use a custom configuration. Just add the
+If you like, you can also use a custom configuration. Add the
 path to your custom configuration file to the environment variable
 `TYPO3_EXCLUDE_FROM_PACKAGING`. This file must return an
 `array` with the keys `directories` and `files` on root level.
@@ -677,16 +677,16 @@ path to your custom configuration file to the environment variable
 
 ### General options for all commands
 
-- ``-r, --raw`` Return result as raw object (e.g. json) - Only for commands,
+- `-r, --raw` Return result as raw object (e.g. json) - Only for commands,
   requesting the TER API
-- ``-h, --help`` Display help message
-- ``-q, --quiet`` Do not output any message
-- ``-v, --version`` Display the CLI applications' version
-- ``-n, --no-interaction`` Do not ask any interactive question
-- ``-v|vv|vvv, --verbose`` Increase the verbosity of messages: 1 for normal output, 2
+- `-h, --help` Display help message
+- `-q, --quiet` Do not output any message
+- `-v, --version` Display the CLI applications' version
+- `-n, --no-interaction` Do not ask any interactive question
+- `-v|vv|vvv, --verbose` Increase the verbosity of messages: 1 for normal output, 2
   for more verbose output and 3 for debug
-- ``--ansi`` Force ANSI output
-- ``--no-ansi`` Disable ANSI output
+- `--ansi` Force ANSI output
+- `--no-ansi` Disable ANSI output
 
 ## Author & License
 
