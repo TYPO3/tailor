@@ -14,6 +14,7 @@ namespace TYPO3\Tailor\Service;
 
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use TYPO3\Tailor\Dto\RequestConfiguration;
 use TYPO3\Tailor\HttpClientFactory;
 use TYPO3\Tailor\Writer\ConsoleWriter;
@@ -35,9 +36,9 @@ class RequestService
     /** @var bool */
     protected $isRaw;
 
-    public function __construct(RequestConfiguration $requestConfiguration, ConsoleWriter $consoleWriter)
+    public function __construct(RequestConfiguration $requestConfiguration, ConsoleWriter $consoleWriter, ?HttpClientInterface $client = null)
     {
-        $this->client = HttpClientFactory::create($requestConfiguration);
+        $this->client = HttpClientFactory::create($requestConfiguration, $client);
         $this->requestConfiguration = $requestConfiguration;
         $this->consoleWriter = $consoleWriter;
         $this->isRaw = $this->requestConfiguration->isRaw();

@@ -31,7 +31,15 @@ final class HttpClientFactory
     private const DEFAULT_BASE_URI = 'https://extensions.typo3.org';
     private const DEFAULT_API_VERSION = 'v1';
 
-    public static function create(RequestConfiguration $requestConfiguration): HttpClientInterface
+    /**
+     * Create the client for a request configuration.
+     *
+     * The optional $client receives the very same options a real client would
+     * be created with. That keeps the option building - query, body, headers
+     * and authentication - on the tested path when a MockHttpClient is passed
+     * in, instead of bypassing it.
+     */
+    public static function create(RequestConfiguration $requestConfiguration, ?HttpClientInterface $client = null): HttpClientInterface
     {
         $defaultAuthMethod = $requestConfiguration->getDefaultAuthMethod();
         $options = [
@@ -64,7 +72,7 @@ final class HttpClientFactory
             // we can throw an exception if the request lacks authentication credentials.
             throw new \InvalidArgumentException('No authentication credentials are defined.', 1606995339);
         }
-        return HttpClient::create($options);
+        return $client !== null ? $client->withOptions($options) : HttpClient::create($options);
     }
 
     private static function getBaseUri(): string

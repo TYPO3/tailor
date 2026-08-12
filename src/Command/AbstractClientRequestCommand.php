@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use TYPO3\Tailor\Dto\Messages;
 use TYPO3\Tailor\Dto\RequestConfiguration;
 use TYPO3\Tailor\Formatter\ConsoleFormatter;
@@ -41,6 +42,19 @@ abstract class AbstractClientRequestCommand extends Command
 
     /** @var InputInterface */
     protected $input;
+
+    /** @var HttpClientInterface|null */
+    private $httpClient;
+
+    /**
+     * Use a specific client for the request instead of a freshly created one.
+     * Required to run a command against a MockHttpClient in tests.
+     */
+    public function setHttpClient(HttpClientInterface $httpClient): self
+    {
+        $this->httpClient = $httpClient;
+        return $this;
+    }
 
     protected function configure(): void
     {
@@ -70,7 +84,8 @@ abstract class AbstractClientRequestCommand extends Command
         // 0 on success and 1 on failure.
         return (int)!(new RequestService(
             $requestConfiguration,
-            new ConsoleWriter($io, $this->getMessages(), $this->resultFormat)
+            new ConsoleWriter($io, $this->getMessages(), $this->resultFormat),
+            $this->httpClient
         ))->run();
     }
 
