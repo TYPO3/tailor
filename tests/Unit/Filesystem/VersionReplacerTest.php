@@ -20,6 +20,19 @@ use TYPO3\Tailor\Filesystem\VersionReplacer;
 class VersionReplacerTest extends TestCase
 {
     #[Test]
+    public function replaceVersionReplacesProperVersionOfComposerJson(): void
+    {
+        $composerContents = file_get_contents(__DIR__ . '/../Fixtures/Composer/composer_with_extension_key.json');
+        $tempFile = tempnam('/tmp/', 'tailor_composer.json');
+        file_put_contents($tempFile, $composerContents);
+        $subject = new VersionReplacer('6.9.0');
+        $subject->setVersion($tempFile, '"version": "([0-9]+\.[0-9]+\.[0-9]+)"');
+        $contents = file_get_contents($tempFile);
+        self::assertStringContainsString('"version": "6.9.0"', $contents);
+        unlink($tempFile);
+    }
+
+    #[Test]
     public function replaceVersionReplacesProperVersionOfEmConf(): void
     {
         $emConfContents = file_get_contents(__DIR__ . '/../Fixtures/EmConf/emconf_valid.php');

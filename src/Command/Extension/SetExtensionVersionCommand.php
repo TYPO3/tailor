@@ -28,6 +28,7 @@ use TYPO3\Tailor\Validation\VersionValidator;
  */
 class SetExtensionVersionCommand extends Command
 {
+    private const COMPOSER_PATTERN = '"version": "([0-9]+\.[0-9]+\.[0-9]+)"';
     private const EMCONF_PATTERN = '["\']version["\']\s=>\s["\']((?:[0-9]+)\.[0-9]+\.[0-9]+\s*)["\']';
 
     // Documentation/guides.xml
@@ -64,6 +65,12 @@ class SetExtensionVersionCommand extends Command
             return 1;
         }
 
+        $composerFile = rtrim($path, '/') . '/composer.json';
+        if (!file_exists($composerFile)) {
+            $io->error(sprintf('No \'composer.json\' found in the given path %s.', $path));
+            return self::FAILURE;
+        }
+
         $emConfFile = rtrim($path, '/') . '/ext_emconf.php';
         if (!file_exists($emConfFile)) {
             $io->error(sprintf('No \'ext_emconf.php\' found in the given path %s.', $path));
@@ -71,6 +78,13 @@ class SetExtensionVersionCommand extends Command
         }
 
         $versionReplacer = new VersionReplacer($version);
+
+        try {
+            $versionReplacer->setVersion($composerFile, self::COMPOSER_PATTERN);
+        } catch (\InvalidArgumentException) {
+            $io->error(sprintf('An error occurred while setting the composer.json version to %s.', $version));
+            return self::FAILURE;
+        }
 
         try {
             $versionReplacer->setVersion($emConfFile, self::EMCONF_PATTERN);

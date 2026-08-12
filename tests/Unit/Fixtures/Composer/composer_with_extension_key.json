@@ -19,7 +19,8 @@
   },
   "extra": {
     "typo3/cms": {
-      "extension-key": "my-extension"
+      "extension-key": "my-extension",
+      "version": "1.0.0"
     }
   }
 }
