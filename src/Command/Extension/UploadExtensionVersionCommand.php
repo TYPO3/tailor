@@ -48,18 +48,29 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
         $this
             ->setDescription('Publishes a new version of an extension to TER')
             ->setResultFormat(ConsoleFormatter::FORMAT_DETAIL)
-            ->addArgument('version', InputArgument::REQUIRED, 'The version to publish, e.g. 1.2.3')
+            ->addArgument('version', InputArgument::OPTIONAL, 'The version to publish, e.g. 1.2.3. Defaults to the tag of the checked out commit.')
             ->addArgument('extensionkey', InputArgument::OPTIONAL, 'The extension key')
-            ->addOption('path', '', InputOption::VALUE_OPTIONAL, 'Path to the extension folder')
+            ->addOption('path', '', InputOption::VALUE_OPTIONAL, 'Path to the extension folder. Defaults to the current working directory.')
             ->addOption('artefact', '', InputOption::VALUE_OPTIONAL, 'Path or URL to a zip file')
             ->addOption('comment', '', InputOption::VALUE_OPTIONAL, 'Upload comment of the new version (e.g. release notes)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->version = $input->getArgument('version');
+        CommandHelper::normalizeVersionAndExtensionKeyArguments($input);
+
+        $resolvedVersion = CommandHelper::getVersionFromInput($input);
+        $this->version = $resolvedVersion->getVersion();
         $this->extensionKey = CommandHelper::getExtensionKeyFromInput($input);
         $this->transactionPath = rtrim(realpath(getcwd() ?: './'), '/') . '/tailor-version-upload';
+
+        if (!$resolvedVersion->isFromArgument() && $input->getOption('raw') === false) {
+            $output->writeln(sprintf(
+                '<info>Using version %s from %s.</info>',
+                $resolvedVersion->getVersion(),
+                $resolvedVersion->getSource()
+            ));
+        }
 
         if (!(new Filesystem\Directory())->create($this->transactionPath)) {
             throw new \RuntimeException(sprintf('Directory could not be created.'));

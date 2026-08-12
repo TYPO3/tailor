@@ -70,4 +70,33 @@ class ComposerReaderTest extends TestCase
         $subject = new ComposerReader('tmp');
         self::assertSame('my-extension', $subject->getExtensionKey());
     }
+
+    #[Test]
+    public function returnEmptyStringIfVersionNotGiven(): void
+    {
+        $composerContent = file_get_contents(__DIR__ . '/../Fixtures/Composer/composer_no_extension_key.json');
+        file_put_contents(self::COMPOSER_FILE, $composerContent);
+        $subject = new ComposerReader('tmp');
+        self::assertEmpty($subject->getVersion());
+    }
+
+    #[Test]
+    public function readCorrectVersionFromGivenComposerJsonFile(): void
+    {
+        $composerContent = file_get_contents(__DIR__ . '/../Fixtures/Composer/composer_with_extension_key.json');
+        file_put_contents(self::COMPOSER_FILE, $composerContent);
+        $subject = new ComposerReader('tmp');
+        self::assertSame('1.0.0', $subject->getVersion());
+    }
+
+    #[Test]
+    public function versionOnRootLevelIsPreferred(): void
+    {
+        file_put_contents(self::COMPOSER_FILE, (string)json_encode([
+            'version' => '2.0.0',
+            'extra' => ['typo3/cms' => ['version' => '1.0.0']],
+        ]));
+        $subject = new ComposerReader('tmp');
+        self::assertSame('2.0.0', $subject->getVersion());
+    }
 }
