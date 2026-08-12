@@ -14,11 +14,14 @@ namespace TYPO3\Tailor\Tests\Unit\Command\Extension;
 
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\Tailor\Command\Extension\UploadExtensionVersionCommand;
+use TYPO3\Tailor\Exception\VersionMissingException;
 use TYPO3\Tailor\Tests\Unit\Command\AbstractCommandTestCase;
+use TYPO3\Tailor\Tests\Unit\GitRepositoryTrait;
 
 class UploadExtensionVersionCommandTest extends AbstractCommandTestCase
 {
     use ExtensionDirectoryTrait;
+    use GitRepositoryTrait;
 
     protected function setUp(): void
     {
@@ -108,6 +111,60 @@ class UploadExtensionVersionCommandTest extends AbstractCommandTestCase
         gc_collect_cycles();
 
         self::assertDirectoryDoesNotExist($this->workingDirectory . '/tailor-version-upload');
+    }
+
+    #[Test]
+    public function versionIsTakenFromTheTagOfTheCheckedOutCommit(): void
+    {
+        $this->createGitRepository($this->extensionDirectory, '1.2.3');
+        $tester = $this->apiTester($this->command(), self::jsonResponse(['number' => '1.2.3'], 201));
+
+        self::assertSame(0, $tester->execute(['--path' => $this->extensionDirectory]));
+        self::assertSame(self::BASE_URI . 'extension/my_ext/1.2.3', $this->request()['url']);
+        self::assertDisplayContains('Using version 1.2.3 from the tag of the checked out commit.', $tester);
+    }
+
+    #[Test]
+    public function versionTagMayBePrefixed(): void
+    {
+        $this->createGitRepository($this->extensionDirectory, 'v1.2.3');
+        $tester = $this->apiTester($this->command(), self::jsonResponse([], 201));
+
+        self::assertSame(0, $tester->execute(['--path' => $this->extensionDirectory]));
+        self::assertSame(self::BASE_URI . 'extension/my_ext/1.2.3', $this->request()['url']);
+    }
+
+    #[Test]
+    public function extensionKeyCanBeGivenAsSoleArgument(): void
+    {
+        $this->createGitRepository($this->extensionDirectory, '1.2.3');
+        $tester = $this->apiTester($this->command(), self::jsonResponse([], 201));
+
+        self::assertSame(0, $tester->execute(['version' => 'my_ext', '--path' => $this->extensionDirectory]));
+        self::assertSame(self::BASE_URI . 'extension/my_ext/1.2.3', $this->request()['url']);
+    }
+
+    #[Test]
+    public function versionIsTakenFromExtEmconfIfTheCommitIsNotTagged(): void
+    {
+        $this->createGitRepository($this->extensionDirectory);
+        $tester = $this->apiTester($this->command(), self::jsonResponse([], 201));
+
+        self::assertSame(0, $tester->execute(['--path' => $this->extensionDirectory]));
+        self::assertSame(self::BASE_URI . 'extension/my_ext/1.2.3', $this->request()['url']);
+        self::assertDisplayContains('Using version 1.2.3 from ext_emconf.php.', $tester);
+    }
+
+    #[Test]
+    public function ambiguousVersionTagsAreRejected(): void
+    {
+        $this->createGitRepository($this->extensionDirectory, '1.2.3', '1.2.4');
+        $tester = $this->apiTester($this->command(), self::jsonResponse([], 201));
+
+        $this->expectException(VersionMissingException::class);
+        $this->expectExceptionMessage('tagged with more than one version (1.2.3, 1.2.4)');
+
+        $tester->execute(['--path' => $this->extensionDirectory]);
     }
 
     #[Test]

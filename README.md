@@ -233,6 +233,41 @@ current root directory the whole command simplifies to:
 ./vendor/bin/tailor ter:publish 1.2.0
 ```
 
+The version can be skipped as well, since Tailor is able to
+determine it from your extension:
+
+```bash
+./vendor/bin/tailor ter:publish
+```
+
+The following sources are used, in this order:
+
+1. The **version argument**, if given.
+2. The **tag of the checked out commit**, no matter whether it's
+   prefixed with `v` (e.g. `v1.2.0`) or not.
+3. The version in **`ext_emconf.php`**.
+4. The version in **`composer.json`**, either on root level or at
+   `[extra][typo3/cms][version]`.
+
+The last two are the ones written by the
+[`set-version`](#update-the-version-in-your-extension-files)
+command. Tailor tells you which version it uses and where it
+comes from, e.g.
+`Using version 1.2.0 from the tag of the checked out commit.`
+
+Since an extension key never looks like a version, it can still
+be passed as only argument:
+
+```bash
+./vendor/bin/tailor ter:publish my_extension
+```
+
+> [!NOTE]
+> The version has to be stated as argument if the checked out
+> commit is tagged with more than one version, or if you publish
+> an `--artefact` which does not belong to the extension in your
+> current working directory.
+
 > [!IMPORTANT]
 > A couple of directories and files are excluded from packaging
 > by default. Read more about
@@ -469,8 +504,13 @@ git push origin --tags
 **Step 4: Push this version to TER**
 
 ```bash
-./vendor/bin/tailor ter:publish 1.5.0
+./vendor/bin/tailor ter:publish
 ```
+
+Since **Step 1** wrote the version into your extension files and
+**Step 2** tagged the commit with it, the version does not have to
+be repeated here. State it as argument, e.g. `ter:publish 1.5.0`,
+if you want to publish another version.
 
 > [!NOTE]
 > Both `set-version` and `ter:publish` provide options
