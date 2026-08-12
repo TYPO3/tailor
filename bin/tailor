@@ -28,7 +28,7 @@ call_user_func(static function () {
             break;
         }
     }
-    $application = new Application('Tailor - Your TYPO3 Extension Helper', '1.6.0');
+    $application = new Application('Tailor - Your TYPO3 Extension Helper', '2.0.0');
     $commands = [
         new Command\Auth\CreateTokenCommand('ter:token:create'),
         new Command\Auth\RefreshTokenCommand('ter:token:refresh'),
