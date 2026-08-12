@@ -118,6 +118,45 @@ class FindExtensionsCommandTest extends AbstractCommandTestCase
     }
 
     #[Test]
+    public function responseWithoutFilterIsRendered(): void
+    {
+        $list = self::extensionList();
+        $list['filter'] = null;
+
+        $tester = $this->apiTester($this->command(), self::jsonResponse($list));
+
+        self::assertSame(0, $tester->execute([]));
+        self::assertDisplayContains('Page: 1, Per page: 10, Filter: -', $tester);
+    }
+
+    #[Test]
+    public function responseWithoutPaginationMetadataIsRendered(): void
+    {
+        $list = self::extensionList();
+        unset($list['page'], $list['per_page'], $list['filter']);
+
+        $tester = $this->apiTester($this->command(), self::jsonResponse($list));
+
+        self::assertSame(0, $tester->execute([]));
+        self::assertDisplayContains('Page: -, Per page: -, Filter: -', $tester);
+        self::assertDisplayContains('georgringer/news', $tester);
+    }
+
+    #[Test]
+    public function emptyResultIsReported(): void
+    {
+        $tester = $this->apiTester($this->command(), self::jsonResponse([
+            'page' => 1,
+            'per_page' => 10,
+            'filter' => ['username' => 'nobody'],
+            'extensions' => [],
+        ]));
+
+        self::assertSame(0, $tester->execute(['--author' => 'nobody']));
+        self::assertDisplayContains('No extensions found for options', $tester);
+    }
+
+    #[Test]
     public function failingRequestReturnsFailure(): void
     {
         $tester = $this->apiTester($this->command(), self::errorResponse('Server error.', 500));

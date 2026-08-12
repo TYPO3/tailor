@@ -132,13 +132,21 @@ class ConsoleFormatter
         return ucfirst(implode(' ', explode('_', $fieldName)));
     }
 
+    /**
+     * Describe the pagination of a list response.
+     *
+     * Every part is optional: a response without an applied filter carries no
+     * filter at all, and a response listing everything carries no pagination.
+     * Missing parts are reported as unset instead of ending the command in a
+     * TypeError on the very last line it would have printed.
+     */
     protected function getPaginationOptions(array $content): string
     {
         return sprintf(
-            'Page: %d, Per page: %d, Filter: %s',
-            $content['page'],
-            $content['per_page'],
-            $this->getFilterString($content['filter'])
+            'Page: %s, Per page: %s, Filter: %s',
+            $content['page'] ?? '-',
+            $content['per_page'] ?? '-',
+            $this->getFilterString(is_array($content['filter'] ?? null) ? $content['filter'] : [])
         );
     }
 
