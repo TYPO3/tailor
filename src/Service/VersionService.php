@@ -81,7 +81,7 @@ class VersionService
                 if ($current->isDir()) {
                     // if $current is a directory, check for excluded directories
                     foreach ($this->excludeConfiguration['directories'] as $excludeDirectory) {
-                        if (preg_match('/^' . $excludeDirectory . '/i', $path)) {
+                        if (preg_match('/^' . preg_quote((string)$excludeDirectory, '/') . '/i', $path)) {
                             return false;
                         }
                     }
@@ -90,7 +90,7 @@ class VersionService
                 if ($current->isFile()) {
                     // if $current is a file, check for excluded files
                     foreach ($this->excludeConfiguration['files'] as $excludeFile) {
-                        if (preg_match('/' . $excludeFile . '$/i', $filename)) {
+                        if (preg_match('/' . preg_quote((string)$excludeFile, '/') . '$/i', $filename)) {
                             return false;
                         }
                     }
