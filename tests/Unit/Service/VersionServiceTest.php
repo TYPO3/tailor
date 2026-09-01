@@ -111,8 +111,33 @@ class VersionServiceTest extends TestCase
     #[Test]
     public function excludedDirectoryContainingASlashIsNotPackaged(): void
     {
+        $packagedFiles = $this->packageExtensionWithExcludeConfiguration('config_nested_directory.php');
+
+        self::assertContains('ext_emconf.php', $packagedFiles);
+        self::assertNotContains('Resources/Private/Build/gulpfile.js', $packagedFiles);
+    }
+
+    #[Test]
+    public function excludedDirectoryContainingAnEscapedSlashIsNotPackaged(): void
+    {
+        $packagedFiles = $this->packageExtensionWithExcludeConfiguration('config_nested_directory_escaped.php');
+
+        self::assertContains('ext_emconf.php', $packagedFiles);
+        self::assertNotContains('Resources/Private/Build/gulpfile.js', $packagedFiles);
+    }
+
+    /**
+     * Package an extension directory with the given exclude configuration
+     * and return the filenames the created archive contains.
+     *
+     * @param string $configurationFilename Filename of the exclude configuration fixture
+     *
+     * @return list<string> The packaged filenames
+     */
+    protected function packageExtensionWithExcludeConfiguration(string $configurationFilename): array
+    {
         unset($_ENV);
-        putenv('TYPO3_EXCLUDE_FROM_PACKAGING=' . __DIR__ . '/../Fixtures/ExcludeFromPackaging/config_nested_directory.php');
+        putenv('TYPO3_EXCLUDE_FROM_PACKAGING=' . __DIR__ . '/../Fixtures/ExcludeFromPackaging/' . $configurationFilename);
 
         $extensionPath = $this->createExtensionDirectory();
         $transactionPath = $this->createTemporaryDirectory();
@@ -130,8 +155,7 @@ class VersionServiceTest extends TestCase
 
         $archive->close();
 
-        self::assertContains('ext_emconf.php', $packagedFiles);
-        self::assertNotContains('Resources/Private/Build/gulpfile.js', $packagedFiles);
+        return $packagedFiles;
     }
 
     /**

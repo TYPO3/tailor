@@ -656,6 +656,12 @@ path to your custom configuration file to the environment variable
 `TYPO3_EXCLUDE_FROM_PACKAGING`. This file must return an
 `array` with the keys `directories` and `files` on root level.
 
+The entries are plain directory and file names, matched case-insensitively -
+directories against the beginning of the path, files against the end of the
+filename. Nested directories can be written as they appear on disk
+(`Resources/Private/Build`); slashes escaped as `Resources\/Private\/Build`
+are still accepted and describe the very same directory.
+
 ## Overview of all available commands
 
 | Commands              | Arguments                         | Options                                                                                               | Description                                            |

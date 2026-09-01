@@ -81,7 +81,7 @@ class VersionService
                 if ($current->isDir()) {
                     // if $current is a directory, check for excluded directories
                     foreach ($this->excludeConfiguration['directories'] as $excludeDirectory) {
-                        if (preg_match('/^' . preg_quote((string)$excludeDirectory, '/') . '/i', $path)) {
+                        if (preg_match('/^' . $this->quoteExcludePattern((string)$excludeDirectory) . '/i', $path)) {
                             return false;
                         }
                     }
@@ -90,7 +90,7 @@ class VersionService
                 if ($current->isFile()) {
                     // if $current is a file, check for excluded files
                     foreach ($this->excludeConfiguration['files'] as $excludeFile) {
-                        if (preg_match('/' . preg_quote((string)$excludeFile, '/') . '$/i', $filename)) {
+                        if (preg_match('/' . $this->quoteExcludePattern((string)$excludeFile) . '$/i', $filename)) {
                             return false;
                         }
                     }
@@ -125,6 +125,23 @@ class VersionService
         $zipArchive->close();
 
         return $this->getVersionFilePath();
+    }
+
+    /**
+     * Quote a configured exclude entry for use within a slash delimited pattern.
+     *
+     * The entries are documented as plain directory and file names. Some extensions
+     * however escape the slashes of a nested directory name (`Resources\/Private\/Build`)
+     * to work around the unquoted interpolation used in earlier versions. Those escapes
+     * are removed first, so both notations describe the very same directory.
+     *
+     * @param string $excludeEntry The configured directory or file name
+     *
+     * @return string The quoted pattern part
+     */
+    protected function quoteExcludePattern(string $excludeEntry): string
+    {
+        return preg_quote(str_replace('\\/', '/', $excludeEntry), '/');
     }
 
     /**
