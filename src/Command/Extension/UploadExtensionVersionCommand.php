@@ -123,6 +123,12 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
             $versionService->createZipArchiveFromPath(getcwd() ?: './');
         }
 
+        $excludeWarnings = $versionService->getExcludeWarnings();
+
+        if ($excludeWarnings !== []) {
+            $this->io->warning($excludeWarnings);
+        }
+
         return new FormDataPart([
             'description' => (string)$options['comment'],
             'gplCompliant' => '1',

@@ -111,7 +111,8 @@ class VersionServiceTest extends TestCase
     #[Test]
     public function excludedDirectoryContainingASlashIsNotPackaged(): void
     {
-        $packagedFiles = $this->packageExtensionWithExcludeConfiguration('config_nested_directory.php');
+        $versionService = $this->packageExtensionWithExcludeConfiguration('config_nested_directory.php');
+        $packagedFiles = $this->packagedFiles($versionService);
 
         self::assertContains('ext_emconf.php', $packagedFiles);
         self::assertNotContains('Resources/Private/Build/gulpfile.js', $packagedFiles);
@@ -120,33 +121,116 @@ class VersionServiceTest extends TestCase
     #[Test]
     public function excludedDirectoryContainingAnEscapedSlashIsNotPackaged(): void
     {
-        $packagedFiles = $this->packageExtensionWithExcludeConfiguration('config_nested_directory_escaped.php');
+        $versionService = $this->packageExtensionWithExcludeConfiguration('config_nested_directory_escaped.php');
+        $packagedFiles = $this->packagedFiles($versionService);
 
         self::assertContains('ext_emconf.php', $packagedFiles);
         self::assertNotContains('Resources/Private/Build/gulpfile.js', $packagedFiles);
     }
 
+    #[Test]
+    public function excludeEntryWhichMatchedIsNotWarnedAbout(): void
+    {
+        $versionService = $this->packageExtensionWithExcludeConfiguration('config_nested_directory.php');
+
+        self::assertSame([], $versionService->getExcludeWarnings());
+    }
+
+    #[Test]
+    public function packagingWithTheDefaultConfigurationProducesNoWarnings(): void
+    {
+        $versionService = $this->packageExtensionWithExcludeConfiguration(null);
+
+        self::assertSame([], $versionService->getExcludeWarnings());
+    }
+
+    #[Test]
+    public function directoryExcludeWithATrailingSlashIsWarnedAbout(): void
+    {
+        $versionService = $this->packageExtensionWithExcludeConfiguration('config_ineffective_directory.php');
+        $warnings = $versionService->getExcludeWarnings();
+
+        self::assertCount(1, $warnings);
+        self::assertStringContainsString('"Resources/Private/Build/" did not take effect', $warnings[0]);
+        self::assertStringContainsString('the archive contains "Resources/Private/Build/gulpfile.js"', $warnings[0]);
+        self::assertStringContainsString('remove it', $warnings[0]);
+        self::assertContains('Resources/Private/Build/gulpfile.js', $this->packagedFiles($versionService));
+    }
+
+    #[Test]
+    public function fileExcludeContainingAPathIsWarnedAbout(): void
+    {
+        $versionService = $this->packageExtensionWithExcludeConfiguration('config_ineffective_file.php');
+        $warnings = $versionService->getExcludeWarnings();
+
+        self::assertCount(1, $warnings);
+        self::assertStringContainsString('can not contain a path', $warnings[0]);
+    }
+
+    #[Test]
+    public function excludeEntryForSomethingTheExtensionDoesNotContainIsNotWarnedAbout(): void
+    {
+        $versionService = $this->packageExtensionWithExcludeConfiguration('config_absent_directory.php');
+
+        self::assertSame([], $versionService->getExcludeWarnings());
+    }
+
+    #[Test]
+    public function excludeEntryCoveredByAnotherEntryIsNotWarnedAbout(): void
+    {
+        $versionService = $this->packageExtensionWithExcludeConfiguration('config_covered_directory.php');
+
+        self::assertSame([], $versionService->getExcludeWarnings());
+        self::assertNotContains('Resources/Private/Build/gulpfile.js', $this->packagedFiles($versionService));
+    }
+
+    #[Test]
+    public function excludeEntryWithEscapedSlashesIsWarnedAbout(): void
+    {
+        $versionService = $this->packageExtensionWithExcludeConfiguration('config_nested_directory_escaped.php');
+        $warnings = $versionService->getExcludeWarnings();
+
+        self::assertCount(1, $warnings);
+        self::assertStringContainsString('escapes its slashes', $warnings[0]);
+        self::assertStringContainsString('write it as "Resources/Private/Build"', $warnings[0]);
+    }
+
     /**
-     * Package an extension directory with the given exclude configuration
-     * and return the filenames the created archive contains.
+     * Package an extension directory with the given exclude configuration.
      *
-     * @param string $configurationFilename Filename of the exclude configuration fixture
+     * @param string|null $configurationFilename Filename of the exclude configuration
+     *                                           fixture, null for the shipped default
      *
-     * @return list<string> The packaged filenames
+     * @return VersionService The service which created the archive
      */
-    protected function packageExtensionWithExcludeConfiguration(string $configurationFilename): array
+    protected function packageExtensionWithExcludeConfiguration(?string $configurationFilename): VersionService
     {
         unset($_ENV);
-        putenv('TYPO3_EXCLUDE_FROM_PACKAGING=' . __DIR__ . '/../Fixtures/ExcludeFromPackaging/' . $configurationFilename);
+        putenv('TYPO3_EXCLUDE_FROM_PACKAGING=' . (
+            $configurationFilename !== null ? $this->excludeConfigurationPath($configurationFilename) : ''
+        ));
 
         $extensionPath = $this->createExtensionDirectory();
         $transactionPath = $this->createTemporaryDirectory();
 
-        $archivePath = (new VersionService('1.0.0', 'my_ext', $transactionPath))
-            ->createZipArchiveFromPath($extensionPath);
+        $versionService = new VersionService('1.0.0', 'my_ext', $transactionPath);
+        $versionService->createZipArchiveFromPath($extensionPath);
 
+        return $versionService;
+    }
+
+    protected function excludeConfigurationPath(string $configurationFilename): string
+    {
+        return __DIR__ . '/../Fixtures/ExcludeFromPackaging/' . $configurationFilename;
+    }
+
+    /**
+     * @return list<string> The filenames the created archive contains
+     */
+    protected function packagedFiles(VersionService $versionService): array
+    {
         $archive = new \ZipArchive();
-        $archive->open($archivePath);
+        $archive->open($versionService->getVersionFilePath());
         $packagedFiles = [];
 
         for ($index = 0; $index < $archive->numFiles; $index++) {
@@ -203,6 +287,9 @@ class VersionServiceTest extends TestCase
         }
 
         $this->temporaryDirectories = [];
+
+        // Do not leak a fixture configuration into the next test
+        putenv('TYPO3_EXCLUDE_FROM_PACKAGING=');
 
         parent::tearDown();
     }
