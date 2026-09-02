@@ -658,9 +658,37 @@ path to your custom configuration file to the environment variable
 
 The entries are plain directory and file names, matched case-insensitively -
 directories against the beginning of the path, files against the end of the
-filename. Nested directories can be written as they appear on disk
-(`Resources/Private/Build`); slashes escaped as `Resources\/Private\/Build`
-are still accepted and describe the very same directory.
+filename. Nested directories are written as they appear on disk, without a
+trailing slash and without a leading `./`:
+
+```php
+return [
+    'directories' => [
+        'Resources/Private/Build',
+    ],
+    'files' => [
+        'gulpfile.js',
+    ],
+];
+```
+
+Escaping the slashes (`Resources\/Private\/Build`) is still accepted and
+describes the very same directory, but is not required any more.
+
+An entry which did not take effect is reported when the archive is created -
+that is, the archive still contains what the entry names. An exclude entry
+that quietly does nothing is the reason for this: it used to end up in a
+published archive carrying the very directory it was supposed to keep out.
+
+```
+[WARNING] The exclude entry "Resources/Private/Build/" did not take effect, the
+          archive contains "Resources/Private/Build/gulpfile.js". Directory
+          names are matched without a trailing slash, remove it.
+```
+
+Entries for directories and files the extension does not contain are not
+reported. Exclude configurations are usually shared between extensions and
+carry entries only some of them need.
 
 ## Overview of all available commands
 

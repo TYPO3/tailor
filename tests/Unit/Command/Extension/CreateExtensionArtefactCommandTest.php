@@ -105,6 +105,24 @@ class CreateExtensionArtefactCommandTest extends AbstractCommandTestCase
     }
 
     #[Test]
+    public function ineffectiveExcludeEntryIsReported(): void
+    {
+        $this->writeExtensionFile('Resources/Private/Build/gulpfile.js', '// build only');
+        $this->setEnvironment([
+            'TYPO3_EXCLUDE_FROM_PACKAGING' => __DIR__ . '/../../Fixtures/ExcludeFromPackaging/config_ineffective_directory.php',
+        ]);
+
+        $tester = $this->tester();
+        $tester->execute([
+            'version' => '1.2.3',
+            'extensionkey' => 'my_ext',
+            '--path' => $this->extensionDirectory,
+        ]);
+
+        self::assertDisplayContains('The exclude entry "Resources/Private/Build/" did not take effect', $tester);
+    }
+
+    #[Test]
     public function versionMismatchInEmConfIsRejected(): void
     {
         $tester = $this->tester();

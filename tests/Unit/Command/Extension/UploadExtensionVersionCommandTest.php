@@ -111,6 +111,20 @@ class UploadExtensionVersionCommandTest extends AbstractCommandTestCase
     }
 
     #[Test]
+    public function ineffectiveExcludeEntryIsReportedBeforeTheUpload(): void
+    {
+        $this->writeExtensionFile('Resources/Private/Build/gulpfile.js', '// build only');
+        $this->setEnvironment([
+            'TYPO3_EXCLUDE_FROM_PACKAGING' => __DIR__ . '/../../Fixtures/ExcludeFromPackaging/config_ineffective_directory.php',
+        ]);
+
+        $tester = $this->apiTester($this->command(), self::jsonResponse([], 201));
+
+        self::assertSame(0, $tester->execute($this->uploadArguments()));
+        self::assertDisplayContains('The exclude entry "Resources/Private/Build/" did not take effect', $tester);
+    }
+
+    #[Test]
     public function failingRequestReturnsFailure(): void
     {
         $tester = $this->apiTester($this->command(), self::errorResponse('Version already exists.', 400, 1603956982));

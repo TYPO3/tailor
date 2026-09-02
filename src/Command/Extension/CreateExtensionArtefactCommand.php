@@ -81,6 +81,12 @@ class CreateExtensionArtefactCommand extends Command
             $versionService->createZipArchiveFromPath(getcwd() ?: './');
         }
 
+        $excludeWarnings = $versionService->getExcludeWarnings();
+
+        if ($excludeWarnings !== []) {
+            $io->warning($excludeWarnings);
+        }
+
         $io->success(sprintf('Extension artefact successfully generated: %s', $versionService->getVersionFilePath()));
 
         return 0;

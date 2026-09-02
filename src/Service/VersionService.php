@@ -38,6 +38,9 @@ class VersionService
     /** @var array */
     protected $excludeConfiguration = [];
 
+    /** @var list<string> The paths the last created archive contains, relative to the extension directory */
+    protected $packagedPaths = [];
+
     public function __construct(string $version, string $extension, string $transactionPath)
     {
         $this->version = $version;
@@ -65,6 +68,7 @@ class VersionService
         $zipArchive->open($this->getVersionFilename(), \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 
         $emConfValidationErrors = [EmConfValidationError::NOT_FOUND];
+        $this->packagedPaths = [];
 
         $iterator = new \RecursiveDirectoryIterator($fullPath, \FilesystemIterator::SKIP_DOTS);
         $files = new \RecursiveIteratorIterator(
@@ -115,7 +119,9 @@ class VersionService
             }
 
             // Add the files including their directories
-            $zipArchive->addFile($fileRealPath, substr($fileRealPath, strlen($fullPath) + 1));
+            $packagedPath = substr($fileRealPath, strlen($fullPath) + 1);
+            $this->packagedPaths[] = $packagedPath;
+            $zipArchive->addFile($fileRealPath, $packagedPath);
         }
 
         if ($emConfValidationErrors !== []) {
@@ -142,6 +148,125 @@ class VersionService
     protected function quoteExcludePattern(string $excludeEntry): string
     {
         return preg_quote(str_replace('\\/', '/', $excludeEntry), '/');
+    }
+
+    /**
+     * Warnings about the configured exclude entries.
+     *
+     * An entry is reported when the archive still carries what the entry names: a
+     * `Resources/Private/Build/` written with a trailing slash reads like a valid
+     * exclude and packages the directory anyway. That silent packaging is what the
+     * filter exists to prevent, so it is reported instead of being guessed straight.
+     *
+     * Entries which name something the extension does not contain are not reported.
+     * Exclude configurations are usually shared between extensions and carry entries
+     * for directories and files only some of them have - the shipped default
+     * configuration most of all.
+     *
+     * @return list<string> The warnings, empty if there is nothing to report
+     */
+    public function getExcludeWarnings(): array
+    {
+        $warnings = [];
+
+        foreach (['directories', 'files'] as $type) {
+            foreach ($this->excludeConfiguration[$type] as $excludeEntry) {
+                $excludeEntry = (string)$excludeEntry;
+
+                if (str_contains($excludeEntry, '\\/')) {
+                    $warnings[] = sprintf(
+                        'The exclude entry "%s" escapes its slashes. This is no longer required, write it as "%s".',
+                        $excludeEntry,
+                        str_replace('\\/', '/', $excludeEntry)
+                    );
+                }
+
+                $packagedPath = $this->getPackagedPathFor($type, $excludeEntry);
+
+                if ($packagedPath === '') {
+                    continue;
+                }
+
+                $warnings[] = trim(sprintf(
+                    'The exclude entry "%s" did not take effect, the archive contains "%s". %s',
+                    $excludeEntry,
+                    $packagedPath,
+                    $this->getExcludeEntryHint($type, $excludeEntry)
+                ));
+            }
+        }
+
+        return $warnings;
+    }
+
+    /**
+     * Find a packaged path the given exclude entry names but did not keep out of the
+     * archive. Since the entry is compared against what was packaged, an entry which
+     * is covered by another one - `Resources/Private` next to `Resources/Private/Build` -
+     * has nothing left to report.
+     *
+     * @param string $type         Either `directories` or `files`
+     * @param string $excludeEntry The configured directory or file name
+     *
+     * @return string The packaged path, empty if the entry has nothing to complain about
+     */
+    protected function getPackagedPathFor(string $type, string $excludeEntry): string
+    {
+        $entryPath = trim(str_replace(['\\/', '\\'], '/', $excludeEntry), '/');
+
+        if (str_starts_with($entryPath, './')) {
+            $entryPath = substr($entryPath, 2);
+        }
+
+        if ($entryPath === '') {
+            return '';
+        }
+
+        // A file entry is matched against the filename, a path in it can never match
+        if ($type === 'files' && !str_contains($entryPath, '/')) {
+            return '';
+        }
+
+        foreach ($this->packagedPaths as $packagedPath) {
+            if ($type === 'files' && strcasecmp($packagedPath, $entryPath) === 0) {
+                return $packagedPath;
+            }
+
+            if ($type === 'directories' && stripos($packagedPath, $entryPath . '/') === 0) {
+                return $packagedPath;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Hint about the most likely reason for an exclude entry not to take effect.
+     *
+     * @param string $type         Either `directories` or `files`
+     * @param string $excludeEntry The configured directory or file name
+     *
+     * @return string The hint, empty if the entry looks the way it is documented
+     */
+    protected function getExcludeEntryHint(string $type, string $excludeEntry): string
+    {
+        if ($type === 'files') {
+            return 'File entries are matched against the filename, they can not contain a path.';
+        }
+
+        if (str_ends_with($excludeEntry, '/')) {
+            return 'Directory names are matched without a trailing slash, remove it.';
+        }
+
+        if (str_starts_with($excludeEntry, './')) {
+            return 'Directory names are matched relative to the extension directory, remove the leading "./".';
+        }
+
+        if (str_contains(str_replace('\\/', '/', $excludeEntry), '\\')) {
+            return 'Use "/" as directory separator.';
+        }
+
+        return '';
     }
 
     /**

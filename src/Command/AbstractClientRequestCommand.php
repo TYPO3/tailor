@@ -43,6 +43,9 @@ abstract class AbstractClientRequestCommand extends Command
     /** @var InputInterface */
     protected $input;
 
+    /** @var SymfonyStyle */
+    protected $io;
+
     /** @var HttpClientInterface|null */
     private $httpClient;
 
@@ -66,6 +69,7 @@ abstract class AbstractClientRequestCommand extends Command
     {
         $this->input = $input;
         $io = new SymfonyStyle($input, $output);
+        $this->io = $io;
 
         if ($this->confirmationRequired
             && !$io->askQuestion(new ConfirmationQuestion($this->getMessages()->getConfirmation()))
