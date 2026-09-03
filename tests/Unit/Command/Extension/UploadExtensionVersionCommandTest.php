@@ -111,6 +111,26 @@ class UploadExtensionVersionCommandTest extends AbstractCommandTestCase
     }
 
     #[Test]
+    public function transactionDirectoryRemovalSurvivesAnAlreadyRemovedDirectory(): void
+    {
+        $command = $this->command();
+        $tester = $this->apiTester($command, self::jsonResponse([], 201));
+        $tester->execute($this->uploadArguments());
+
+        // Something removed the transaction directory before the destructor could
+        $transactionPath = $this->workingDirectory . '/tailor-version-upload';
+        foreach ((array)glob($transactionPath . '/*') as $file) {
+            unlink((string)$file);
+        }
+        rmdir($transactionPath);
+
+        unset($command, $tester);
+        gc_collect_cycles();
+
+        self::assertDirectoryDoesNotExist($transactionPath);
+    }
+
+    #[Test]
     public function failingRequestReturnsFailure(): void
     {
         $tester = $this->apiTester($this->command(), self::errorResponse('Version already exists.', 400, 1603956982));
