@@ -38,6 +38,13 @@ class Directory
     public function remove(string $directory): bool
     {
         $directory = realpath($directory);
+
+        // Nothing to remove: the directory does not exist (any more) or is a file.
+        // Both would make the iterator below throw, which is fatal in a destructor.
+        if ($directory === false || !is_dir($directory)) {
+            return false;
+        }
+
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
