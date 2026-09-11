@@ -15,8 +15,7 @@ namespace TYPO3\Tailor\Service;
 use TYPO3\Tailor\Environment\Variables;
 use TYPO3\Tailor\Exception\FormDataProcessingException;
 use TYPO3\Tailor\Exception\RequiredConfigurationMissing;
-use TYPO3\Tailor\Validation\EmConfValidationError;
-use TYPO3\Tailor\Validation\EmConfVersionValidator;
+use TYPO3\Tailor\Validation\ManifestValidator;
 use ZipArchive;
 
 /**
@@ -48,7 +47,7 @@ class VersionService
 
     /**
      * Create the final ZipArchive for the given directory after validation
-     * of the given files (e.g. ext_emconf.php).
+     * of the manifests at its root (composer.json, ext_emconf.php).
      *
      * @param string $path Path to the directory, whose content should be added to the ZipArchive
      * @return string The full path to the ZipArchive
@@ -64,7 +63,8 @@ class VersionService
         $zipArchive = new \ZipArchive();
         $zipArchive->open($this->getVersionFilename(), \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 
-        $emConfValidationErrors = [EmConfValidationError::NOT_FOUND];
+        $composerJsonPath = null;
+        $emConfPath = null;
 
         $iterator = new \RecursiveDirectoryIterator($fullPath, \FilesystemIterator::SKIP_DOTS);
         $files = new \RecursiveIteratorIterator(
@@ -102,7 +102,6 @@ class VersionService
         );
 
         foreach ($files as $file) {
-            $filename = $file->getFilename();
             $fileRealPath = $file->getRealPath();
 
             // Do not add directories (will be added with the corresponding file anyways).
@@ -110,16 +109,27 @@ class VersionService
                 continue;
             }
 
-            if ($filename === 'ext_emconf.php') {
-                $emConfValidationErrors = (new EmConfVersionValidator($fileRealPath))->collectErrors($this->version);
+            $relativePath = substr($fileRealPath, strlen($fullPath) + 1);
+
+            // Only the manifests at the root describe the extension. A fixture
+            // extension further down carries its own and must not be validated.
+            if ($relativePath === 'composer.json') {
+                $composerJsonPath = $fileRealPath;
+            } elseif ($relativePath === 'ext_emconf.php') {
+                $emConfPath = $fileRealPath;
             }
 
             // Add the files including their directories
-            $zipArchive->addFile($fileRealPath, substr($fileRealPath, strlen($fullPath) + 1));
+            $zipArchive->addFile($fileRealPath, $relativePath);
         }
 
-        if ($emConfValidationErrors !== []) {
-            throw new FormDataProcessingException($this->formatEmConfValidationErrors($emConfValidationErrors), 1605563410);
+        $manifestErrors = (new ManifestValidator($composerJsonPath, $emConfPath))->collectErrors($this->version);
+
+        if ($manifestErrors !== []) {
+            $zipArchive->unchangeAll();
+            $zipArchive->close();
+            @unlink($this->getVersionFilename());
+            throw new FormDataProcessingException($this->formatManifestErrors($manifestErrors), 1605563410);
         }
 
         $zipArchive->close();
@@ -253,14 +263,14 @@ class VersionService
     }
 
     /**
-     * @param list<EmConfValidationError::*> $errors
+     * @param list<string> $errors Human readable errors as ManifestValidator reports them
      */
-    private function formatEmConfValidationErrors(array $errors): string
+    private function formatManifestErrors(array $errors): string
     {
-        $messageParts = ['Validation of `ext_emconf.php` file failed due to the following errors:'];
+        $messageParts = ['Validation of the extension manifest (`composer.json`, `ext_emconf.php`) failed due to the following errors:'];
 
         foreach ($errors as $error) {
-            $messageParts[] = '  * ' . EmConfValidationError::getErrorMessage($error);
+            $messageParts[] = '  * ' . $error;
         }
 
         return implode(PHP_EOL, $messageParts);

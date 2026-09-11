@@ -1,0 +1,7 @@
+{
+    "name": "vendor/my-lib",
+    "type": "library",
+    "require": {
+        "typo3/cms-core": "^13.4"
+    }
+}

@@ -15,6 +15,7 @@ versions to the [extension repository][ter].
   - [Manage your personal access token](#manage-your-personal-access-token)
   - [Register a new extension key](#register-a-new-extension-key)
   - [Update the version in your extension files](#update-the-version-in-your-extension-files)
+  - [What the extension archive must carry](#what-the-extension-archive-must-carry)
   - [Publish a new version of an extension to TER](#publish-a-new-version-of-an-extension-to-ter)
   - [Create a local artefact of an extension](#create-a-local-artefact-of-an-extension)
   - [Update extension meta information](#update-extension-meta-information)
@@ -169,9 +170,10 @@ Owner: your_username
 
 ### Update the version in your extension files
 
-Prior to publishing a new version, you have to update the
-version in your extensions `ext_emconf.php` file. This can
-be done using the `set-version` command.
+Prior to publishing a new version, the version declared in
+your extension files has to match the version you publish.
+The `set-version` command updates it in `composer.json`
+and, if the file exists, in `ext_emconf.php`.
 
 ```bash
 ./vendor/bin/tailor set-version 1.2.0
@@ -186,12 +188,28 @@ setting the environment variable `TYPO3_DISABLE_DOCS_VERSION_UPDATE=1`.
 > [!TIP]
 > It's also possible to use the `--path` option to
 > specify the location of your extension. If not given, your
-> current working directory is search for the `ext_emconf.php`
-> file.
+> current working directory is searched for the `composer.json`
+> and `ext_emconf.php` files.
 
 > [!NOTE]
-> The version will only be updated if already present
-> in your `ext_emconf.php`. It won't be added by this command.
+> The version will only be updated where it is already present.
+> A `composer.json` without a `version` field stays without one;
+> TER takes the version from the publish command in that case.
+> An `ext_emconf.php` is not required and is skipped when missing.
+
+### What the extension archive must carry
+
+`composer.json` at the root of your extension is the manifest.
+It must declare `"type": "typo3-cms-extension"` and require
+`typo3/cms-core`. If it declares a `version`, that version must
+match the one you publish. An `ext_emconf.php` is optional: TER
+reads it only for what `composer.json` cannot express, such as
+the category and the state. Without a `composer.json` the
+`ext_emconf.php` is validated as before.
+
+Only the files at the root of the extension count. Manifests of
+fixture extensions further down in the directory tree are packaged
+but not validated.
 
 ### Publish a new version of an extension to TER
 
@@ -666,7 +684,7 @@ are still accepted and describe the very same directory.
 
 | Commands              | Arguments                         | Options                                                                                               | Description                                            |
 |-----------------------|-----------------------------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------|
-| ``set-version``       | ``version``                       | ``--path``<br/>``--no-docs``                                                                          | Update the version in extension files                  |
+| ``set-version``       | ``version``                       | ``--path``<br/>``--no-docs``                                                                          | Update the version in composer.json and ext_emconf.php |
 | ``ter:delete``        | ``extensionkey``                  |                                                                                                       | Delete an extension.                                   |
 | ``ter:details``       | ``extensionkey``                  |                                                                                                       | Fetch details about an extension.                      |
 | ``ter:find``          |                                   | ``--page``<br/>``--per-page``<br/>``--author``<br/>``--typo3-version``                                | Fetch a list of extensions from TER.                   |

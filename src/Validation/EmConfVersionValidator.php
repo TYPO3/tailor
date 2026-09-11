@@ -32,7 +32,7 @@ class EmConfVersionValidator
     }
 
     /**
-     * @return list<EmConfValidationError::*> List of validation errors. If list is empty, ext_emconf.php file is valid.
+     * @return list<EmConfValidationError> List of validation errors. If list is empty, ext_emconf.php file is valid.
      */
     public function collectErrors(string $givenVersion): array
     {

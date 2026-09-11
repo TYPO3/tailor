@@ -62,15 +62,17 @@ class SetExtensionVersionCommandTest extends AbstractCommandTestCase
     }
 
     #[Test]
-    public function missingEmConfIsReported(): void
+    public function missingEmConfIsSkipped(): void
     {
         unlink($this->extensionDirectory . '/ext_emconf.php');
+        $this->writeExtensionFile('composer.json', '{' . PHP_EOL . '    "version": "1.0.0"' . PHP_EOL . '}');
 
         $tester = $this->tester();
-        $exitCode = $tester->execute(['version' => '2.3.4', '--path' => $this->extensionDirectory]);
+        $exitCode = $tester->execute(['version' => '2.3.4', '--path' => $this->extensionDirectory, '--no-docs' => null]);
 
-        self::assertSame(1, $exitCode);
-        self::assertDisplayContains('No \'ext_emconf.php\' found', $tester);
+        self::assertSame(0, $exitCode);
+        self::assertStringContainsString('"version": "2.3.4"', $this->extensionFile('composer.json'));
+        self::assertFileDoesNotExist($this->extensionDirectory . '/ext_emconf.php');
     }
 
     #[Test]

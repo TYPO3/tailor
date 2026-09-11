@@ -1,0 +1,13 @@
+{
+    "name": "vendor/my-ext",
+    "type": "typo3-cms-extension",
+    "version": "9.9.9",
+    "require": {
+        "typo3/cms-core": "^13.4"
+    },
+    "extra": {
+        "typo3/cms": {
+            "version": "1.2.3"
+        }
+    }
+}

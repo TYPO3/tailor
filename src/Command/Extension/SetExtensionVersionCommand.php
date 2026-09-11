@@ -23,8 +23,9 @@ use TYPO3\Tailor\Filesystem\VersionReplacer;
 use TYPO3\Tailor\Validation\VersionValidator;
 
 /**
- * Command for updating the extension version in ext_emconf.php and
- * the extension documentation configuration files guides.xml and Settings.cfg.
+ * Command for updating the extension version in composer.json, in
+ * ext_emconf.php when present, and in the documentation configuration
+ * files guides.xml and Settings.cfg.
  */
 class SetExtensionVersionCommand extends Command
 {
@@ -43,7 +44,7 @@ class SetExtensionVersionCommand extends Command
     {
         parent::configure();
         $this
-            ->setDescription('Update the extensions ext_emconf.php version to a specific version. Useful in CI environments')
+            ->setDescription('Update the version in composer.json and, if present, in ext_emconf.php of the extension. Useful in CI environments')
             ->addArgument('version', InputArgument::REQUIRED, 'The version to publish, e.g. 1.2.3. Must have three digits.')
             ->addOption('path', '', InputOption::VALUE_OPTIONAL, 'Path to the extension folder', getcwd() ?: './')
             ->addOption('no-docs', '', InputOption::VALUE_OPTIONAL, 'Disable version update in documentation settings', false);
@@ -71,11 +72,8 @@ class SetExtensionVersionCommand extends Command
             return self::FAILURE;
         }
 
+        // ext_emconf.php is optional since TYPO3 v14 reads composer.json only.
         $emConfFile = rtrim($path, '/') . '/ext_emconf.php';
-        if (!file_exists($emConfFile)) {
-            $io->error(sprintf('No \'ext_emconf.php\' found in the given path %s.', $path));
-            return 1;
-        }
 
         $versionReplacer = new VersionReplacer($version);
 
@@ -86,11 +84,13 @@ class SetExtensionVersionCommand extends Command
             return self::FAILURE;
         }
 
-        try {
-            $versionReplacer->setVersion($emConfFile, self::EMCONF_PATTERN);
-        } catch (\InvalidArgumentException $e) {
-            $io->error(sprintf('An error occurred while setting the ext_emconf.php version to %s.', $version));
-            return 1;
+        if (file_exists($emConfFile)) {
+            try {
+                $versionReplacer->setVersion($emConfFile, self::EMCONF_PATTERN);
+            } catch (\InvalidArgumentException $e) {
+                $io->error(sprintf('An error occurred while setting the ext_emconf.php version to %s.', $version));
+                return 1;
+            }
         }
 
         if ($input->getOption('no-docs') === null
