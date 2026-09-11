@@ -105,6 +105,137 @@ class CreateExtensionArtefactCommandTest extends AbstractCommandTestCase
     }
 
     #[Test]
+    public function anExtensionWithOnlyAComposerJsonIsPackaged(): void
+    {
+        unlink($this->extensionDirectory . '/ext_emconf.php');
+        $this->writeExtensionFile('composer.json', (string)json_encode([
+            'name' => 'vendor/my-ext',
+            'type' => 'typo3-cms-extension',
+            'require' => ['typo3/cms-core' => '^13.4'],
+            'extra' => ['typo3/cms' => ['extension-key' => 'my_ext']],
+        ]));
+
+        $tester = $this->tester();
+        $exitCode = $tester->execute([
+            'version' => '1.2.3',
+            'extensionkey' => 'my_ext',
+            '--path' => $this->extensionDirectory,
+        ]);
+
+        self::assertSame(0, $exitCode);
+        self::assertSame(['composer.json'], $this->packagedFiles());
+    }
+
+    #[Test]
+    public function aComposerJsonWithoutACoreConstraintIsRejectedWhenNoEmConfDeclaresOne(): void
+    {
+        unlink($this->extensionDirectory . '/ext_emconf.php');
+
+        $this->expectException(FormDataProcessingException::class);
+        $this->expectExceptionCode(1605563410);
+        $this->expectExceptionMessage('No TYPO3 version constraint');
+
+        // The composer.json of the test directory declares no "require"
+        $this->tester()->execute([
+            'version' => '1.2.3',
+            'extensionkey' => 'my_ext',
+            '--path' => $this->extensionDirectory,
+        ]);
+    }
+
+    #[Test]
+    public function versionMismatchInComposerJsonIsRejected(): void
+    {
+        $this->writeExtensionFile('composer.json', (string)json_encode([
+            'type' => 'typo3-cms-extension',
+            'version' => '1.2.3',
+            'require' => ['typo3/cms-core' => '^13.4'],
+        ]));
+
+        $this->expectException(FormDataProcessingException::class);
+        $this->expectExceptionCode(1605563410);
+        $this->expectExceptionMessage('composer.json');
+
+        $this->tester()->execute([
+            'version' => '9.9.9',
+            'extensionkey' => 'my_ext',
+            '--path' => $this->extensionDirectory,
+        ]);
+    }
+
+    #[Test]
+    public function aBrokenComposerJsonIsRejectedDespiteAValidEmConf(): void
+    {
+        $this->writeExtensionFile('composer.json', '{');
+
+        $this->expectException(FormDataProcessingException::class);
+        $this->expectExceptionCode(1605563410);
+        $this->expectExceptionMessage('could not be read');
+
+        $this->tester()->execute([
+            'version' => '1.2.3',
+            'extensionkey' => 'my_ext',
+            '--path' => $this->extensionDirectory,
+        ]);
+    }
+
+    #[Test]
+    public function anExtensionWithoutAnyManifestIsRejected(): void
+    {
+        unlink($this->extensionDirectory . '/ext_emconf.php');
+        unlink($this->extensionDirectory . '/composer.json');
+        $this->writeExtensionFile('Classes/Foo.php', '<?php');
+
+        $this->expectException(FormDataProcessingException::class);
+        $this->expectExceptionCode(1605563410);
+        $this->expectExceptionMessage('Neither');
+
+        $this->tester()->execute([
+            'version' => '1.2.3',
+            'extensionkey' => 'my_ext',
+            '--path' => $this->extensionDirectory,
+        ]);
+    }
+
+    #[Test]
+    public function aManifestInASubdirectoryIsNotTheExtensionManifest(): void
+    {
+        // A fixture extension below the packaged one carries another version;
+        // only the root-level manifest decides.
+        $this->writeExtensionFile(
+            'Resources/Private/Extensions/other_ext/ext_emconf.php',
+            '<?php $EM_CONF[$_EXTKEY] = [\'version\' => \'9.9.9\'];'
+        );
+        $this->writeExtensionFile('Resources/Private/Extensions/other_ext/composer.json', '{"type":"library"}');
+
+        $exitCode = $this->tester()->execute([
+            'version' => '1.2.3',
+            'extensionkey' => 'my_ext',
+            '--path' => $this->extensionDirectory,
+        ]);
+
+        self::assertSame(0, $exitCode);
+        self::assertContains('Resources/Private/Extensions/other_ext/ext_emconf.php', $this->packagedFiles());
+    }
+
+    /**
+     * @return list<string> Names of the files the generated archive contains
+     */
+    private function packagedFiles(): array
+    {
+        $zip = new \ZipArchive();
+        $zip->open($this->workingDirectory . '/tailor-version-artefact/my_ext_1.2.3.zip');
+        $names = [];
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $names[] = $zip->getNameIndex($i);
+        }
+        $zip->close();
+        sort($names);
+
+        return $names;
+    }
+
+    #[Test]
     public function versionMismatchInEmConfIsRejected(): void
     {
         $tester = $this->tester();

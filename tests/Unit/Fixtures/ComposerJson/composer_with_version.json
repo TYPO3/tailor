@@ -1,0 +1,8 @@
+{
+    "name": "vendor/my-ext",
+    "type": "typo3-cms-extension",
+    "version": "1.2.3",
+    "require": {
+        "typo3/cms": "^13.4"
+    }
+}

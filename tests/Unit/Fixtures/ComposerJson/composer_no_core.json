@@ -1,0 +1,7 @@
+{
+    "name": "vendor/my-ext",
+    "type": "typo3-cms-extension",
+    "require": {
+        "php": "^8.2"
+    }
+}
