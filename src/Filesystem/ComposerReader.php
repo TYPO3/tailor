@@ -42,4 +42,17 @@ class ComposerReader
     {
         return $this->composerSchema['extra']['typo3/cms']['extension-key'] ?? '';
     }
+
+    /**
+     * The version of the extension, as maintained by the `set-version` command.
+     * Both the root level and the TYPO3 specific section are taken into account.
+     */
+    public function getVersion(): string
+    {
+        $version = $this->composerSchema['version']
+            ?? $this->composerSchema['extra']['typo3/cms']['version']
+            ?? '';
+
+        return trim((string)$version);
+    }
 }
