@@ -123,10 +123,20 @@ class UploadExtensionVersionCommand extends AbstractClientRequestCommand
             $versionService->createZipArchiveFromPath(getcwd() ?: './');
         }
 
+        $versionFilePath = $versionService->getVersionFilePath();
+        $sha256 = hash_file('sha256', $versionFilePath);
+        $sha512 = hash_file('sha512', $versionFilePath);
+        if ($sha256 === false || $sha512 === false) {
+            throw new \RuntimeException(sprintf('Could not calculate the checksums of "%s".', $versionFilePath));
+        }
+
         return new FormDataPart([
             'description' => (string)$options['comment'],
             'gplCompliant' => '1',
-            'file' => DataPart::fromPath($versionService->getVersionFilePath()),
+            // The REST API verifies the checksums against the uploaded file
+            'sha256' => $sha256,
+            'sha512' => $sha512,
+            'file' => DataPart::fromPath($versionFilePath),
         ]);
     }
 
