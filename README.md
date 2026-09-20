@@ -263,6 +263,10 @@ current root directory the whole command simplifies to:
 > `--comment` option. If not set, Tailor will automatically use
 > `Updated extension to <version>` as comment.
 
+> [!NOTE]
+> Tailor sends the SHA-256 and SHA-512 checksums of the zip file along
+> with the upload, so the REST API can verify its integrity.
+
 ### Create a local artefact of an extension
 
 You can generate a local artefact of your extension using the

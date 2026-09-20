@@ -76,6 +76,24 @@ class UploadExtensionVersionCommandTest extends AbstractCommandTestCase
     }
 
     #[Test]
+    public function checksumsOfTheUploadedZipAreSent(): void
+    {
+        $tester = $this->apiTester($this->command(), self::jsonResponse([], 201));
+        $tester->execute($this->uploadArguments());
+
+        $body = $this->requestBody();
+        self::assertSame(1, preg_match('/name="sha256"\r\n\r\n([0-9a-f]{64})\r\n/', $body, $sha256));
+        self::assertSame(1, preg_match('/name="sha512"\r\n\r\n([0-9a-f]{128})\r\n/', $body, $sha512));
+
+        // The zip part is the last one, so the checksums must match exactly those bytes.
+        $zipStart = strpos($body, "\r\n\r\n", (int)strpos($body, 'name="file"')) + 4;
+        $zipEnd = (int)strrpos($body, "\r\n--");
+        $zip = substr($body, $zipStart, $zipEnd - $zipStart);
+        self::assertSame(hash('sha256', $zip), $sha256[1]);
+        self::assertSame(hash('sha512', $zip), $sha512[1]);
+    }
+
+    #[Test]
     public function commentIsGeneratedFromTheVersionIfNotGiven(): void
     {
         $tester = $this->apiTester($this->command(), self::jsonResponse([], 201));
