@@ -9,6 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+use Composer\InstalledVersions;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Dotenv\Dotenv;
 use TYPO3\Tailor\Command;
@@ -28,7 +29,10 @@ call_user_func(static function () {
             break;
         }
     }
-    $application = new Application('Tailor - Your TYPO3 Extension Helper', '2.0.0');
+    $version = InstalledVersions::isInstalled('typo3/tailor')
+        ? InstalledVersions::getPrettyVersion('typo3/tailor')
+        : null;
+    $application = new Application('Tailor - Your TYPO3 Extension Helper', $version ?? 'unknown');
     $commands = [
         new Command\Auth\CreateTokenCommand('ter:token:create'),
         new Command\Auth\RefreshTokenCommand('ter:token:refresh'),
